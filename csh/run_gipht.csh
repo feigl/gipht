@@ -1,8 +1,8 @@
 #!/bin/csh
 
-module add matlab-r2013b
 matlab -nodisplay <<!
-giphtpath
+%giphtpath
+run(strcat(getenv('HOME'),filesep,'gipht',filesep,'src',filesep','giphtpath'));
 gipht
 !
 

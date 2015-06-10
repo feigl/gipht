@@ -1,6 +1,6 @@
 #!/bin/csh -ex
 
-# Run GIPhT from ACI
+# Run GIPhT 
 # 20150609 Kurt Feigl
 
 #SBATCH --partition=geoscience          # queue 
