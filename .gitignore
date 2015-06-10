@@ -1,10 +1,13 @@
 # ignore things for gipht
 # binary data files
-*.pha
+#*.pha
 *.qls
-*.i2
+#*.i2
 
 # ignore output 
+grx*
+gry*
+*.qls
 x_*
 *.mat
 *.log 
