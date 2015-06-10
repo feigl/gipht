@@ -1,0 +1,9 @@
+plotbp begins at 2015-06-09 22:27:38
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-09 22:27:39
+plotbp begins at 2015-06-09 22:30:53
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-09 22:30:53
+plotbp begins at 2015-06-09 22:42:57
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-09 22:42:58

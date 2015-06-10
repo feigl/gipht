@@ -1,0 +1,144 @@
+		---------------------------------
+		   FICHIER DESCRIPTIF D'UN MNT
+		    DESCRIPTOR FILE OF THE DEM
+		---------------------------------
+LANGUE   français
+LNG      fra
+
+----------------------------------------------------------
+
+FICHIER BINAIRE	sivrice_dem.i2
+(BINARY FILE)
+
+NOMBRE DE LIGNES	1419
+(NUMBER OF ROWS)                
+
+NOMBRE DE COLONNES	1878
+(NUMBER OF COLUMNS)
+
+(si fichier mnt effectif/if DEM file exists :)
+CODAGE				I2
+(I2, I4 ou R4)
+
+(si aucun fichier/if not :)
+ALTITUDE CONSTANTE		---
+(CONSTANT ELEVATION)
+
+----------------------------------------------------------
+
+EXTRACTION OUI
+(OUI ou NON)
+(si oui :)
+PREMIERE LIGNE EXTRAITE	498
+(FIRST EXTRACTED ROW)
+
+PREMIERE COLONNE EXTRAITE	874
+(FIRST EXTRACTED COLUMN)
+
+LIGNES EXTRAITES	201
+(EXTRACTED ROWS)
+
+COLONNES EXTRAITES	261
+(EXTRACTED COLUMN)
+
+PAS D'EXTRACTION DES LIGNES	1
+(NO EXTRACTED ROW)
+
+PAS D'EXTRACTION DES COLONNES	1
+(NO EXTRACTED COLUMNS)
+
+---------------------------------------------------------
+
+OFFSET D'ALTITUDE    			0.
+(ELEVATION OFFSET)
+
+FACTEUR D'ECHELLE ALTITUDE		1
+(ELEVATION SCALE FACTOR)
+	
+ELLIPSOIDE ASSOCIE			WGS84
+(ASSOCIATED ELLIPSOID : NAD27, NTF, GRS80, ED50, WGS72 ou WGS84)
+
+REFERENCE DES ALTITUDES                 GEOIDE
+(ELEVATION REFERENCE : GEOIDE ou ELLIPSOIDE)
+                                     
+NATURE DES COORDONNEES	GEOGRAPHIQUES
+(SYSTEM OF COORDINATES : GEOGRAPHIQUES ou CARTOGRAPHIQUES)
+
+---------------------------------------------------------
+             COORDONNEES GEOGRAPHIQUES 
+---------------------------------------------------------
+
+(Si les coordonnees sont geographiques :) 
+(If it is a geographic system :)
+
+LONGITUDE DU POINT 1	38.5175000000f
+(LONGITUDE POINT 1 in degrees)
+
+PAS LONGITUDE	0.0008333333
+(LONGITUDE GRID in degrees)
+
+LATITUDE DU POINT 1	38.8600000000
+(LATITUDE POINT 1 in degrees)
+	
+PAS LATITUDE	-0.0008333333
+(LATITUDE GRID in degrees)
+       
+
+---------------------------------------------------------
+ 	     COORDONNEES CARTOGRAPHIQUES
+---------------------------------------------------------
+
+(Si les coordonnees sont cartographiques :)
+(If it is a cartographic system :)
+
+COORDONNEE X POINT          				 (en metres)
+(COORDINATE IN X FOR POINT 0 in meters)
+ 
+PAS X							 (en metres)
+(GRID IN X in meters)
+
+COORDONNEE Y POINT 0					 (en metres)
+(COORDINATE IN Y FOR POINT 0 in meters)
+
+PAS Y	 						 (en metres)
+(GRID IN Y in meters)
+
+
+REPRESENTATION				
+(UTM ou LAMBERT)
+
+(si la representation est Lambert :)
+(if it is a Lambert representation :)
+
+LATITUDE ORIGINE EN DEGRES	0  
+(ORIGIN OF THE LATITUDE IN DEGREES)
+
+LONGITUDE ORIGINE EN DEGRES	0
+(ORIGIN OF THE LONGITUDE IN DEGREES)
+
+COORDONNEES EN X DE L'ORIGINE	0
+(COORDINATE IN X OF THE ORIGIN)
+
+COORDONNEES EN Y DE L'ORIGINE	0
+(COORDINATE IN Y OF THE ORIGIN)
+
+FACTEUR D'ECHELLE LAMBERT	1
+(SCALE FACTOR FOR THE LAMBERT REPRESENTATION)
+
+
+(si la representation est utm :)
+(if it is an utm representation :)
+
+NUMERO DU FUSEAU		37
+(NUMBER OF THE TIME ZONE [1:60])
+
+HEMISPHERE			NORD
+(NORD ou SUD)
+
+-----------------------------------------------------------
+
+
+
+
+
+

@@ -30,8 +30,8 @@ halfwidth = 130	        % half the east-west width of the sampled region in pixe
 %pselect     = 1	    % Randomly select NPIX pixels from subregion
 %npix        = 100	    % number of pixels to include in inversion - not enough to consistently get same answer
 %pselect     = 3        % select pixels of phase, randomly choosing NPIX pixels after resampling by quadtree
- pselect     = 5        % select pixels of phase using quadtree
-%pselect     = 7        % select pixels of range gradient using quadtree
+%pselect     = 5        % select pixels of phase using quadtree
+ pselect     = 7        % select pixels of range gradient using quadtree
 %pselect     = 9        % select pixels of phase gradient, randomly choosing NPIX pixels after resampling by quadtree
 
 % 700 points
@@ -61,8 +61,8 @@ unitv_up     =  0.920500  % Upward component (must be positive)
 %txtinname = demoZ1.gin    % One Okada                            
 %txtinname = demoZ1b.gin    % One Okada with looser bounds                          
 %txtinname = demoZ3.gin   % Two Okadas
-%txtinname = demoZ4.gin   % One Okada with with new format for Beauducel parameterization
-txtinname = demoZ5.gin   % Two Okadas with with new format for Beauducel parameterization
+txtinname = demoZ4.gin   % One Okada with with new format for Beauducel parameterization
+%txtinname = demoZ5.gin   % Two Okadas with with new format for Beauducel parameterization
 
 % objective function to calculate cost
 objfun = funcostrarc         % mininum angle,  assumes zero mean, using arc function in radians 
@@ -72,12 +72,12 @@ objfun = funcostrarc         % mininum angle,  assumes zero mean, using arc func
 fitfun = funfit28 
 
 % use exact or approximate version of fitting function
-%surrogate = 0       % use exact, but slow version of fitting function
- surrogate = 1       % use fast approximate version of fitting function (1st order Taylor series)
+ surrogate = 0       % use exact, but slow version of fitting function
+%surrogate = 1       % use fast approximate version of fitting function (1st order Taylor series)
 
-%nprocessors = 2     % number of processors to use in Distributed Computing Toolbox 
-% nprocessors = 4     % number of processors to use in Distributed Computing Toolbox 
- nprocessors = 16     % number of processors to use in Distributed Computing Toolbox 
+
+nprocessors = 0     % number of processors to use in Distributed Computing Toolbox 
+% nprocessors = 16     % number of processors to use in Distributed Computing Toolbox 
 
 
 % CHOOSE ALGORITHM FOR INVERSION
