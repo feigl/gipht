@@ -178,6 +178,10 @@ elseif strcmp(objfun,'funcostrarcscaled') == 1
     costs00 = rarcm(DST.phaobs,wrm00) ./ DST.phasig;
     costs0  = rarcm(DST.phaobs,wrm0)  ./ DST.phasig;
     costs1  = rarcm(DST.phaobs,wrm1)  ./ DST.phasig;
+elseif strcmp(objfun,'funcostrms') == 1
+    costs00 = abs(DST.phaobs-wrm00);
+    costs0  = abs(DST.phaobs-wrm0);
+    costs1  = abs(DST.phaobs-wrm1);
 else
     error(sprintf('Unknown value of objfun %s\n',objfun));
 end

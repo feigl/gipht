@@ -13,3 +13,42 @@ plotbp ended at 2015-06-09 23:11:30
 plotbp begins at 2015-06-09 23:40:37
 Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
 plotbp ended at 2015-06-09 23:40:38
+plotbp begins at 2015-06-10 00:34:28
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 00:34:31
+plotbp begins at 2015-06-10 00:42:49
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 00:42:51
+plotbp begins at 2015-06-10 00:52:12
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 00:52:15
+plotbp begins at 2015-06-10 00:57:11
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 00:57:13
+plotbp begins at 2015-06-10 01:01:37
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 01:01:40
+plotbp begins at 2015-06-10 01:10:56
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 01:10:58
+plotbp begins at 2015-06-10 01:14:39
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 01:14:41
+plotbp begins at 2015-06-10 01:16:28
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 01:16:31
+plotbp begins at 2015-06-10 01:30:37
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 01:30:40
+plotbp begins at 2015-06-10 01:37:57
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 01:38:00
+plotbp begins at 2015-06-10 01:42:49
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 01:42:52
+plotbp begins at 2015-06-10 01:47:41
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 01:47:44
+plotbp begins at 2015-06-10 01:55:25
+Pair trees Member0 Member1 orbn0 orbn1 year0 year1 year Bperp (m)
+plotbp ended at 2015-06-10 01:55:28

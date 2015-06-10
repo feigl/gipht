@@ -511,7 +511,7 @@ switch ianneal
         %
         %      OPTIONS(1) = scale of cooling schedule (default = 4).  Higher numbers
         %                    produce more exhaustive searches.
-        if pselect == 7
+        if pselect == 5
             options(1) = 2;
         else
             options(1) = 4;
@@ -524,11 +524,11 @@ switch ianneal
         %options(2) = 5;
         %       OPTIONS(3) = grid spacing (default = 4).  Higher numbers permit finer levels
         %                    of parameter discretization.
-        if pselect == 7
-            options(3) = 4;
+        if pselect == 5
+        options(3) = 4;
         else
-            options(3) = 10; % necessary for tests with simulated data
-        end
+        %options(3) = 10; % necessary for tests with simulated data
+        endif
         %       OPTIONS(4) = temperature scale. To tweak this parameter, inspect
         %                    a graph of 'energy'.  Values higher than 3 or lower than 1 are
         %                    seldom, if ever, warranted.  The default (0) tries several different
