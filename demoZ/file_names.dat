@@ -1,0 +1,4 @@
+% FILE_NAMES.DAT format
+%  decimal.year_master  decimal.year_slave  phase_file_name  % comments
+2005.3836  2007.5890  psp_16851_28374_ort.pha	% 2005 May  2007 AUG   
+%end of file

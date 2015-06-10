@@ -1,11 +1,20 @@
 # ignore things for gipht
 # binary data files
 *.pha
+*.qls
 *.i2
 
 # ignore output 
 x_*
 *.mat
+*.log 
+adjust.bp
+DST*
+PST*
+*.pst
+*.PST
+*.DST
+*.dst
 
 # executables
 .mex*

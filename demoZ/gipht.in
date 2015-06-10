@@ -1,0 +1,117 @@
+% gipht.in
+
+% Variables to control how GIPhT 
+%
+% This file is for SAR data for the Sivrice earthquake
+%
+% parameter names must be lower case
+% Only one equal sign per line
+% any text following a percent symbol is ignored as a comment
+%
+% COORDINATES
+xcenter = 39.35466	      % X coordinate of center of sampled region
+                        %   UTM easting in meters, OR
+                        %   Geographic Longitude in decimal degrees (positive East) 
+ycenter = 38.36103 	      % Y coordinate of center of sampled region
+                        %   UTM northing in meters, OR
+                        %   Geographic Latitude in decimal degrees (positive North)
+                        % Note on coordinates: 
+                        %       These values should be specified in the same system as the DEM,
+                        %       as described in the dem_descriptor.dat file
+% DIMENSIONS            %
+halfwidth = 130	        % half the east-west width of the sampled region in pixels
+%halfheight = 75	        % half the north-south height of the sampled region in pixels
+%halfheight = 120	        % half the north-south height of the sampled region in pixels
+
+% File describing Digital Elevation Model (contains metadata)
+ demdescfile = dem_descriptor.dat 
+
+% SELECTING THE DATA
+%pselect     = 1	    % Randomly select NPIX pixels from subregion
+%npix        = 100	    % number of pixels to include in inversion - not enough to consistently get same answer
+%pselect     = 3        % select pixels of phase, randomly choosing NPIX pixels after resampling by quadtree
+ pselect     = 5        % select pixels of phase using quadtree
+%pselect     = 7        % select pixels of range gradient using quadtree
+%pselect     = 9        % select pixels of phase gradient, randomly choosing NPIX pixels after resampling by quadtree
+
+% 700 points
+% pixinpatch  = 16        % mininum number of valid (nonzero) pixels in a patch
+% ithresh =     32        % minimum misfit (circular mean deviation) to mean ( 1 DN is 1 / 256 pixel)
+% maxcmd  =     16        % minimum misfit (circular mean deviation) to ramp ( 1 DN is 1 / 256 pixel)
+
+% 2000 points
+pixinpatch  = 4        % mininum number of valid (nonzero) pixels in a patch
+ithresh =     16        % minimum misfit (circular mean deviation) to mean ( 1 DN is 1 / 256 pixel)
+maxcmd  =     8        % minimum misfit (circular mean deviation) to ramp ( 1 DN is 1 / 256 pixel)
+
+% fringe spacing
+  mpercy = 0.0284 % meters for ENVISAT, ERS-1, and ERS-2
+% mpercy = 0.1181 % meters for ALOS
+% mpercy = 0.0155 % meters for TSX
+
+
+% UNIT VECTOR FROM TARGET TO SATELLITE
+% assumed constant over scene
+unitv_east   =  0.382192  % Eastward component
+unitv_north  = -0.081237  % Northward component
+unitv_up     =  0.920500  % Upward component (must be positive)
+
+%txtinname = demoZ.gin    % same as above, but updated X,Y
+%txtinname = demoZ2.gin   % Two Okadas
+%txtinname = demoZ1.gin    % One Okada                            
+%txtinname = demoZ1b.gin    % One Okada with looser bounds                          
+%txtinname = demoZ3.gin   % Two Okadas
+%txtinname = demoZ4.gin   % One Okada with with new format for Beauducel parameterization
+txtinname = demoZ5.gin   % Two Okadas with with new format for Beauducel parameterization
+
+% objective function to calculate cost
+objfun = funcostrarc         % mininum angle,  assumes zero mean, using arc function in radians 
+%objfun = funcostrarcscaled   % same as above, but weight by measurement uncertainty
+
+% fitting function to caluculate range change values from model parameters
+fitfun = funfit28 
+
+% use exact or approximate version of fitting function
+%surrogate = 0       % use exact, but slow version of fitting function
+ surrogate = 1       % use fast approximate version of fitting function (1st order Taylor series)
+
+%nprocessors = 2     % number of processors to use in Distributed Computing Toolbox 
+% nprocessors = 4     % number of processors to use in Distributed Computing Toolbox 
+ nprocessors = 16     % number of processors to use in Distributed Computing Toolbox 
+
+
+% CHOOSE ALGORITHM FOR INVERSION
+  
+% anneal = 0  %     0 to skip Simulated Annealing (FAST for forward modeling, skip statistics)
+% anneal = 1  %     1 to run Simulated Annealing (under development)
+  anneal = 2  %     2 to run S.A. with recording (BEST)
+% anneal = 3  %     3 to using SIMANN (under development)
+% anneal = 4  %     4 to use approximate fitting function with surrogate
+% anneal = 5  %     5 to use Grid search
+% anneal = 6  %     6 to use Markov Chain Monte Carlo (MCMC)
+
+
+% nprocessors = 4     % number of processors to use in Distributed Computing Toolbox 
+% nsaruns     = 3     % number of runs through Simulated Annealing
+
+% How handle values for multi-panel plots
+%figopt % xx1 propagate nulls from quadtree, paint missing data black
+%figopt % x1x calculate modeled values at all pixel locations
+%figopt % 1xx request grids and profiles of vector components of displacement
+%figopt = 000 % none of the above
+%figopt = 111 % do all of the above
+%figopt = 110 % best-looking plots without black
+ figopt = 001 % good for trial and error
+%figopt = 010 % simple for demo
+
+% How to make figures
+%printfun = printpdf  % make figures in PDF
+%printps  = printps   % make figures in PostScript
+ printfun = printnull % do not write figures to files (fast)
+
+% warnings and error messages
+% verbose = 0 % be quiet
+% verbose = 1 % tell us everything
+  verbose = 2 % debug and tell us everything
+
+

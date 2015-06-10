@@ -1,0 +1,25 @@
+parameters.in for Sivrice        initial      plusminus
+E_grad__@_epoch_000_dimless____    0.00e+00   0.00e+00   
+N_grad__@_epoch_000_dimless____    0.00e+00   0.00e+00   
+U_grad__@_epoch_000_dimless____   -1.00e-05   1.00e-05   
+Okada1_Length_in_m______________  4308.0738    424.3164
+Okada1_Width_in_m_______________  5035.3854    314.9414
+Okada1_Centroid_Depth_in_m______  5999.9760     82.5195
+Okada1_Dip_in_deg_______________    65.9941      4.1699
+Okada1_Strike_CW_from_N_in_deg__   206.0934      7.1875
+Okada1_Centroid_Easting_in_m____   530996.9       183.6
+Okada1_Centroid_Northing_in_m___  4242682.7       431.2
+Okada1_Coplanar_slip_in_m_______     0.2919      0.0447
+Okada1_Rake_in_deg_CCW__________   -28.7569      4.8975
+Okada2_Length_in_m______________  4308.0738    424.3164
+Okada2_Width_in_m_______________  5035.3854    314.9414
+Okada2_Centroid_Depth_in_m______  1000.         82.5195
+Okada2_Dip_in_deg_______________    65.9941      4.1699
+Okada2_Strike_CW_from_N_in_deg__   206.0934      7.1875
+Okada2_Centroid_Easting_in_m____   530996.9       183.6
+Okada2_Centroid_Northing_in_m___  4242682.7       431.2
+Okada2_Coplanar_slip_in_m_______     0.2919      0.0447
+Okada2_Rake_in_deg_CCW__________   -28.7569      4.8975
+Poisson_Ratio_dimless__________    0.25         0.02
+Shear_Modulus_in_Pa____________    3.0E10       0.
+Reference_Epoch_in_years_______    2007.1397    0.
