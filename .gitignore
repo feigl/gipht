@@ -1,0 +1,16 @@
+# ignore things for gipht
+# binary data files
+*.pha
+*.i2
+
+# ignore output 
+x_*
+*.mat
+
+# executables
+.mex*
+.mac*
+.a*
+
+ 
+
