@@ -101,13 +101,13 @@ nprocessors = 0     % number of processors to use in Distributed Computing Toolb
 %figopt = 000 % none of the above
 %figopt = 111 % do all of the above
 %figopt = 110 % best-looking plots without black
- figopt = 001 % good for trial and error
-%figopt = 010 % simple for demo
+%figopt = 001 % good for trial and error
+ figopt = 010 % simple for demo
 
 % How to make figures
-%printfun = printpdf  % make figures in PDF
+ printfun = printpdf  % make figures in PDF
 %printps  = printps   % make figures in PostScript
- printfun = printnull % do not write figures to files (fast)
+%printfun = printnull % do not write figures to files (fast)
 
 % warnings and error messages
 % verbose = 0 % be quiet
