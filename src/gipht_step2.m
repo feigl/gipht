@@ -438,6 +438,8 @@ if surrogate == 1
         mdl1p = feval(fitfun,DST,PST1,TST);
         clear PST1;
         
+        epdiff = nanstd(mdl1p-mdl1e)/2./pi;
+        fprintf(1,'Standard deviation of difference between exact and approximate: %.5f [cycles]\n',epdiff);
         % figure comparing Exact vs. Aprox
         nf=nf+1;h(nf)=figure;subplot(2,1,1);
         plot(mdl1e/2./pi,'b-'); hold on;
@@ -447,7 +449,7 @@ if surrogate == 1
         subplot(2,1,2);
         plot((mdl1p-mdl1e)/2./pi,'g-');
         xlabel('index');ylabel('phase value (cycles)');legend('aprox error','location','best');
-        title(sprintf('standard deviation = %.4f cycles\n',nanstd(mdl1p-mdl1e)/2./pi));
+        title(sprintf('standard deviation = %.4f cycles\n',epdiff));
         feval(printfun,sprintf('%s_Taylor1Check',runname));
         clear mdl1p, mdl1e;
     end
