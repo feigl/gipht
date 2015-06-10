@@ -5,8 +5,12 @@
 #*.i2
 
 # ignore output 
-grx*
-gry*
+adjustbp.bp
+gipht_subregion.dat
+plotbpout.txt
+qsp_*
+grx_*
+gry_*
 *.qls
 x_*
 *.mat
