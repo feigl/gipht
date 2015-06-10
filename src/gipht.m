@@ -99,10 +99,11 @@ echo off all
 
 %splashtext = sprintf('%80s\n',help('gipht.m'));
 
+fprintf(1,'\n\nGeneral Inversion of Phase Technique (GIPhT)\n\n');
 versionnum = 2.9;
 D=dir(which('gipht'));
 versiondat = D.date;
-versionstr = sprintf('% General Inversion of Phase Technique (GIPhT)\nDevelopment version %.1f of %s'...
+versionstr = sprintf('GIPhT Development version %.1f of %s'...
     ,versionnum,versiondat);
 
 help gipht_splash
