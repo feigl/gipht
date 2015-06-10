@@ -1,7 +1,7 @@
 #!/bin/csh -ex
 
 # Run GIPhT from ACI
-# 20150609 Kurt Feigl
+# 20140125 Kurt Feigl
 
 #SBATCH --partition=geoscience          # queue 
 #SBATCH --time=0-05:00:00		# run time in days-hh:mm:ss
@@ -17,16 +17,22 @@
 
 module purge
 module list
+module add comsol51
+#module add matlab-r2013b
 module add  matlab-r2014b
 module list
 which matlab
 
+
+/home/feigl/comsol_trials3/startcss
+
 matlab -nodisplay  <<EOF
-run(strcat(getenv('HOME'),filesep,'gipht',filesep,'src',filesep','giphtpath'));
-%giphtpath
+giphtpath
+validate_comsol
 gipht
 exit
 EOF
 
 
+/home/feigl/comsol_trials3/killcss
 
