@@ -4,6 +4,9 @@
 *.qls
 #*.i2
 
+# backup files
+*~
+
 # ignore output 
 adjustbp.bp
 gipht_subregion.dat
