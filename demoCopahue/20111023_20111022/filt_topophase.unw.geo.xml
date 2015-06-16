@@ -1,0 +1,73 @@
+<imageFile>
+    <property name="BYTE_ORDER">
+        <value>l</value>
+    </property>
+    <property name="ACCESS_MODE">
+        <value>write</value>
+    </property>
+    <property name="DESCRIPTION">
+        <value>DEM-flattened interferogram orthorectified to an equi-angular latitude, longitude grid</value>
+    </property>
+    <property name="DATA_TYPE">
+        <value>FLOAT</value>
+    </property>
+    <property name="IMAGE_TYPE">
+        <value>unw</value>
+    </property>
+    <property name="FILE_NAME">
+        <value>filt_topophase.unw.geo</value>
+    </property>
+    <component name="Coordinate1">
+        <factorymodule>isceobj.Image</factorymodule>
+        <factoryname>createCoordinate</factoryname>
+        <doc>First coordinate of a 2D image (witdh).</doc>
+        <property name="startingValue">
+            <value>-71.528334654</value>
+            <doc>{'doc': 'Starting value of the coordinate.'}</doc>
+            <units>{'units': 'degree'}</units>
+        </property>
+        <property name="delta">
+            <value>0.000277777</value>
+            <doc>{'doc': 'Coordinate quantization.'}</doc>
+            <units>{}</units>
+        </property>
+        <property name="size">
+            <value>3078</value>
+            <doc>{'doc': 'Coordinate size.'}</doc>
+        </property>
+    </component>
+    <property name="NUMBER_BANDS">
+        <value>2</value>
+    </property>
+    <component name="Coordinate2">
+        <factorymodule>isceobj.Image</factorymodule>
+        <factoryname>createCoordinate</factoryname>
+        <doc>Second coordinate of a 2D image (length).</doc>
+        <property name="startingValue">
+            <value>-37.562215048</value>
+            <doc>{'doc': 'Starting value of the coordinate.'}</doc>
+            <units>{'units': 'degree'}</units>
+        </property>
+        <property name="delta">
+            <value>-0.000277777</value>
+            <doc>{'doc': 'Coordinate quantization.'}</doc>
+            <units>{}</units>
+        </property>
+        <property name="size">
+            <value>2432</value>
+            <doc>{'doc': 'Coordinate size.'}</doc>
+        </property>
+    </component>
+    <property name="WIDTH">
+        <value>3078</value>
+    </property>
+    <property name="LENGTH">
+        <value>2432</value>
+    </property>
+    <property name="SCHEME">
+        <value>BIL</value>
+    </property>
+    <property name="ISCE_VERSION">
+        <value>Release: 1.5.01, svn-1191, 20131028. Current: svn-1224M.</value>
+    </property>
+</imageFile>
