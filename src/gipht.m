@@ -100,7 +100,7 @@ echo off all
 %splashtext = sprintf('%80s\n',help('gipht.m'));
 
 fprintf(1,'\n\nGeneral Inversion of Phase Technique (GIPhT)\n\n');
-versionnum = 2.9;
+versionnum = 2.92;
 D=dir(which('gipht'));
 versiondat = D.date;
 versionstr = sprintf('GIPhT Development version %.1f of %s'...
@@ -161,6 +161,11 @@ tstart = tic;
 % 2013-MAY v. 2.7 
 %     improve partial derivatives
 %     use comsol
+% 2015-JUN v. 2.9.1
+%     first version in public repository on GitHub with 
+%      Lesser GNU Public License
+% 2015-JUN v. 2.9.2
+%     handle Quadtree data in 14-column format from JPL
 
 % initialize paths
 %giphtpath

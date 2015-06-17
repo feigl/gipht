@@ -1,0 +1,179 @@
+From: MARIA CORDOVA <maria.cordova@sernageomin.cl>
+Subject: Fwd: Copahue interferogram
+Date: 2015-Jun -15 at 17:22:13 CDT
+To: Kurt Feigl <feigl@wisc.edu>
+
+
+
+
+De: "Paul R Lundgren (329A)" <Paul.R.Lundgren@jpl.nasa.gov>
+Para: "MARIA CORDOVA" <maria.cordova@sernageomin.cl>
+Enviados: Martes, 26 de Mayo 2015 14:16:25
+Asunto: Re: Copahue interferogram
+
+Hi Loreto,
+
+Here are three down-sampled time series results (two from COSMO-SkyMed – CSK; and one from RADARSAT-2 – RSAT2).
+Column values are:
+vel_los (m/yr), rms_vel, center_lon, center_lat, 4 quad corners lon, 4 quad corners lat, ground incidence angle, satellite heading (radar is right looking)
+
+Let me know if you have any questions.
+
+Regarding GPS processing, just send an email to her with the RINEX files (or an ftp site from which to download the data).
+If I knew you were going to be in the US we could have tried to host you at JPL.
+
+Paul
+____________________________
+Paul Lundgren, Ph.D.
+Jet Propulsion Laboratory 
+California Institute of Technology
+4800 Oak Grove Drive
+Pasadena, CA 91109, USA    
+tel:  +01 818 354-1795
+cell: +01 626 375-3638
+fax: +01 818 354-9476
+paul.r.lundgren@jpl.nasa.gov
+____________________________
+
+From: MARIA CORDOVA <maria.cordova@sernageomin.cl>
+Date: Tuesday, May 26, 2015 at 2:04 PM
+To: paul <paul.r.lundgren@jpl.nasa.gov>
+Subject: Re: Copahue interferogram
+
+Hi Paul, 
+I think that down-sampled is fine, If I can´t do so much, or If I need more points, you could send me the full sized Interferograms then.
+Do you think Will be OK if I ask tu Susan process GPS data with Gipsy again? (I still don´t have enough time to finish the installation of Gipsy at OVDAS, and I think that now I have to install the new version, as Chuck recomended me, since 6.2 will be obsolete soon)
+
+cheers
+
+Loreto
+
+De: "Paul R Lundgren (329A)" <Paul.R.Lundgren@jpl.nasa.gov>
+Para: "MARIA CORDOVA" <maria.cordova@sernageomin.cl>
+Enviados: Martes, 26 de Mayo 2015 15:53:14
+Asunto: Re: Copahue interferogram
+
+Hi Loreto,
+
+Would you be ok with getting InSAR data that are already down-sampled? That way the files would not be large and you would have all the information you need for modeling in one file (including incidence angle and satellite heading).
+Otherwise I can give you full sized interferograms (or mean velocities from time series analysis) plus the coherence and line-of-sight files.
+
+Regarding Villarrica, there is no resolvable deformation (although I can check with the latest data).
+
+Cheers,
+Paul
+____________________________
+Paul Lundgren, Ph.D.
+Jet Propulsion Laboratory 
+California Institute of Technology
+4800 Oak Grove Drive
+Pasadena, CA 91109, USA    
+tel:  +01 818 354-1795
+cell: +01 626 375-3638
+fax: +01 818 354-9476
+paul.r.lundgren@jpl.nasa.gov
+____________________________
+
+From: MARIA CORDOVA <maria.cordova@sernageomin.cl>
+Date: Tuesday, May 26, 2015 at 12:17 PM
+To: paul <paul.r.lundgren@jpl.nasa.gov>
+Subject: Re: Copahue interferogram
+
+Hi Paul, 
+so, I would like to know how, from the Interferogram + GPS, I can obtain boundary conditions to model using COMSOL.
+I'm interesting on Copahue, I have GPS data since the end of 2012, and 'cause  I want to correlated both, I would prefer a couple of interferograms, that spam since that time until "now", .
+My idea is to practice modelling, the aim is not related with publishing, maybe then we can discuss what I obtain, and do a "time series" of deformation patterns, and then see what happen... 
+I saw your complex model before deflation, but I'm not sure what have you already published about... and my idea is to do something simple, trying to adjust the inflation before, "during"(something from October until December or so)  and after (this year, basically) the unrest.
+And next time you (or other group)  send me an interferogram from whatever volcano, I could model something integrating INSAR and our GPS. I will be here until friday working with Kurt and Chuck, and then I fly to San Francisco.
+
+by the way, Do  you have something  new for Villarrica?
+
+have a good return
+
+regards, 
+Loreto
+
+
+
+From: "Paul R Lundgren (329A)" <Paul.R.Lundgren@jpl.nasa.gov>
+To: "MARIA CORDOVA" <maria.cordova@sernageomin.cl>
+Sent: Tuesday, May 26, 2015 11:57:56 AM
+Subject: Re: Copahue interferogram
+
+Hi Loreto,
+
+I’m still in NZ but starting my return later this afternoon. Remind me again what data you are interested in - new data that has not been modeled or published? Or just data to “practice” modeling?
+
+Paul
+____________________________
+Paul Lundgren, Ph.D.
+Jet Propulsion Laboratory 
+California Institute of Technology
+4800 Oak Grove Drive
+Pasadena, CA 91109, USA    
+tel:  +01 818 354-1795
+cell: +01 626 375-3638
+fax: +01 818 354-9476
+paul.r.lundgren@jpl.nasa.gov
+____________________________
+
+From: MARIA CORDOVA <maria.cordova@sernageomin.cl>
+Date: Monday, May 18, 2015 at 7:24 PM
+To: paul <paul.r.lundgren@jpl.nasa.gov>
+Subject: Re: Copahue interferogram
+
+Hi Paul, 
+ok, no hurry... whenever you can. We have data from Maule too... but since the rates are so high it easier to model... and I would be repeating what Helene already did.
+
+I will have these two weeks here.... and then I will stay since June 1st until 9th , in Menlo Park. Then I come back here for a couple of days.
+
+Have a good flight and nice time in New Zealand.
+Thank you for taking the time to answer.
+
+Hasta pronto!!
+
+Loreto
+
+
+
+De: "Paul R Lundgren (329A)" <Paul.R.Lundgren@jpl.nasa.gov>
+Para: "MARIA CORDOVA" <maria.cordova@sernageomin.cl>
+Enviados: Lunes, 18 de Mayo 2015 20:36:02
+Asunto: Re: Copahue interferogram
+
+Hi Loreto,
+
+Sure no problem. I am about to head to the airport to fly to New Zealand (via Sydney) tonight, so I will probably not get to it until tomorrow (I will try to do it in-flight via wifi if possible).
+
+Hasta pronto,
+Paul
+____________________________
+Paul Lundgren, Ph.D.
+Jet Propulsion Laboratory 
+California Institute of Technology
+4800 Oak Grove Drive
+Pasadena, CA 91109, USA    
+tel:  +01 818 354-1795
+cell: +01 626 375-3638
+fax: +01 818 354-9476
+paul.r.lundgren@jpl.nasa.gov
+____________________________
+
+From: MARIA CORDOVA <maria.cordova@sernageomin.cl>
+Date: Monday, May 18, 2015 at 6:26 PM
+To: paul <paul.r.lundgren@jpl.nasa.gov>
+Subject: Copahue interferogram
+
+Hi Paul, 
+I´m in Madison working with Helene and Kurt, modelling deformation, and I was wondering if you could send me a couple of interferograms, maybe one co-eruptive and another newer,  to practice some ways of modelling GPS and INSAR, taking the advantages from both methods. Since we have just 3 GPS stations + 1 reference, they suggested to me that an interferogram could help me to improve a models, and I could learn to work with interferograms too...
+
+
+Let me know what you think...
+
+thank you in advance
+
+Loreto
+
+
+
+
