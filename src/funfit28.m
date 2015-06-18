@@ -71,7 +71,7 @@ if (nin == 1 || nin == 2) && nout == 2 && isstruct(varargin{1}) == 0
     j=j+1;pnames{j} = sprintf('Mogi1 Easting in m             '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('Mogi1 Northing in m            '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('Mogi1 Depth in m               '); pscl(j)=1.0E4;
-    j=j+1;pnames{j} = sprintf('Mogi1 Depth in m               '); pscl(j)=1.0E4;
+%20150618j=j+1;pnames{j} = sprintf('Mogi1 Depth in m               '); pscl(j)=1.0E4;
     j=j+1;pnames{j} = sprintf('Mogi1 Volume Increase in m3    '); pscl(j)=1.0E6;
     j=j+1;pnames{j} = sprintf('Mogi2 Easting in m             '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('Mogi2 Northing in m            '); pscl(j)=1.0E3;

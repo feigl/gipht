@@ -39,6 +39,10 @@ heading    = Q(:,14);
 
 nquads = numel(vlos)
 
+incidence1= mean(incidence)
+heading1 = mean(heading)
+[ue, un, uz] = inc_head_to_enu(incidence1,heading1)
+
 %% find spacing between quads and build grid in geographic coordinates
 dUniqLon = unique(diff(unique(colvec(CornersLon))))
 dLon = min(dUniqLon)

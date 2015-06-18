@@ -1,0 +1,11 @@
+<VRTDataset rasterXSize="3078" rasterYSize="2432">
+    <SRS>EPSG:4326</SRS>
+    <GeoTransform>-71.528334654, 0.000277777, 0.0, -37.562215048, 0.0, -0.000277777</GeoTransform>
+    <VRTRasterBand band="1" dataType="Float32" subClass="VRTRawRasterBand">
+        <SourceFilename relativeToVRT="1">phase.geo</SourceFilename>
+        <ByteOrder>LSB</ByteOrder>
+        <ImageOffset>0</ImageOffset>
+        <PixelOffset>4</PixelOffset>
+        <LineOffset>12312</LineOffset>
+    </VRTRasterBand>
+</VRTDataset>

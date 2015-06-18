@@ -3,7 +3,7 @@ function ierr = write_dem_descriptor(demdescfile,demdescfile2,isgeo,y1,x1,nl,nc,
 % write DEM parameters to descriptor file
 % input:
 %     demdesc  == file name of DEM descriptor, e.g. 'dem.dat' points to 'dem.i2'
-%     demdesc 2 == file name of DEM descriptor, e.g. 'dem.dat' points to 'dem.i2'
+%     demdesc2 == file name of DEM descriptor, e.g. 'dem.dat' points to 'dem.i2'
 %      isgeo   == 1 for geographic coordinates in degrees
 %              == 2 for UTM coordinates in meters
 %              == 3 for Lambert coordinates in meters
