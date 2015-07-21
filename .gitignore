@@ -1,35 +1,35 @@
 # ignore things for gipht
 # binary data files
 #*.pha
-*.qls
+#*.qls
 #*.i2
 
 # backup files
 *~
 
 # ignore output 
-adjustbp.bp
-gipht_subregion.dat
-plotbpout.txt
-qsp_*
-grx_*
-gry_*
+#adjustbp.bp
+#gipht_subregion.dat
+#plotbpout.txt
+#qsp_*
+#grx_*
+#gry_*
 *.qls
-x_*
-*.mat
-*.log 
-adjust.bp
-DST*
-PST*
-*.pst
-*.PST
-*.DST
-*.dst
+#x_*
+#*.mat
+#*.log 
+#adjust.bp
+#DST*
+#PST*
+#*.pst
+#*.PST
+#*.DST
+#*.dst
 
 # executables
-.mex*
-.mac*
-.a*
+#.mex*
+#.mac*
+#.a*
 
  
 
