@@ -2,9 +2,9 @@ Parameter_Name                   P0(pre-fit) PlusMinus
 E_grad__@_epoch_002_dimless____       0.      1.e-6
 N_grad__@_epoch_002_dimless____       0.      1.e-6               
 U_grad__@_epoch_002_dimless____       0.   5.e-6             
-Mogi1_Easting_in_m_____________    315.e3    1000.
-Mogi1_Northing_in_m____________   5800.e3    1000. 
+Mogi1_Easting_in_m_____________    318.e3    1000.
+Mogi1_Northing_in_m____________   5810.e3    1000. 
 Mogi1_Depth_in_m_______________   6000.      1000.
-Mogi1_Volume_Increase_in_m3____   -2.e6      1.0e6
+Mogi1_Volume_Increase_in_m3____   2.e6      1.0e6
 Poisson_Ratio_dimless__________     0.25       0.
 Shear_Modulus_in_Pa____________     3.0E10     0.

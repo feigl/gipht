@@ -7,7 +7,6 @@ LNG      fra
 
 ----------------------------------------------------------
 
-##dd conv=block,notrunc if=/dev/zero bs=2432w count=3078 of=CopahueCSKdesc.i2
 FICHIER BINAIRE			CopahueCSKdesc.i2
 (BINARY FILE)
 

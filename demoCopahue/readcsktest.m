@@ -153,7 +153,8 @@ phaG = rwrapm(2*pi*(-1.0*phaG/31/2. - 31/4.));
 
 phabyte = 256.*phaG/2./pi;
 phabyte_file_name = strrep(pha_file_name,'.grd','.pha');
-write_pha(phabyte_file_name,phabyte);
+%write_pha(phabyte_file_name,phabyte);
+write_pha(phabyte_file_name,flipud(phabyte));
 phabyte2 = double(read_pha(phabyte_file_name,mcol));
 izero = find(abs(phabyte2) < 1);
 phabyte2(izero) = nan;

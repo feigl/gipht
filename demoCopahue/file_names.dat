@@ -7,7 +7,6 @@
 %Date 2013/04/02  0:00 hrs, DOY  92 JD  2456384.5000 MJD  56384.0000
 %GPS Week  1734 Day of week  2, GPS Seconds 172800 Day of Week Tue 
 %Decimal Year  2013.24932
-
 %  decimal.year_master  decimal.year_slave  phase_file_name  % comments
-2014.95890 2013.24932  phase.pha % 20141217_20130402/phase.pha
+2013.24932  2014.95890   phase.pha % 20141217_20130402/phase.pha
 %end of file
