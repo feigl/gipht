@@ -597,7 +597,8 @@ elseif nin == 3 ...
     % call the function if volume is not zero
     switch idatatype1
         case 0  % observable is phase
-            kp = 10;
+%            kp = 10;
+            kp = 9; % 20150721
             % coseismic
             if  sum(abs(pg(kp+7:kp+9))) > 1.e-3
 %                 uokada1 = disloc(pg(kp:kp+9),[DST.x';DST.y'],nu);
@@ -605,7 +606,8 @@ elseif nin == 3 ...
             else
                 uokada1 = zeros(3,ndata);
             end
-            kp = 19;
+            %kp = 19;
+            kp = 18; % 20150721
             % coseismic
             if  sum(abs(pg(kp+7:kp+9))) > 1.e-3
                 %uokada2 = disloc(pg(kp:kp+9),[DST.x';DST.y'],nu);
@@ -613,7 +615,8 @@ elseif nin == 3 ...
             else
                 uokada2 = zeros(3,ndata);
             end
-            kp = 57;
+            %kp = 57;
+            kp = 56 % 20150721
             % poroelastic
             if  sum(abs(pg(kp+7:kp+9))) > 1.e-3
                 uokada3 = okada85_wrapper(pg(kp:kp+9),[DST.x';DST.y'],nu2 ) ...
@@ -623,7 +626,7 @@ elseif nin == 3 ...
             end
             
         case -1  % observable is gradient
-            kp = 10;
+            kp = 9;
             % coseismic
             if  sum(abs(pg(kp+7:kp+9))) > 1.e-3
                 tl = okada85_wrapper(pg(kp:kp+9),[DST.x'-DST.dx';DST.y'],nu);
@@ -632,7 +635,7 @@ elseif nin == 3 ...
             else
                 uokada1 = zeros(3,ndata);
             end
-            kp = 19;
+            kp = 18;
             % coseismic
             if  sum(abs(pg(kp+7:kp+9))) > 1.e-3
                 tl = okada85_wrapper(pg(kp:kp+9),[DST.x'-DST.dx';DST.y'],nu);
@@ -641,7 +644,7 @@ elseif nin == 3 ...
             else
                 uokada2 = zeros(3,ndata);
             end
-            kp = 57;
+            kp = 56;
             % poroelastic
             if  sum(abs(pg(kp+7:kp+9))) > 1.e-3
                 tl      = okada85_wrapper(pg(kp:kp+9),[DST.x'-DST.dx';DST.y'],nu2 ) ...

@@ -34,16 +34,16 @@ function uENZ = okada85_wrapper(pg,xyobs,nu)
 %	   SLIP   : dislocation in RAKE direction (length unit)
 %	   OPEN   : dislocation in tensile component (same unit as SLIP)
 
-% 1 E#  32 Okada1_Length_in_m______________  2340.0000  2340.0000     0.0000        NaN     NaN  2340.0000
-% 2 E#  33 Okada1_Width_in_m_______________  2780.0000  2780.0000     0.0000        NaN     NaN  2780.0000
-% 3 E#  34 Okada1_Centroid_Depth_in_m______  3000.0000  3000.0000     0.0000        NaN     NaN  3000.0000
-% 4 E#  35 Okada1_Dip_in_deg_______________    50.0000    50.0000     0.0000        NaN     NaN    50.0000
-% 5 E#  36 Okada1_Strike_CCW_from_N_in_deg_   282.0000   282.0000     0.0000        NaN     NaN   282.0000
-% 6 E#  37 Okada1_Easting_in_m_____________   507200.0   507200.0        0.0        NaN     NaN   507200.0
-% 7 E#  38 Okada1_Northing_in_m____________  3802200.0  3802200.0        0.0        NaN     NaN  3802200.0
-% 8 E#  39 Okada1_RL_Strike_Slip_in_m______  -1.99e-02  -1.99e-02   0.00e+00        NaN     NaN  -1.99e-02
-% 9 E#  40 Okada1_Downdip_Slip_in_m________    -0.5630    -0.5630     0.0000        NaN     NaN    -0.5630
-% 10 F#  41 Okada1_Tensile_Opening_in_m_____   0.00e+00   0.00e+00   0.00e+00        NaN     NaN   0.00e+00
+% F#  31 Okada1_Length_in_m______________  4308.0738  4308.0738     0.0000        NaN     NaN   424.3164
+% F#  32 Okada1_Width_in_m_______________  5035.3854  5035.3854     0.0000        NaN     NaN   314.9414
+% F#  33 Okada1_Centroid_Depth_in_m______  5999.9760  5999.9760     0.0000        NaN     NaN    82.5195
+% F#  34 Okada1_Dip_in_deg_______________    65.9941    65.9941     0.0000        NaN     NaN     4.1699
+% F#  35 Okada1_Strike_CW_from_N_in_deg__   206.0934   206.0934     0.0000        NaN     NaN     7.1875
+% F#  36 Okada1_Centroid_Easting_in_m____   530996.9   530996.9        0.0        NaN     NaN      183.6
+% F#  37 Okada1_Centroid_Northing_in_m___  4242682.7  4242682.7        0.0        NaN     NaN      431.2
+% F#  38 Okada1_Coplanar_slip_in_m_______     0.2919     0.2919     0.0000        NaN     NaN     0.0447
+% F#  39 Okada1_Rake_in_deg_CCW__________   -28.7569   -28.7569     0.0000        NaN     NaN     4.8975
+% F#  40 Okada1_Tensile_Opening_in_m_____   0.00e+00   0.00e+00   0.00e+00        NaN     NaN   0.00e+00
 
 % for i=1:numel(pg)
 %     fprintf(1,'PG(%3d) = %10.2E\n',i,pg(i));
@@ -81,6 +81,12 @@ NU    = nu;                               % Poisson's ratio
 %[uE,uN,uZ,uZE,uZN,uNN,uNE,uEN,uEE] = OKADA85(E,N,DEPTH,STRIKE,DIP,LENGTH,WIDTH,RAKE,SLIP,OPEN)
 %[uE,uN,uZ] = okada85(E,N,DEPTH,STRIKE,DIP,LENGTH,WIDTH,RAKE,SLIP,OPEN,NU);
 [uE,uN,uZ] = okada85disp(E,N,DEPTH,STRIKE,DIP,LENGTH,WIDTH,RAKE,SLIP,OPEN,NU);
+
+figure
+hist(colvec(sqrt(uE.*uE + uN.*uN + uZ.*uZ)));
+title('displacement magnitude in meters');
+xlabel('U [m]');
+ylabel('number of occurrences');
 
 % disp 'uE'; size(uE)
 
