@@ -26,7 +26,7 @@ fidtxtout = fopen(txtoutname,'a');
 
 % % Restore exact model instead of Taylor
 % if ianneal == 4
-%     fitfun = fitfun0;
+%     fitfun = PST.fitfun;
 % end
 %
 % %if  numel(strfind(fitfun,'funpressure4')) > 0
@@ -350,18 +350,24 @@ for i = 1:np
         % use exact fitting function
         fitfun = fitfun_exact;
         % temporary storage structure TST
-        [rng,TST] = feval(fitfun,DST2,PST);
+        %[rng,TST] = feval(fitfun,DST2,PST);
+        [rng,TST0] = feval(fitfun,DST2,PST0); %20150727
         % initial model
         fprintf(1,'Evaluating fitting function %s for initial estimate at %d locations....\n',fitfun,numel(DST2.x));
-        mCdl0 = feval(fitfun,DST2,PST,TST); % initl
+        %mCdl0 = feval(fitfun,DST2,PST,TST); % initl
+        mCdl0 = feval(fitfun,DST2,PST0,TST0); % 20150727
         if isreal(mCdl0) ~= 1
             warning(sprintf('Found complex values in mCdl0. Max abs(imaginary) is %g\n',max(imag(mCdl0))));
             mCdl0 = real(mCdl0);
         end
         %             fprintf(1,'Setting Offset parameters in final estimate to zero ....\n');
         %             PST1.p1(22) = 0;
+                % temporary storage structure TST
+        %[rng,TST] = feval(fitfun,DST2,PST);
+        [rng,TST1] = feval(fitfun,DST2,PST1); %20150727
+
         fprintf(1,'Evaluating fitting function %s for final   estimate at %d locations....\n',fitfun,numel(DST2.x));
-        mCdl1 = feval(fitfun,DST2,PST1,TST); % final
+        mCdl1 = feval(fitfun,DST2,PST1,TST1); % final
         %profile off
         if isreal(mCdl1) ~= 1
             warning(sprintf('Found complex values in mCdl0. Max abs(imaginary) is %g\n',max(imag(mCdl0))));
@@ -455,8 +461,8 @@ for i = 1:np
         mdl1 = mdl1 + mean_direction(phao);
     end
     
-    fprintf(1,'Extreme values of mdl0 %12.4e %12.4e \n',min(min(mdl0)),max(max(mdl0)));
-    fprintf(1,'Extreme values of mdl1 %12.4e %12.4e \n',min(min(mdl1)),max(max(mdl1)));
+    fprintf(1,'Extreme values of mdl0 %12.4e %12.4e \n',nanmin(nanmin(mdl0)),nanmax(nanmax(mdl0)));
+    fprintf(1,'Extreme values of mdl1 %12.4e %12.4e \n',nanmin(nanmin(mdl1)),nanmax(nanmax(mdl1)));
     
     % wrapped modeled values in radians
     wrm0 = rwrapm(mdl0);
@@ -471,8 +477,8 @@ for i = 1:np
     %         wrm1 = rwrapm(wrm1 + mean_direction(phao) - mean_direction(wrm1));
     %     end
     
-    fprintf(1,'Extreme values of wrm0 %12.4e %12.4e \n',min(min(wrm0)),max(max(wrm0)));
-    fprintf(1,'Extreme values of wrm1 %12.4e %12.4e \n',min(min(wrm1)),max(max(wrm1)));
+    fprintf(1,'Extreme values of wrm0 %12.4e %12.4e \n',nanmin(nanmin(wrm0)),nanmax(nanmax(wrm0)));
+    fprintf(1,'Extreme values of wrm1 %12.4e %12.4e \n',nanmin(nanmin(wrm1)),nanmax(nanmax(wrm1)));
     
     % residuals in radians
     res0 = rwrapm(phao-mdl0);

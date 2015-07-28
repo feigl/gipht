@@ -68,7 +68,7 @@
 % LICENSING:
 % 
 % Copyright (c) 2009 Kurt Feigl, Cliff Thurber All rights reserved. 
-
+%
 % U.S. Patent No. 7,446,705.
 % 
 % Copyright (c) Kurt Feigl, Cliff Thurber, Lee Powell, Peter Sobol, Aaron

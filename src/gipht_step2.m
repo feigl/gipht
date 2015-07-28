@@ -371,96 +371,24 @@ DST.phamod = colvec(mdl0);
 % xlabel('pixel index');ylabel('phase (cycle)');legend('residual');
 % feval(printfun,sprintf('%s_Taylor1Check',runname));
 
-% Approximate Fitting function by a surrogate using an approximation
-if surrogate == 1
-    
-    %         % read or generate matrix of partial derivatives
-    fnametst = 'TSTP.DAT';
-    %         if fexist(fnametst)
-    %             TSTP = read_tst(fnametst);
-    %             [ndum,mdum] = size(TSTP.partial_wrt_1param);
-    %             if [ndum,mdum] == [ndata, mparam]
-    %                 igenptl = 0;
-    %             else
-    %                 warning(sprintf('Existing file named %s has wrong size. %d rows %d columns \n',ndum,mdum));
-    %                 igenptl = 1;
-    %             end
-    %         else
-    %             igenptl = 1;
-    %         end
-    
-    % generate partial derivatives
-    fprintf(1,'Generating partial derivatives for 1st-order Taylor expansion\n');
-    % % make scale match difference between bounds
-    PST.scale = colvec(ub-lb)/100.;
-    
-    [rngdum,TSTP] = generate_partials(DST,PST,TST);
-    whos TSTP.partial_wrt_1param
-    size(TSTP.partial_wrt_1param)
-    
-    %             % write to a file and check
-    %             ierr = write_tst(TSTP,fitfun,fnametst);
-    %             TSTP2 = read_tst(fnametst);
-    %             nerr = numel(find(abs(TSTP.partial_wrt_1param-TSTP2.partial_wrt_1param) > 1.e-6));
-    %             if nerr > 0
-    %                 warning(sprintf('Found %d large numerical errors in partial derivatives\n',nerr));
-    %             end
-    
-    % check for NaNs
-    [ibad,jbad] = find(isfinite(TSTP.partial_wrt_1param) == 0);
-    if numel(ibad) > 0
-        warning(sprintf('Found %d NaN values in matrix of partial derivatives. Replacing with zeros.\n',numel(ibad)));
-        %     for j=1:numel(ibad)
-        %         fprintf(1,'ibad = %10d jbad = %10d\n',ibad(j),jbad(j));
-        %     end
-        TSTP.partial_wrt_1param(ibad,jbad) = 0;
-    end
-    
-    % evaluate at randomly perturbed estimate of parameters  within bounds
-    if verbose == 2
-        PST1 = PST;
-        PST1.p1 = PST1.p0 + (rand(size(PST1.p0))-0.5*ones(size(PST1.p0))) .* (ub-lb);
-        %         for i=1:mparam
-        %            fprintf(1,'%3d %s %10.3g\n',i,char(pnames{i}),PST1.p1(i)-PST1.p0(i));
-        %         end
-        % evaluate exactly
-        mdl1e = feval(fitfun,DST,PST1,TST);
-    end
-    %
-    % now use the Taylor Expansion to the Fitting function
-    fitfun = 'funtaylor1';
-    PST.fitfun = 'funtaylor1';
-    TST = TSTP;
-    clear TSTP;
-    
-    if verbose == 2
-        % now evaluate approximately
-        mdl1p = feval(fitfun,DST,PST1,TST);
-        clear PST1;
-        
-        epdiff = nanstd(mdl1p-mdl1e)/2./pi;
-        fprintf(1,'Standard deviation of difference between exact and approximate: %.5f [cycles]\n',epdiff);
-        % figure comparing Exact vs. Aprox
-        nf=nf+1;h(nf)=figure;subplot(2,1,1);
-        plot(mdl1e/2./pi,'b-'); hold on;
-        plot(mdl1p/2./pi,'r-');
-        ylabel('model phase value (cycles)');
-        legend('exact fitting function','1st order Taylor expansion','location','best');
-        subplot(2,1,2);
-        plot((mdl1p-mdl1e)/2./pi,'g-');
-        xlabel('index');ylabel('phase value (cycles)');legend('aprox error','location','best');
-        title(sprintf('standard deviation = %.4f cycles\n',epdiff));
-        feval(printfun,sprintf('%s_Taylor1Check',runname));
-        clear mdl1p, mdl1e;
-    end
-end
+% % Approximate Fitting function by a surrogate 
+% % generate partials for first order Taylor series approximation
+% if surrogate == 1
+%     imode = 1;
+%     maxiter = 1;
+%     [TSTP, PST_dummy, trials] = anneal_with_surrogate(objfun, DST, PST, TST, maxiter ...
+%         , verbose, imode, nf, runname, printfun);
+%     % update fitting function
+%     fitfun = 'funtaylor1';
+%     PST.fitfun = 'funtaylor1';   
+% end
 
 %error('Stopping here to debug on 20150609\n');
 
 
 % Calculate costs of null and initial models
 switch ianneal
-    case {0,1,2,3,5,6}
+    case {0,1,2,3,4,5,6}
         % WARNING: this makes an assumption about the objective function
         % costs00 = rarcm(xd,zeros(size(xd)));
         % cost00 = nanmean(costs00)/DNPC;
@@ -487,11 +415,13 @@ switch ianneal
 %         %   2010JAN27 need to wrap model to prevent negative values of cost
 %         cost00 = mean(rarcm(DST.phaobs,zeros(size(DST.phaobs))))/DNPC;
 %         cost0  = mean(rarcm(DST.phaobs,           rwrapm(mdl0)))/DNPC;
-     case 4
-        fprintf(1,'ianneal is 4, so runnning untested code in %s...\n',mfilename);        
-        p00 = zeros(size(p0)); % null model
-        cost00  = feval(objfun,p00,fitfun,DST,PST,TST); % cost of null model
-        cost0   = feval(objfun,p0, fitfun,DST,PST,TST); % cost of initial model        
+%      case 4
+%         fprintf(1,'ianneal is 4, so runnning untested code in %s...\n',mfilename);        
+%         p00 = zeros(size(p0)); % null model
+% %         cost00  = feval(objfun,p00,fitfun,DST,PST,TST); % cost of null model
+% %         cost0   = feval(objfun,p0, fitfun,DST,PST,TST); % cost of initial model        
+%         cost00  = feval(objfun,p00,fitfun,DST,PST,TSTP); % cost of null model
+%         cost0   = feval(objfun,p0, fitfun,DST,PST,TSTP); % cost of initial model        
        
     otherwise
         error(sprintf('Unknown value of ianneal = %d\n',ianneal));
@@ -511,7 +441,7 @@ switch ianneal
         %
         %      OPTIONS(1) = scale of cooling schedule (default = 4).  Higher numbers
         %                    produce more exhaustive searches.
-        if pselect == 7
+        if pselect == 7 || ianneal == 4
             options(1) = 2;
         else
             options(1) = 4;
@@ -520,14 +450,19 @@ switch ianneal
         %       OPTIONS(2) = number of individual annealing runs (default = 3).  Higher
         %                    numbers produce more exhaustive searches and reduce dependency
         %                    on correctly guessing critical temperature.
-        options(2) = nsaruns;
+        if ianneal == 4
+            options(2) = 1;  % only one run through SA for each iteration
+        else
+            options(2) = nsaruns;
+        end
         %options(2) = 5;
         %       OPTIONS(3) = grid spacing (default = 4).  Higher numbers permit finer levels
         %                    of parameter discretization.
-        if pselect == 7
-            options(3) = 4;
+        if pselect == 7 || ianneal == 4
+            options(3) = 2;
         else
-            options(3) = 10; % necessary for tests with simulated data
+            %options(3) = 10; % necessary for tests with simulated data
+            options(3) = 4; % necessary for tests with simulated data
         end
         %       OPTIONS(4) = temperature scale. To tweak this parameter, inspect
         %                    a graph of 'energy'.  Values higher than 3 or lower than 1 are
@@ -584,13 +519,18 @@ switch ianneal
         disp 'Skipping Annealing'
         p1 = p0;acosts1(1)=NaN;
         cost1 = cost0;
-    case {1,4}
-        fprintf (1,'\nStarting anneal4 without recording...\n');
+    case 1
+        fprintf (1,'\nStarting Constrained Optimization...\n');
         options(7) = 1;acosts1(1)=NaN;
         tanneal=tic;
-        [p1,f,model,energy,count] = anneal5(objfun,bounds,options,fitfun,DST,PST,TST);
+        %[p1,f,model,energy,count] = anneal5(objfun,bounds,options,fitfun,DST,PST,TST);
+        
+        %function [mhat,fval,model,energy,count]=constrainedopt1(FUN,bounds,OPTIONS,varargin)
+        [p1,f,model,energy,count] = constrainedopt1(objfun,bounds,options,fitfun,DST,PST,TST);
         fprintf (1,'\nAnnealing ended after %15.0f seconds\n',toc(tanneal));
         msig = nan(size(p0));
+        
+        
     case 2
         %start annealing
         fprintf (1,'\nStarting anneal5 with recording....\n');
@@ -621,6 +561,23 @@ switch ianneal
         %[p1,F,model,energy,count]=simann1(objfun,bounds,options,fitfun,DST,PST,TST);
         [DST,PST,TST] = simann1(objfun,bounds,options,fitfun,DST,PST,TST)
         fprintf (1,'\nAnnealing using SIMANN ended after %15.0f seconds\n',toc(tanneal));
+    case 4
+        if surrogate ~= 1
+           error(sprintf('surrogate (%d) is not set',surrogate));
+        end
+        imode = 2;
+        
+        maxiter = nsaruns;
+       
+        [TSTP, PST4, trials] = anneal_with_surrogate(objfun, DST, PST, TST, maxiter...
+            , verbose, imode, nf, runname, printfun, options);
+        p1 = PST4.p1;
+        msig = nan(size(p1));
+        trials = trials';
+        acosts1= trials(:,1);        % cost values are in first column
+        temps  = trials(:,2);        % temperatures are in second column
+        trials = trials(:,3:end);% trial parameter values are in remaining columns
+
     case 5
         fprintf (1,'\nStarting optimization using gridsearch...\n');
         acosts1(1)=NaN;
@@ -641,8 +598,8 @@ switch ianneal
 end; % switch on ianneal
 
 % save final estimate
-PST.p1 = colvec(p0);
 PST1       = PST;
+PST1.p0    = colvec(p0); 
 PST1.p1    = colvec(p1);
 PST1.sigma = colvec(msig);
 

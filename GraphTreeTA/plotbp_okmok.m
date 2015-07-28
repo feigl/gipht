@@ -1,5 +1,5 @@
-function ktours = plotbp(tepochs, bpest, DD, trees, iuniqorbs, uniqdates, plotts,ylab)
-%function ktours = plotbp(tepochs, bpest, DD, trees, iuniqorbs, uniqdates, plotts,ylab)
+function ktours = plotbp_okmok(tepochs, cal_date, bpest, DD, species, iuniqorbs, uniqdates, plotts,ylab)
+%function ktours = plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, plotts,ylab)
 %
 % plot pseudo-absolute Bperp as a function of time 
 % and return ktours the mininum-lenthg traveling salesman path
@@ -10,14 +10,14 @@ function ktours = plotbp(tepochs, bpest, DD, trees, iuniqorbs, uniqdates, plotts
 % 3  X = Bperp  Y = Ddop
 %
 %
-% ktours = plotbp(tepochs, bpest, DD, trees, iuniqorbs, uniqdates, plotts)
+% ktours = plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, plotts)
 %
 %
-% ktours = plotbp(tepochs, bpest, DD, trees)
+% ktours = plotbp(tepochs, bpest, DD, species)
 %  
-% ktours = plotbp(tepochs, bpest, DD, trees, iuniqorbs, uniqdates)
+% ktours = plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates)
 %
-% ktours = plotbp(tepochs, bpest, DD, trees, iuniqorbs, uniqdates, plotts)
+% ktours = plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, plotts)
 %     plotts = 0 do not connect points with traveling salesman net 
 %     plotts = 1 connect points with traveling salesman net 
 %     plotts = 2 connect points with traveling salesman net AND existence
@@ -30,13 +30,15 @@ function ktours = plotbp(tepochs, bpest, DD, trees, iuniqorbs, uniqdates, plotts
 % 2007 NOV 17 connect points with traveling salesman trajectory
 % 2008-MAR-29 correct annoying bug
 % 2014-JUL-06 include ylab as input
+FigHandle = figure;
+
 
 fidtxtout = fopen(sprintf('%sout.txt',mfilename),'a+t');
 for ifile = [1 fidtxtout]
    fprintf(ifile,'%s begins at %s\n',mfilename,datestr(now,31));
 end
 
-
+%set(FigHandle,'defaulttextinterpreter','latex');
 nargchk(4,8,nargin);
 if nargin <= 6
    plotts = 0;
@@ -46,7 +48,8 @@ nargoutchk (1,1,nargout);
 if (max(bpest)-min(bpest) < 1.0)
    if max(tepochs) < 1990
       icase = 3;
-      xlab = 'Bperp (m)';
+      
+      xlab = '$B_{\perp}$ (m)';
       ylab = 'Azimuthal Doppler/PRF';
       Tend = 10;
       yrbp = 100/0.1; % 100 m of Bperp is like 0.1 PRF of Doppler separatio
@@ -66,12 +69,17 @@ else
     else
         icase = 1;
         xlab = 'year';
-        ylab = 'Bperp (m)';
+        ylab = '$B_{\perp}$ (m)';
         Tend = 25;
         yrbp = 1/1000; % 1 year of time separation is like 1000 m of orbits separation
     end
 end
 
+if plotts == 1
+   titl = 'Optimal set of pairs';
+else
+   titl = 'Selected pairs';
+end
 
 % define symbols to use
 
@@ -96,47 +104,39 @@ mydash = {'g--' 'r--' 'b--' 'k--' 'm--' 'c--'};
 mysym0 = {'gx'  'ro'  'b*'  'ks'  'md'  'cv'};
 
 % graphics handle to return
-h=figure;hold on; 
+%h=figure; 
 
-% number of trees
-[ntrees,ndum] = size(trees);
+% number of species
+nm = size(species); nf = nm(1);
 
-% number of pairs and number of epochs
-[np,me] = size(DD); 
-
-if plotts == 1
-   titl1 = 'Optimal set of pairs';
-else
-   titl1 = 'Selected pairs'
-end
-titl = sprintf('%s np = %d me = %d ntrees = %d\n',titl1,np,me,ntrees);
+% number of pairs
+nm = size(DD); np = nm(1);
 
 %plot origin to make legend come out right
-if ntrees < 10
-    for j=1:ntrees
-        plot(min(tepochs),0,mysyms{1+mod(j,length(mysyms))});
-        tree = trees(j,:);
-        k=isfinite(tree);
-        tree=tree(k);
-        me = length(find(k == 1));
-        if nargin >= 6
-            tree_name{j} = strcat(sprintf('trees %s orbits:',char(j+64)),sprintf(' %7d',iuniqorbs(tree(1:me))));
-        else
-            tree_name{j} = strcat(sprintf('trees %s ID:',char(j+64)),sprintf('%3d',char(j+64),tree(1:me)));
-        end
+for j=1:nf
+    plot(min(tepochs),0,mysyms{1+mod(j,length(mysyms))});
+    hold on;
+    specie = species(j,:);
+    k=isfinite(specie);
+    specie=specie(k);
+    me = length(find(k == 1));
+    if nargin >= 6
+       famnam{j} = strcat(sprintf('Species %s orbits:',char(j+64)),sprintf(' %1d',iuniqorbs(specie(1:me))));
+    else
+       famnam{j} = strcat(sprintf('Species %s ID:',char(j+64)),sprintf('%3d',char(j+64),specie(1:me)));
     end
-    ktours = zeros(size(trees));
-    
-    legend(tree_name,'Location','NorthOutside');
-    % over plot origin with white
-    plot(min(tepochs),0,'sw');
-    plot(min(tepochs),0,'ow');
-    plot(min(tepochs),0,'xw');
-    plot(min(tepochs),0,'*w');
-    plot(min(tepochs),0,'dw');
-    plot(min(tepochs),0,'vw');
 end
+ktours = zeros(size(species));
 
+legend(famnam,'Location','NorthOutside');
+
+% over plot origin with white
+plot(min(tepochs),0,'sw');
+plot(min(tepochs),0,'ow');
+plot(min(tepochs),0,'xw');
+plot(min(tepochs),0,'*w');
+plot(min(tepochs),0,'dw');
+plot(min(tepochs),0,'vw');
 
 % draw end points of available pairs
 for i=1:np      
@@ -147,77 +147,82 @@ for i=1:np
 end
 id2 = unique([id0 id1]);
 
+
 for ifile = [1 fidtxtout]
-   fprintf(ifile,'Pair trees Member0 Member1 orbn0 orbn1 year0 year1 %s %s\n',xlab,ylab);
+   fprintf(ifile,'Pair Species Member0 Member1 orbn0 orbn1 year0 year1 %s %s\n',xlab,ylab);
 end
 i=0;
-
+nt = numel(tepochs);
 % label available epochs
-for j=1:ntrees
-    tree = trees(j,:);
-    k=isfinite(tree);
-    me = length(find(k == 1));
-    tree_name{j} = sprintf('%3d',tree(1:me));
-    for i=1:me
-       %           plot(tree(i),tepochs(id2(tree(i))),mysyms{mod(j,length(mysy
-       %           ms))}); hold on;
-       px = tepochs(id2(tree(i)));
-       py = bpest(id2(tree(i)));
-       
-       if py >  mean(bpest)
-          if py >  mean(bpest) + std(bpest)
-             rotang = 30;
-             aline = 'left';
-             dpy = 0.05 * std(bpest);
-          else
-             rotang = 15;
-             aline = 'left';
-             dpy = 0.05 * std(bpest);
-          end
-       else
-          if py <  mean(bpest) - std(bpest)
-             rotang = -30;
-             aline = 'left';
-             dpy = -0.05 * std(bpest);
-          else
-             rotang = -15;
-             aline = 'left';
-             dpy = -0.05 * std(bpest);
-          end
-       end
-
-       % plot solid line for TSP
-       %plot(px,py,mysols{1+mod(j,length(mysols))}); hold on;
-       %plot(px,py,mysyms{1+mod(j,length(mysyms))}); hold on;
-       if nargin >= 6
-          if plotts == 0
-             if mod(i,3) == 1
-                hh=text (px,1.1*max(py),sprintf('%7d',iuniqorbs(id2(tree(i)))));
-                set(hh,'HorizontalAlignment','left','rotation',45);
-             elseif mod(i,3) == 2
-                hh=text (px,1.2*max(py),sprintf('%7d',iuniqorbs(id2(tree(i)))));
-                set(hh,'HorizontalAlignment','left','rotation',45);
-             else
-                hh=text (px,1.3*max(py),sprintf('%7d',iuniqorbs(id2(tree(i)))));
-                set(hh,'HorizontalAlignment','left','rotation',45);
-             end
-          else
-             hh=text (px,py+dpy,sprintf('%7d',iuniqorbs(id2(tree(i)))));
-             set(hh,'HorizontalAlignment',aline,'rotation',rotang,'BackgroundColor',[1 1 1],'Margin',0.1);
-             set(hh,'FontName','Helvetica','Fontsize',10);
-          end
-       end
-    end
-end
+%for j=1:nt
+    %specie = species(j,:);
+    %k=isfinite(specie);
+    %me = length(find(k == 1));
+    %famnam{j} = sprintf('%3d',specie(1:me));
+    
+   % for i=1:me
+    %    if 
+        
+%        %           plot(specie(i),tepochs(id2(specie(i))),mysyms{mod(j,length(mysy
+%        %           ms))}); hold on;
+%        px = tepochs(id2(specie(i)));
+%        py = bpest(id2(specie(i)));
+%        
+%        if py >  mean(bpest)
+%           if py >  mean(bpest) + std(bpest)
+%              rotang = 30;
+%              aline = 'left';
+%              dpy = 0.05 * std(bpest);
+%           else
+%              rotang = 15;
+%              aline = 'left';
+%              dpy = 0.05 * std(bpest);
+%           end
+%        else
+%           if py <  mean(bpest) - std(bpest)
+%              rotang = -30;
+%              aline = 'left';
+%              dpy = -0.05 * std(bpest);
+%           else
+%              rotang = -15;
+%              aline = 'left';
+%              dpy = -0.05 * std(bpest);
+%           end
+%        end
+% % 
+% %        % plot solid line for TSP
+%        plot(px,py,mysols{1+mod(j,length(mysols))}); hold on;
+%        plot(px,py,mysyms{1+mod(j,length(mysyms))}); hold on;
+%        if nargin >= 6
+%           if plotts == 0
+%              if mod(i,3) == 1
+%                  hh=text (px,1.1*max(py),sprintf('%7d',iuniqorbs(id2(specie(i)))));
+%                 hh=text (px,1.1*max(py),sprintf('%7d',iuniqorbs(id2(specie(i)))));
+%                 set(hh,'HorizontalAlignment','left','rotation',45);
+%              elseif mod(i,3) == 2
+%                 hh=text (px,1.2*max(py),sprintf('%7d',iuniqorbs(id2(specie(i)))));
+%                 set(hh,'HorizontalAlignment','left','rotation',45);
+%              else
+%                 hh=text (px,1.3*max(py),sprintf('%7d',iuniqorbs(id2(specie(i)))));
+%                set(hh,'HorizontalAlignment','left','rotation',45);
+%              end
+%           else
+%              hh=text (px,py+dpy,sprintf('%7d',iuniqorbs(id2(specie(i)))));
+%              set(hh,'HorizontalAlignment',aline,'rotation',rotang,'BackgroundColor',[1 1 1],'Margin',0.1);
+%              set(hh,'FontName','Courier','Fontsize',10);
+%           end
+%        end
+   % end
+%end
 
 if plotts > 0
-   for j = 1:ntrees
-      % find the members of this trees
-      kkeep = find(isnan(trees(j,:)) == 0);
+   for j = 1:nf
+      % find the members of this species
+      kkeep = find(isnan(species(j,:)) == 0);
       tspxy = zeros(numel(kkeep),2);
       % traveling salesman coordinates are time and Bperp
-      tspxy(:,1) = tepochs(trees(j,kkeep));
-      tspxy(:,2) = bpest(trees(j,kkeep));
+      tspxy(:,1) = tepochs(species(j,kkeep));
+      tspxy(:,2) = bpest(species(j,kkeep));
 
       % rescale
       %yrbp = (max(tspxy(:,2))-min(tspxy(:,2)))/(max(tspxy(:,1))-min(tspxy(:,1)));
@@ -225,7 +230,7 @@ if plotts > 0
       tspxy(:,1) = tspxy(:,1)*yrbp;
       nmem = numel(kkeep);
       
-      %fprintf (1,'Traveling Salesman on trees %d with %d members and scale %.3f and Tend = %f\n',j,nmem,yrbp,Tend);
+      %fprintf (1,'Traveling Salesman on species %d with %d members and scale %.3f and Tend = %f\n',j,nmem,yrbp,Tend);
       
       if nmem > 3
          % traveling salesman problem
@@ -248,13 +253,13 @@ if plotts > 0
       ktours(j,1:numel(ktour)) = ktour;
  
       % overwrite values in ktour order
-      %tree_name{j} = strcat(sprintf('trees %s orbits:',char(j+64)),sprintf(' %7d',iuniqorbs(tree(1:me))));
-      %tree_name{j} = strcat(sprintf('trees %s orbits:',char(j+64)),sprintf(' %7d',iuniqorbs(trees(j,kkeep(ktour)))));
+      %famnam{j} = strcat(sprintf('Species %s orbits:',char(j+64)),sprintf(' %7d',iuniqorbs(specie(1:me))));
+      %famnam{j} = strcat(sprintf('Species %s orbits:',char(j+64)),sprintf(' %7d',iuniqorbs(species(j,kkeep(ktour)))));
  
       for k=1:numel(ktour)-1
          i=i+1;  % count pairs
-         i0=trees(j,kkeep(ktour((k))));
-         i1=trees(j,kkeep(ktour((k+1))));
+         i0=species(j,kkeep(ktour((k))));
+         i1=species(j,kkeep(ktour((k+1))));
          % Traveling Salesman Pairs
          for ifile = [1 fidtxtout]
             fprintf(ifile,'%3d %3d %3d %3d %5d %5d %12.4f %12.4f %12.4f %12.4f\n',i,j,k,k+1 ...
@@ -280,8 +285,8 @@ end
 
 
 for i=1:np
-   for j = 1:ntrees
-      if sum(ismember(trees(j,:),id0(i))) == 1 & sum(ismember(trees(j,:),id1(i))) == 1
+   for j = 1:nf
+      if sum(ismember(species(j,:),id0(i))) == 1 && sum(ismember(species(j,:),id1(i))) == 1
    
          %                plot([id0(i) id1(i)],[tepochs(id0(i)) tepochs(id1(i))],mysyms{1+mod(j,length(mysyms))}); hold on;
          % draw symbol
@@ -303,22 +308,59 @@ end
 
 plot([min(tepochs) min(tepochs)],[min(bpest)-0.1*(max(bpest)-min(bpest)) max(bpest)+0.1*(max(bpest)-min(bpest))],'w.'); % draw a white dot to stretch scales
 
-%legend(tree_name,'Location','NorthOutside');
+v = axis;
+% Plotting Epoch Calendar Dates
+% for Okmok:  set pix = 1/2, set del = .75
+% for Bradys: set pix = 1/6, set del = .20
+kt = floor(min(tepochs)):1:ceil(max(tepochs)); %getting time span
 
-h2=title (titl); set(h2,'FontName','Helvetica','Fontsize',14,'FontWeight','bold');
-h2=xlabel(xlab);       set(h2,'FontName','Helvetica','Fontsize',14,'FontWeight','bold');
-h2=ylabel(ylab);         set(h2,'FontName','Helvetica','Fontsize',14,'FontWeight','bold');
-set(gca,'FontName','Helvetica','Fontsize',14,'FontWeight','bold');
+mepi = 0; %set max number of epochs per interval = 0 
+for k = 1:length(kt)-1
+    Icount = find(tepochs > kt(k) & tepochs <= kt(k+1));
+    if length(Icount) > mepi
+        mepi = length(Icount); %finding maximum number of epochs per interval
+    end
+end
+pix = 1/2; %amount of space needed for each label, dependent on values of tick marks
+del = .9; %amount of space between each label, dependent on tick marks 
+
+lspace = ceil(min(bpest)-ceil(pix*mepi)); %finding amount of space needed for labels
+l_bot = lspace+.5; %starting spot for label
+for k = 1:length(kt)-1
+    I = find(tepochs > kt(k) & tepochs <= kt(k+1));
+    xp = (kt(k)+kt(k+1))/2; %average the x interval for text starting point
+    tp = tepochs(I); 
+    dy = length(tp);
+    by = l_bot +del*(dy-1); %9.5-.75*(dy-1); -14.5
+    yy = fliplr(l_bot:del:by); %fliplr(by:.75:9.5);
+    for xx = 1:dy
+        text(xp,yy(xx),sprintf('%1d/%1d',cal_date(xx,1), cal_date(xx,2)));
+        
+    end
+end
+
+axis([floor(min(tepochs)) ceil(max(tepochs)) lspace max(bpest)+del*4])
+%legend(famnam,'Location','NorthOutside');
+
+h2=title (titl); set(h2,'FontName','Helvetica','Fontsize',12,'FontWeight','bold');
+h2=xlabel(xlab);       set(h2,'FontName','Helvetica','Fontsize',12,'FontWeight','bold');
+h2=ylabel(ylab,'interpreter','latex');         set(h2,'FontName','Helvetica','Fontsize',12,'FontWeight','bold');
+set(gca,'FontName','Helvetica','Fontsize',12,'FontWeight','bold');
+%set(FigHandle, 'Position', [100, 100, 1049, 895]);
 
 if nargout == 0
    hold off
 end
+
+
+
 
 for ifile = [1 fidtxtout]
    fprintf(ifile,'%s ended at %s\n',mfilename,datestr(now,31));
 end
 fclose(fidtxtout);
 
+set(FigHandle, 'Position', [100, 100, 1049, 895]);%1049 795     [100, 100, 595, 795]
 
 return;
 

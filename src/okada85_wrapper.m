@@ -82,11 +82,11 @@ NU    = nu;                               % Poisson's ratio
 %[uE,uN,uZ] = okada85(E,N,DEPTH,STRIKE,DIP,LENGTH,WIDTH,RAKE,SLIP,OPEN,NU);
 [uE,uN,uZ] = okada85disp(E,N,DEPTH,STRIKE,DIP,LENGTH,WIDTH,RAKE,SLIP,OPEN,NU);
 
-figure
-hist(colvec(sqrt(uE.*uE + uN.*uN + uZ.*uZ)));
-title('displacement magnitude in meters');
-xlabel('U [m]');
-ylabel('number of occurrences');
+% figure
+% hist(colvec(sqrt(uE.*uE + uN.*uN + uZ.*uZ)));
+% title('displacement magnitude in meters');
+% xlabel('U [m]');
+% ylabel('number of occurrences');
 
 % disp 'uE'; size(uE)
 

@@ -616,7 +616,7 @@ elseif nin == 3 ...
                 uokada2 = zeros(3,ndata);
             end
             %kp = 57;
-            kp = 56 % 20150721
+            kp = 56; % 20150721
             % poroelastic
             if  sum(abs(pg(kp+7:kp+9))) > 1.e-3
                 uokada3 = okada85_wrapper(pg(kp:kp+9),[DST.x';DST.y'],nu2 ) ...
@@ -893,6 +893,10 @@ elseif nin == 3 ...
     
     % range for deformation only, without accounting for nuisance parameters
     rng0 = tdif .* gmod * 2.0 * pi ./ DST.mpercy; % in radians
+    
+%     % replace NaN with zeros?
+%     inan = find(isfinite(rng0) == 0);
+%     rng0(inan) = 0;
     
     %fprintf(1,'pair %d min = %12.4f max = %12.4f radians\n',i,min(min(rng1)),max(max(rng1)));
     
