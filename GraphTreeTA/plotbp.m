@@ -128,9 +128,9 @@ for j=1:nf
     specie=specie(k);
     me = length(find(k == 1));
     if nargin >= 6
-       famnam{j} = strcat(sprintf('Species %s orbits:',char(j+64)),sprintf(' %1d',iuniqorbs(specie(1:me))));
+       famnam{j} = strcat(sprintf('Component %s orbit numbers:',char(j+64)),sprintf(' %1d',iuniqorbs(specie(1:me))));
     else
-       famnam{j} = strcat(sprintf('Species %s ID:',char(j+64)),sprintf('%3d',char(j+64),specie(1:me)));
+       famnam{j} = strcat(sprintf('Component %s IDs:',char(j+64)),sprintf('%3d',char(j+64),specie(1:me)));
     end
 end
 ktours = zeros(size(species));
@@ -392,7 +392,7 @@ for ifile = [1 fidtxtout]
 end
 fclose(fidtxtout);
 
- set(FigHandle, 'Position', [100, 100, 995, 895]);%1049
-save('OkmokBplot')
+set(FigHandle, 'Position', [100, 100, 995, 895]);%1049
+%save('OkmokBplot')
 return;
 

@@ -93,6 +93,7 @@ for i=1:nrows % plot from top to bottom
     end
 end
 imagesc(im1);axis ij; axis tight; axis equal;
+colormap(ctab);
 title(titlestr);
 xlabel('pixel index for columns');
 ylabel('pixel index for rows');
