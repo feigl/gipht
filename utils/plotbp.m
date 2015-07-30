@@ -1,5 +1,5 @@
 function ktours = plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, plotts,ylab, cal_date)
-%function ktours = plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, plotts,ylab)
+%function ktours = plotbp(tepochs, bpest, DD, trees, iuniqorbs, uniqdates, plotts,ylab)
 %
 % plot pseudo-absolute Bperp as a function of time 
 % and return ktours the mininum-lenthg traveling salesman path
@@ -30,8 +30,11 @@ function ktours = plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, plot
 % 2007 NOV 17 connect points with traveling salesman trajectory
 % 2008-MAR-29 correct annoying bug
 % 2014-JUL-06 include ylab as input
-FigHandle = figure;
+%
+% Elena C. Baluyut, UW-Madison
+% 2015-01-30 add text to plot showing month and day of epochs per interval
 
+FigHandle = figure;
 
 fidtxtout = fopen(sprintf('%sout.txt',mfilename),'a+t');
 for ifile = [1 fidtxtout]
@@ -128,7 +131,7 @@ for j=1:nf
     specie=specie(k);
     me = length(find(k == 1));
     if nargin >= 6
-       famnam{j} = strcat(sprintf('Component %s orbit numbers:',char(j+64)),sprintf(' %1d',iuniqorbs(specie(1:me))));
+       famnam{j} = strcat(sprintf('Component %s epochs:',char(j+64)),sprintf(' %1d',iuniqorbs(specie(1:me))));
     else
        famnam{j} = strcat(sprintf('Component %s ID:',char(j+64)),sprintf('%3d',char(j+64),specie(1:me)));
     end
@@ -156,71 +159,10 @@ id2 = unique([id0 id1]);
 
 
 for ifile = [1 fidtxtout]
-   fprintf(ifile,'Pair Species Member0 Member1 orbn0 orbn1 year0 year1 %s %s\n',xlab,ylab);
+   fprintf(ifile,'Pair Component Member0 Member1 orbn0 orbn1 year0 year1 %s %s\n',xlab,ylab);
 end
 i=0;
 nt = numel(tepochs);
-% label available epochs
-%for j=1:nt
-    %specie = species(j,:);
-    %k=isfinite(specie);
-    %me = length(find(k == 1));
-    %famnam{j} = sprintf('%3d',specie(1:me));
-    
-   % for i=1:me
-    %    if 
-        
-%        %           plot(specie(i),tepochs(id2(specie(i))),mysyms{mod(j,length(mysy
-%        %           ms))}); hold on;
-%        px = tepochs(id2(specie(i)));
-%        py = bpest(id2(specie(i)));
-%        
-%        if py >  mean(bpest)
-%           if py >  mean(bpest) + std(bpest)
-%              rotang = 30;
-%              aline = 'left';
-%              dpy = 0.05 * std(bpest);
-%           else
-%              rotang = 15;
-%              aline = 'left';
-%              dpy = 0.05 * std(bpest);
-%           end
-%        else
-%           if py <  mean(bpest) - std(bpest)
-%              rotang = -30;
-%              aline = 'left';
-%              dpy = -0.05 * std(bpest);
-%           else
-%              rotang = -15;
-%              aline = 'left';
-%              dpy = -0.05 * std(bpest);
-%           end
-%        end
-% % 
-% %        % plot solid line for TSP
-%        plot(px,py,mysols{1+mod(j,length(mysols))}); hold on;
-%        plot(px,py,mysyms{1+mod(j,length(mysyms))}); hold on;
-%        if nargin >= 6
-%           if plotts == 0
-%              if mod(i,3) == 1
-%                  hh=text (px,1.1*max(py),sprintf('%7d',iuniqorbs(id2(specie(i)))));
-%                 hh=text (px,1.1*max(py),sprintf('%7d',iuniqorbs(id2(specie(i)))));
-%                 set(hh,'HorizontalAlignment','left','rotation',45);
-%              elseif mod(i,3) == 2
-%                 hh=text (px,1.2*max(py),sprintf('%7d',iuniqorbs(id2(specie(i)))));
-%                 set(hh,'HorizontalAlignment','left','rotation',45);
-%              else
-%                 hh=text (px,1.3*max(py),sprintf('%7d',iuniqorbs(id2(specie(i)))));
-%                set(hh,'HorizontalAlignment','left','rotation',45);
-%              end
-%           else
-%              hh=text (px,py+dpy,sprintf('%7d',iuniqorbs(id2(specie(i)))));
-%              set(hh,'HorizontalAlignment',aline,'rotation',rotang,'BackgroundColor',[1 1 1],'Margin',0.1);
-%              set(hh,'FontName','Courier','Fontsize',10);
-%           end
-%        end
-   % end
-%end
 
 if plotts > 0
    for j = 1:nf
@@ -232,12 +174,8 @@ if plotts > 0
       tspxy(:,2) = bpest(species(j,kkeep));
 
       % rescale
-      %yrbp = (max(tspxy(:,2))-min(tspxy(:,2)))/(max(tspxy(:,1))-min(tspxy(:,1)));
-      %yrbp = 1;
       tspxy(:,1) = tspxy(:,1)*yrbp;
       nmem = numel(kkeep);
-      
-      %fprintf (1,'Traveling Salesman on species %d with %d members and scale %.3f and Tend = %f\n',j,nmem,yrbp,Tend);
       
       if nmem > 3
          % traveling salesman problem
@@ -259,10 +197,6 @@ if plotts > 0
       end
       ktours(j,1:numel(ktour)) = ktour;
  
-      % overwrite values in ktour order
-      %famnam{j} = strcat(sprintf('Species %s orbits:',char(j+64)),sprintf(' %7d',iuniqorbs(specie(1:me))));
-      %famnam{j} = strcat(sprintf('Species %s orbits:',char(j+64)),sprintf(' %7d',iuniqorbs(species(j,kkeep(ktour)))));
- 
       for k=1:numel(ktour)-1
          i=i+1;  % count pairs
          i0=species(j,kkeep(ktour((k))));
@@ -279,14 +213,8 @@ if plotts > 0
             plot([tepochs(i0) tepochs(i1)],[bpest(i0) bpest(i1)]...
                ,mylins{1+mod(j,length(mylins))},'Linewidth',2);
          end
+      end
 
-%          plot([tepochs(ktour(id2(k)))  tepochs(ktour(id2(k+1)))]...
-%             ,  [ bpest(ktour(id2(k)))   bpest(ktour(id2(k+1)))  ]...
-%             ,    mydash{1+mod(j,length(mydash))},'Linewidth',2);        
-       end
-
-      % connect existing pairs as dashed lines
-      %plot(tspxy(:,1)/yrbp,tspxy(:,2),mysols{1+mod(j,length(mysols))},'Linewidth',2); hold on;
    end
 end
 
@@ -294,19 +222,12 @@ end
 for i=1:np
    for j = 1:nf
       if sum(ismember(species(j,:),id0(i))) == 1 && sum(ismember(species(j,:),id1(i))) == 1
-   
-         %                plot([id0(i) id1(i)],[tepochs(id0(i)) tepochs(id1(i))],mysyms{1+mod(j,length(mysyms))}); hold on;
          % draw symbol
          plot([tepochs(id0(i)) tepochs(id1(i))],[bpest(id0(i)) bpest(id1(i))],mysym0{1+mod(j,length(mysym0))},'Linewidth',2,'MarkerFaceColor','k'); hold on;
          
          if plotts == 0  || plotts == 2 || plotts == 3 % draw dashed line for possible pairs
               plot([tepochs(id0(i)) tepochs(id1(i))],[bpest(id0(i)) bpest(id1(i))],mydash{1+mod(j,length(mydash))},'Linewidth',2,'MarkerFaceColor','k'); hold on;
-              %plot([tepochs(id0(i)) tepochs(id1(i))],[bpest(id0(i)) bpest(id1(i))],mylins{1+mod(j,length(mylins))},'Linewidth',2,'MarkerFaceColor','k'); hold on;
          end
-         
-%          if plotts == 2  % draw dashed line
-%             plot([tepochs(id0(i)) tepochs(id1(i))],[bpest(id0(i)) bpest(id1(i))],mydash{1+mod(j,length(mydash))},'Linewidth',2,'MarkerFaceColor','k'); hold on;
-%          end
       end
    end
 end
@@ -320,48 +241,46 @@ v = axis;
 
 if lab_on == 1
 % Plotting Epoch Calendar Dates
-% for Okmok:  set pix = 1/2, set del = .75
-% for Bradys: set pix = 1/6, set del = .20
 kt = floor(min(tepochs)):1:ceil(max(tepochs)); %getting time span
 
 mepi = 0; %set max number of epochs per interval = 0 
 for k = 1:length(kt)-1
-    Icount = find(tepochs > kt(k) & tepochs <= kt(k+1));
+    Icount = find(tepochs > kt(k) & tepochs <= kt(k+1)); % set vector of years 
     if length(Icount) > mepi
         mepi = length(Icount); %finding maximum number of epochs per interval
     end
 end
 
-maxepi = ceil(mepi/3);
-deltay = ((max(bpest)-min(bpest))/5);
-maxy = min(bpest)+deltay*7; %counts 5 deltay for length of longest bpest plus 2 for top border
-miny = min(bpest)-deltay*maxepi;
+maxepi = ceil(mepi/3); 
+deltay = ((max(bpest)-min(bpest))/5); % find distance along y axis for writing
+maxy = min(bpest)+deltay*7; % counts 5 deltay for length of longest bpest plus 2 for top border
+miny = min(bpest)-deltay*maxepi; % sets bottom border for text
 
-month_name = {'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'};
+month_name = {'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'}; % string of month names
+[yr mn day] = dyear2date(tepochs);
 
-%pix = 1/5; %amount of space needed for each label, dependent on values of tick marks
 del = deltay/2; %amount of space between each label, dependent on tick marks 
 
 lspace = min(bpest)-miny;%ceil(min(bpest)-ceil(mepi*pix)); %finding amount of space needed for labels
 l_bot = miny;%lspace+del; %starting spot for label
 for k = 1:length(kt)-1
-    I = find(tepochs > kt(k) & tepochs <= kt(k+1));
+    I = find(yr >= kt(k) & yr < kt(k+1));
     xp = kt(k);%(kt(k)+kt(k+1))/2; %average the x interval for text starting point
-    tp = tepochs(I); 
+    tp = yr(I); 
     dy = length(tp);
     by = l_bot +del*(dy-1); %9.5-.75*(dy-1); -14.5
     yy = fliplr(l_bot:del:by); %fliplr(by:.75:9.5);
     for xx = 1:dy
-        text(xp,yy(xx),sprintf('%1s-%1d',month_name{cal_date(xx,1)}, cal_date(xx,2)));
+        text(xp,yy(xx),sprintf('%1s-%1d',month_name{mn(I(xx))}, day(I(xx)))); % print calendar month and day for each epoch in interval
         
     end
 end
-%set(gca, 'Ytick', miny-deltay:deltay:maxy);
 axis([floor(min(tepochs))-1 ceil(max(tepochs))+1 miny-deltay maxy])
 end
 
+% Set axis and label properties
 year_counts = unique(floor(tepochs));
-year_lab = floor(min(tepochs)):2:ceil(max(tepochs));%(min(year_counts)+1:2:max(year_counts)+1);
+year_lab = floor(min(tepochs)):2:ceil(max(tepochs)); % set x axis labels
 year_labs = {};
 for i = 1:numel(year_lab)
     j = i+1*(i-1);
@@ -369,12 +288,9 @@ for i = 1:numel(year_lab)
     year_labs{j+1} = ' ';
 end
 set(gca,'XTick',[floor(min(tepochs)):1:ceil(max(tepochs))]) 
-%legend(famnam,'Location','NorthOutside');
-%set(gca,'XTick',[2002:1:2016])
-%set(gca,'XTickLabel',['2002';' ';'2004';' ';'2006';' ';'2008';' ';'2010',' ', '2012', ' ', '2014', ' ', '2016'])
 set(gca,'XTickLabel',year_labs)
 
-
+% Set figure properties
 h2=title (titl); set(h2,'FontName','Courier','Fontsize',14,'FontWeight','bold');
 h2=xlabel(xlab);       set(h2,'FontName','Courier','Fontsize',14,'FontWeight','bold');
 h2=ylabel(ylab,'interpreter','latex');         set(h2,'FontName','Courier','Fontsize',14,'FontWeight','bold');
@@ -392,8 +308,7 @@ for ifile = [1 fidtxtout]
 end
 fclose(fidtxtout);
 
-set(FigHandle, 'Position', [100, 100, 995, 895]);%1049
-%save('OkmokBplot')
-
+ set(FigHandle, 'Position', [100, 100, 995, 895]);%1049
+save('OkmokBplot')
 return;
 

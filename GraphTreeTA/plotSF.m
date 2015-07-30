@@ -1,10 +1,21 @@
 function [ output_args ] = plotSF( DD, trees, tu, rs, scalefactor )
-%plotSF Using the incidence matrix DD, trees, epochs, and rates, returns
-%the connectivity graph of the full data set with edges weighted by the
-%uncertainty of the data.  In this graph, nodes represent epochs and edges
-%represent pairs (interferograms).  This function is used in conjunction
-%with plotMSF to find the optimal abridged data set according to Prim's
-%algorithm.
+% function [ output_args ] = plotSF( DD, trees, tu, rs, scalefactor )
+% plotSF: Using the incidence matrix DD, trees, epochs, and rates, returns
+% the connectivity graph of the full data set with edges weighted by the
+% uncertainty of the data.  In this graph, nodes represent epochs and edges
+% represent pairs (interferograms).  This function is used in conjunction
+% with plotMSF to find the optimal abridged data set according to Prim's
+% algorithm.
+%
+% INPUTS:
+%   Q           - edge-vertex incidence matrix 
+%   trees       - matrix of components in data set
+%   tu          - vector of epochs
+%   rs          - uncertainties of pairwise data 
+%   scalefactor - scaling value for data set
+%
+% Elena C. Baluyut, UW-Madison
+% 2015-02-20
 
 % Find pairs
 pairlst = pairlist(DD);
@@ -20,7 +31,7 @@ Wrs = rRSs/100;
 C = zeros(numel(tu), numel(tu));
 mn = numel(tu);
 for h = 1:ndat
-    C(PN(h,3), PN(h,4)) = Wrs(h);
+    C(PN(h,3), PN(h,4)) = Wrs(h); % store uncertainty for each pair
 end
 
 % Plot connectivity graph
@@ -34,7 +45,7 @@ for h = 1:numel(tu)
 end
 
 bg1 = biograph(C, ids);
-set(bg1, 'ShowArrows', 'off')
+set(bg1, 'ShowArrows', 'off') 
 set(bg1, 'ShowWeights', 'on')
 
 % Print biograph to figure with title

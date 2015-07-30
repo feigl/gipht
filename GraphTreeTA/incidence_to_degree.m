@@ -1,18 +1,21 @@
-function [De] = incidence_to_degree(DD)
-%given incidence matrix DD, returns degree matrix De.
-%For ndat = (number of pairs) and me = (number of epochs)...
-%If DD is vertex-edge incidence matrix (me x ndat):
-%   edge degree matrix = incidence_to_degree(DD)
-%   vertex degree matrix = incidence_to_degree(DD')
-% If DD is edge-vertex incidence matrix* (ndat x me): 
-%   vertex degree matrix = incidence_to_degree(DD)
-%   edge degree matrix = incidence_to_degree(DD')
+function [De] = incidence_to_degree(Q)
+% function [De] = incidence_to_degree(Q)
+% Given edge-vertex incidence matrix Q, returns degree matrix De (calculated column-wise).
+% For ndat = (number of pairs) and me = (number of epochs)...
+%   If Q is edge-vertex incidence matrix (ndat x me): 
+%       vertex degree matrix = incidence_to_degree(Q)
+%       edge degree matrix = incidence_to_degree(Q')
+%   In GraphTeeTA, the edge degree matrix is used
 %
-%* as is the case in temporal adjustment
+% INPUT:
+%   Q - edge-vertex incidence matrix (n (# pairs) - by - m (# epochs))
+% OUTPUT:
+%   De - degree matrix
 %
-%Elena Baluyut 2014-08-27
+% Elena C. Baluyut, UW-Madison
+% 2014-08-27
 
-De = diag(sum(abs(DD)));
+De = diag(sum(abs(Q)));
 
 return
 

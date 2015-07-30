@@ -10,7 +10,7 @@ function ft = time_function5(tfunc, ti, tbreaks, metaparams)
 %    output
 %          ft         == vector containing value of time function
 %                        evaluated at each epoch
-%
+% Called in current timefunction.m to avoid repeating code within code
 % 2014-JUL-07 Kurt Feigl
 %
 
