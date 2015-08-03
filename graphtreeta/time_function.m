@@ -62,7 +62,15 @@ function ft = time_function(tfunc, ti, tbreaks, metaparams)
 % 2014-JUL-15 Kurt Feigl
 % 2015 - 04 - 17 Elena C. Baluyut, UW-Madison
 
+%    If the persistent variable does not exist the first time you issue
+%     the persistent statement, it will be initialized to the empty matrix.
 
+persistent nwarning
+
+% if exist('nwarning','var') == 0
+% if nwarning == []
+%     nwarning = 0;
+% end
 
 if nargin ~= 4
     error(sprintf('wrong number of arguments %d. Need 4\n',nargin));
@@ -87,7 +95,12 @@ if numel(tbreaks) > 0
         
         case {'rate','secular'} % CONSTANT RATE
             if numel(tbreaks) > 1
-                warning('ignoring extra tbreaks in secular parameterization');
+                if numel(nwarning) == 0
+                    warning('ignoring %d extra tbreaks in secular parameterization',numel(tbreaks));
+                    nwarning = 1;
+                else
+                    nwarning = nwarning + 1;
+                end
             end
             mparams = 1; % only one interval
             ft = zeros(mparams,1);

@@ -60,25 +60,51 @@ while sats < 1
     ylabel('norm(L*m)')
     hold on
     
-    % User defines index for parameterization
-    index = input('choose index of alpha: ')
+    % FOR INTERACTIVE DECISION, REMOVE COMMENT ON NEXT LINE
+    %interactive = 1;
+    interactive = 0;
+    if interactive == 1
+        % User defines index for parameterization
+        %index = input('choose index of alpha: ')
+        
+        % User desides to keep index or choose a new one
+        check = input('continue with this alpha? [y/n]: ', 's')
+        if strcmp(check, 'y') == 0 && strcmp(check, 'n') == 0
+            disp('incorrect input, make sure not to add spaces')
+        end
+       
+    else
+        % FOR OKMOK EXAMPLE ONLY
+        index = 2
+        check = 'y'     
+    end
+    
     plot(rho(index), eta(index), 'r*') % plot chosen index on L curve
     hold off 
     
-    % User desides to keep index or choose a new one
-    check = input('continue with this alpha? [y/n]: ', 's')
-    if strcmp(check, 'y') == 0 && strcmp(check, 'n') == 0
-        disp('incorrect input, make sure not to add spaces')
-    end
 
      sats = strcmp(check, 'y'); % repeats process until index is satisfactory, 
 end
 
 % Compute statistics similarly to other parameterizations
 pest = M(:, index);
-mse = d'*(pinv(V) - pinv(V)*G*pinv(G'*pinv(V)*G)*G'*pinv(V))*d./(ndat-mparams);
-Vx = pinv(G'*pinv(V)*G)*mse;
-psig = sqrt(diag(pinv(G'*pinv(V)*G)*mse));
-
+if isreal(pest) ~= 1
+    warning('pest has an imaginary part with magnitude %f Taking real part',nanmax(imag(pest)));
+    pest = real(pest);
 end
+
+mse = d'*(pinv(V) - pinv(V)*G*pinv(G'*pinv(V)*G)*G'*pinv(V))*d./(ndat-mparams);
+
+Vx = pinv(G'*pinv(V)*G)*mse;
+
+% standard deviation of parameters
+psig = sqrt(diag(pinv(G'*pinv(V)*G)*mse));
+if isreal(psig) ~= 1
+    warning('psig has an imaginary part with magnitude %f Taking real part',nanmax(imag(psig)));
+    psig = real(psig);
+end
+
+return
+
+
 

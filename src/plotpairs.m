@@ -44,7 +44,12 @@ tmid = (tm+ts)/2;
 tu = unique([tm ts]);
 
 % Start figure
-h1 = figure('color','w'); hold on; set(h1,'DefaultTextInterpreter','None');    
+h1 = figure('color','w'); hold on; set(h1,'DefaultTextInterpreter','None'); 
+
+if isreal(Qfsigl) == 0 || isreal(Qfsigu) == 0
+    Qfsigl 
+    Qfsigu
+end
 
 % Draw green, vertical lines at times when slope breaks
 if exist('tbreaks','var') == 1

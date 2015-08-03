@@ -1,4 +1,4 @@
-function [ minWd, hbar] = plot_var_epochs(Wd, tu)
+function [ minWd, h] = plot_var_epochs(Wd, tu)
 % function [ minWd, hbar] = var_epochs(Q, V, tu)
 % Plots the relative variance for each epoch as a bar graph with epochs labeled with
 % corresponding calendar dates
@@ -26,7 +26,7 @@ index = 1:numel(tu); % assign epoch index numbers
 
 % Display 
 figure;
-hbar = bar(index, Wd_norm);
+h = bar(index, Wd_norm);
 title('Variance in Epoch-wise Measurements by Epoch Index')
 xlabel('epoch index')
 h = ylabel('uncertainty in \DeltaV');
@@ -48,7 +48,10 @@ axpx_ratio = ax(4)/80; % ratio of y axis units to pixels
 maxbar_pix = 80*max(Wd_norm)/ax(4); % find pixel length of longest bar
 axis_pix = maxbar_pix+text_pix; % pixel length
 axis_len = axis_pix*axpx_ratio; % convert to axis length
-axis([min(index)-.5, max(index)+1, 0, axis_len])
+axis([min(index)-.5, max(index)+1, 0, axis_len]);
+
+% return graphics handle to current figure;
+h = gcf;
 
 end
 

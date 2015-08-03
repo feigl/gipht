@@ -271,7 +271,8 @@ for k = 1:length(kt)-1
     by = l_bot +del*(dy-1); %9.5-.75*(dy-1); -14.5
     yy = fliplr(l_bot:del:by); %fliplr(by:.75:9.5);
     for xx = 1:dy
-        text(xp,yy(xx),sprintf('%1s-%1d',month_name{mn(I(xx))}, day(I(xx)))); % print calendar month and day for each epoch in interval
+       % text(xp,yy(xx),sprintf('%1s-%1d',month_name{mn(I(xx))}, day(I(xx)))); % print calendar month and day for each epoch in interval
+       text(xp,yy(xx),sprintf('%3s-%02.2d',month_name{mn(I(xx))}, day(I(xx)))); % print calendar month and day for each epoch in interval
         
     end
 end
@@ -309,6 +310,6 @@ end
 fclose(fidtxtout);
 
  set(FigHandle, 'Position', [100, 100, 995, 895]);%1049
-save('OkmokBplot')
+%save('OkmokBplot')
 return;
 
