@@ -65,22 +65,25 @@ while sats < 1
     interactive = 0;
     if interactive == 1
         % User defines index for parameterization
-        %index = input('choose index of alpha: ')
-        
+        index = input('choose index of alpha: ')
+        plot(rho(index), eta(index), 'r*') % plot chosen index on L curve
+        hold off
         % User desides to keep index or choose a new one
         check = input('continue with this alpha? [y/n]: ', 's')
+        
         if strcmp(check, 'y') == 0 && strcmp(check, 'n') == 0
             disp('incorrect input, make sure not to add spaces')
         end
-       
+        
     else
         % FOR OKMOK EXAMPLE ONLY
-        index = 2
-        check = 'y'     
+        index = 1
+        check = 'y'
+        plot(rho(index), eta(index), 'r*') % plot chosen index on L curve
+        hold off
     end
     
-    plot(rho(index), eta(index), 'r*') % plot chosen index on L curve
-    hold off 
+    
     
 
      sats = strcmp(check, 'y'); % repeats process until index is satisfactory, 

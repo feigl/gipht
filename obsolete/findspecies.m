@@ -1,4 +1,4 @@
-function [trees, DD] = findtrees(t0,t1,score)
+function [species, DD] = findspecies(t0,t1,score)
 % given pair-wise list of epochs t0 and t1, return a list of trees
 % Kurt Feigl, CNRS
 % 2007 MAY 09  Allow case of np = 2
@@ -23,7 +23,7 @@ nargoutchk (2,2,nargout);
 
 
 % initialize values to return
-trees = NaN;
+species = NaN;
 DD = NaN;
 
 if length(t0) ~= length(t1) 
@@ -115,18 +115,18 @@ end
 if ncnull ~= ntrees || nrnull ~= me 
     error 'Counting problem'
 else
-   trees = NaN*ones(ntrees,me);  
+   species = NaN*ones(ntrees,me);  
     for j=1:ntrees
         k = 0;
         for i=1:me
            if abs(N(i,j)) > 0
                 k = k+1;
-                trees(j,k) = i;
+                species(j,k) = i;
             end
         end
     end
 end
 
-trees = sortrows(trees);
+species = sortrows(species);
 return
 

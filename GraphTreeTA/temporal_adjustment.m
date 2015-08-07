@@ -1,4 +1,4 @@
-function [pest, psig, mse, dmod, tfit, pfit, sfitl, sfitu, rd, V, G, sswr, Vx, var] = temporal_adjustment(data,data_sigma,tm,ts,tbreaks,tfunc,metaparams)
+function [pest, psig, mse, dmod, tfit, pfit, sfitl, sfitu, rd, V, G, sswr, Vx, var, res_n] = temporal_adjustment(data,data_sigma,tm,ts,tbreaks,tfunc,metaparams)
 % function [pest, psig, mse, dmod, tfit, pfit, sfitl, sfitu, rd, V, G, sswr, Vx, var] = temporal_adjustment(data,data_sigma,tm,ts,tbreaks,tfunc,metaparams)
 % Given time tags and data values, perform temporal adjustment. Solve the weighted least squares
 % problem Gm = d, where G is the design matrix, d is the data vector
