@@ -130,6 +130,7 @@ if strcmp(tfunc,'pwl') == 1 && ntrees == 1
     G(end+1, 1) = 1; 
     data(end+1) = 0; 
     dsig(end+1) = 1; % aribtrarily assign uncertainty for constraint
+    Q = G;
 elseif strcmp(tfunc, 'ber') == 1
     [ G ] = ber_mat( Q, tu);
     mparams = me-1;
