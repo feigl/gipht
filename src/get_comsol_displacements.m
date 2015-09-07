@@ -1,6 +1,6 @@
 function [solution_epochs,xpts,ypts,zpts,dupts,dvpts,dwpts] = get_comsol_displacements(PST,DST,TST)
 %function [solution_epochs,xpts,ypts,zpts,dupts,dvpts,dwpts] = get_comsol_displacements(PST,DST,TST)
-% Kurt 2014-08-08
+% Kurt 2015-09-07 works with Comsol version 5.1
 xpts=DST.x;
 ypts=DST.y;
 zpts=DST.z;
@@ -15,14 +15,15 @@ verbose = 0;
 
 model = mphload(PST.datafilename);
 
-info1 = mphsolinfo(model);
+info1 = mphsolinfo(model,'soltag','sol1');
 info2 = mphsolutioninfo(model);
-
+% 
 if verbose == 1
     info1
     info2
 end
 
+% 
 % Comsol evaluation solution_epochs in seconds
 solution_epochs = info1.solvals;
 
@@ -157,8 +158,6 @@ if verbose == 1
     figure;
     quiver(colvec(DST.x/1e3),colvec(DST.y/1e3),colvec(dupts),colvec(dvpts));
 end
-
-
 
 return
 

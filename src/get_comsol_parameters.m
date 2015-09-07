@@ -4,12 +4,12 @@ function [pnames32, pnames, values, dims, descrs] = get_comsol_parameters(mphnam
 
 verbose = 1;
 if verbose == 1;
-    fprintf(1,'Loading %s\n',mphname);
+    fprintf(1,'Loading %s\n',char(mphname));
 end
 
 %model = svartsengi2DaxiV09a;
 
-model = mphload(mphname);
+model = mphload(char(mphname));
 
 param_names = model.param.varnames;
 

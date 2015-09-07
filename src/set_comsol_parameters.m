@@ -4,10 +4,10 @@ function nreset = set_comsol_parameters(PST, mphname, pnamesCS, values, dims, de
 verbose = 0;
 
 if verbose == 1;
-    fprintf(1,'Loading %s\n',mphname);
+    fprintf(1,'Loading %s\n',char(mphname));
 end
 tstart=tic;
-model = mphload(mphname);
+model = mphload(char(mphname));
 if verbose == 1
     fprintf(1,'Finished task in %.1f seconds\n',toc(tstart));
 end
@@ -66,11 +66,16 @@ if verbose == 1;
     fprintf(1,'Saving %s\n',mphname);
 end
 tstart = tic;
+
+%% Save the parameters to the MPH file
 %mphsave(model,sprintf('%s.mph',mphname));
 %mphsave(model,mphname);
 
 % 20140829 need to instance it 
-model.save(mphname);
+%model.save(mphname);
+
+% 20150901 call function
+mphsave(model,char(mphname));
 
 if verbose == 1
     fprintf(1,'Finished task in %.1f seconds\n',toc(tstart));

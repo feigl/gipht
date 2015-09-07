@@ -83,36 +83,36 @@ mysym0 = {'gx'  'ro'  'b*'  'ks'  'md'  'cv'};
 % number of pairs and number of epochs
 [np,me] = size(DD); 
 
+%% Kurt 20150901 Causes problems because iuniqorbs not defined
+% %plot origin to make legend come out right
+% if ntrees < 10
+%     for j=1:ntrees
+%         plot(min(tepochs),0,mysyms{1+mod(j,length(mysyms))});
+%         tree = trees(j,:);
+%         k=isfinite(tree);
+%         tree=tree(k);
+%         me = length(find(k == 1));
+%         if nargin >= 6
+%             tree_name{j} = strcat(sprintf('trees %s orbits:',char(j+64)),sprintf(' %7d',iuniqorbs(tree(1:me))));
+%         else
+%             tree_name{j} = strcat(sprintf('trees %s ID:',char(j+64)),sprintf('%3d',char(j+64),tree(1:me)));
+%         end
+%     end
+%     ktours = zeros(size(trees));
+%     
+%     legend(tree_name,'Location','NorthOutside');
+%     % over plot origin with white
+%     plot(min(tepochs),0,'sw');
+%     plot(min(tepochs),0,'ow');
+%     plot(min(tepochs),0,'xw');
+%     plot(min(tepochs),0,'*w');
+%     plot(min(tepochs),0,'dw');
+%     plot(min(tepochs),0,'vw');
+%     
+% end
 
-%plot origin to make legend come out right
-if ntrees < 10
-    for j=1:ntrees
-        plot(min(tepochs),0,mysyms{1+mod(j,length(mysyms))});
-        tree = trees(j,:);
-        k=isfinite(tree);
-        tree=tree(k);
-        me = length(find(k == 1));
-        if nargin >= 6
-            tree_name{j} = strcat(sprintf('trees %s orbits:',char(j+64)),sprintf(' %7d',iuniqorbs(tree(1:me))));
-        else
-            tree_name{j} = strcat(sprintf('trees %s ID:',char(j+64)),sprintf('%3d',char(j+64),tree(1:me)));
-        end
-    end
-    ktours = zeros(size(trees));
-    
-    legend(tree_name,'Location','NorthOutside');
-    % over plot origin with white
-    plot(min(tepochs),0,'sw');
-    plot(min(tepochs),0,'ow');
-    plot(min(tepochs),0,'xw');
-    plot(min(tepochs),0,'*w');
-    plot(min(tepochs),0,'dw');
-    plot(min(tepochs),0,'vw');
-    
-end
 
-
-% draw end points of available pairs
+%% draw end points of available pairs
 id0 = zeros(np,1); 
 id1 = zeros(np,1); 
 for i=1:np      
@@ -141,10 +141,11 @@ end
 
 %plot([min(tepochs) min(tepochs)],[min(scores)-0.1*(max(scores)-min(scores)) max(scores)+0.1*(max(scores)-min(scores))],'w.'); % draw a white dot to stretch scales
 
-% make a legend
-if np < 10
-   legend(tree_name,'Location','NorthOutside');
-end
+% %% Kurt 2015 causes problems
+% % make a legend
+% if np < 10
+%    legend(tree_name,'Location','NorthOutside');
+% end
 
 % make title string
 titl = sprintf('np = %d me = %d ntrees = %d\n',np,me,ntrees);

@@ -256,8 +256,13 @@ end
 % estimate the pseudoabsolute baselines
 bpest = adjustbp(tepochs,DD,bperp, species,iuniqorbs, uniqdates);
 nf=nf+1;h(nf)=figure;
-plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, 0, 'orbital separation (Bperp) [m]');
+%plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, 0, 'orbital separation (Bperp) [m]');
 %ktour = plotbp(tepochs, bpest, DD, species,iuniqorbs, uniqdates, 3);
+
+% Call Elena's function 20150901
+% function h = plot_trees(tepochs, scores, DD, trees,xlab,ylab)
+plot_trees(tepochs, bpest, DD, species, 'year', 'B_perp [m]');
+
 %feval(printfun,sprintf('%s_%02d',mfilename,nf));
 %feval(printfun,sprintf('%s_SPECIES',runname));
 feval(printfun,sprintf('%s_SPECIES',runname));
