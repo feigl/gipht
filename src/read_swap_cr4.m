@@ -55,7 +55,7 @@ function z=read_swap_cr4(name,ncols)
 % Swap bytes 4 by 4
 
 % Swap bytes 4 by 4
-commandline = sprintf('%s %s 4 swap_cr4.cr4\n',get_executable_name('swapbytes.c'),name);
+commandline = sprintf('%s %s 4 swap_cr4.cr4\n',get_executable_name('swapbytes.c'),name)
 [status, result] = system(commandline)
 
 if status ~= 0

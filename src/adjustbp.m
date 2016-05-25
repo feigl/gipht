@@ -11,12 +11,12 @@ function bpest = adjustbp(tepochs,DD,bp,species, iuniqorbs, uniqdates)
 % 2005 JUL 14 add orbit numbers and dates as option
 %
 % 2007 DEC replace Bp with Ddop
-
+% 20160524 use datetime timetags
 
 fprintf(1,'%s begins ...\n',mfilename);
 
-nargchk(4,6,nargin);
-nargoutchk (1,1,nargout);
+narginchk(4,6);
+nargoutchk(1,1);
 
 
 if (max(bp)-min(bp) < 1)
@@ -101,8 +101,10 @@ else
            j=j(1);k=k(1);
           %fprintf (1,  '%5d %c %7d %s %3d %10.4f %10.4f\n',i,char(i+64),iuniqorbs(i),uniqdates{i},j,tepochs(i),bpest(i));
           %fprintf (fid,'%5d %c %7d %s %3d %10.4f %10.4f\n',i,char(i+64),iuniqorbs(i),uniqdates{i},j,tepochs(i),bpest(i));
-           fprintf (1,  '%5d %7d %s %c %10.4f %10.4f\n',i,iuniqorbs(i),uniqdates{i},char(j+64),tepochs(i),bpest(i));
-           fprintf (fid,'%5d %7d %s %c %10.4f %10.4f\n',i,iuniqorbs(i),uniqdates{i},char(j+64),tepochs(i),bpest(i));
+%            fprintf (1,  '%5d %7d %s %c %10.4f %10.4f\n',i,iuniqorbs(i),uniqdates{i},char(j+64),tepochs(i),bpest(i));
+%            fprintf (fid,'%5d %7d %s %c %10.4f %10.4f\n',i,iuniqorbs(i),uniqdates{i},char(j+64),tepochs(i),bpest(i));
+           fprintf (1,  '%5d %7d %s %c %12s %10.4f\n',i,iuniqorbs(i),uniqdates{i},char(j+64),tepochs(i),bpest(i));
+           fprintf (fid,'%5d %7d %s %c %12s %10.4f\n',i,iuniqorbs(i),uniqdates{i},char(j+64),tepochs(i),bpest(i));
 	end
 end
 fclose(fid);

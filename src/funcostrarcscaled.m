@@ -1,19 +1,13 @@
-function cost1 = funcostrarcscaled(p,fitfun,DST,PST,TST)
-% cost  function for phase model
-%   p   == parameter
+function cost1 = funcostrarcscaled(DST,PST,TST)
+%function cost1 = funcostrarcscaled(DST,PST,TST)
 % 2014-JAN-08 angular deviations by measurement uncertainty
-%
-% for use with ANNEAL
+% 20160524 change number of arguments
 
-nargchk(5, 5, nargin);
+narginchk(3, 3);
 
-if numel(p) ~= numel(PST.p0)
-    error(sprintf('Dimension mismatch %d %d\n',numel(p),numel(PST.p0)));
-end
-PST.p1 = p;
 
-% field of costs in radians
-costs = funcostsrarc(fitfun,DST,PST,TST);
+% field of costs (angular devation) in radians
+costs = funcostsrarc(DST,PST,TST);
 
 % normalize by uncertainty
 costs = costs ./ DST.phasig;

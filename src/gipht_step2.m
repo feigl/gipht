@@ -144,9 +144,9 @@ for k=1:me  %    % loop over epochs
         i2 = ndata;
     end
     
-    [is,jm] = find(species == k);
-    % is is index to species
-    % jm is index of member within species
+    [is,jm] = find(trees == k);
+    % is is index to trees
+    % jm is index of member within trees
     
     %pindex=             get_parameter_index(sprintf('time_fn_@_epoch_%03d_____________',k),pnames);
     pindex = [];%                                     E_grad__@_epoch_001_dimless_____
@@ -164,7 +164,7 @@ for k=1:me  %    % loop over epochs
     pindex=union(pindex,get_parameter_index(sprintf('OrbitVelV__@_epoch_%03d_m_per_s__',k),pnames));
     
     for ii=1:numel(pindex)
-        if jm == 1   % epoch is first in species
+        if jm == 1   % epoch is first in trees
             %if abs(p0(pindex(ii))) >= 0.0 && isfinite(p0(pindex(ii))) == 1 % initial value is already set
             if isfinite(p0(pindex(ii))) == 1 % initial value is already set
                 lb(pindex(ii)) = p0(pindex(ii));                % update lower bound
@@ -178,7 +178,7 @@ for k=1:me  %    % loop over epochs
                 fprintf(1,'Zeroing  initial value and bounds on %s %16.7g %16.7g %16.7g\n'...
                     ,pnames{pindex(ii)},p0(pindex(ii)),lb(pindex(ii)),ub(pindex(ii)));
             end
-        else % epoch is NOT first in species
+        else % epoch is NOT first in trees
             lb(pindex(ii)) = p0(pindex(ii)) + lb(pindex(ii));                % update lower bound
             ub(pindex(ii)) = p0(pindex(ii)) + ub(pindex(ii));                % update upper bound
             fprintf(1,'Updating                       bounds on %s %16.7g %16.7g %16.7g\n'...
@@ -209,9 +209,10 @@ end
 % handle time function
 pindex=get_parameter_index('time_fn',pnames);
 if numel(pindex) == numel(tepochs)
-    p0(pindex) = tepochs;
-    lb(pindex) = tepochs;
-    ub(pindex) = tepochs;
+    dy = dyear(year(tepochs),month(tepochs),day(tepochs));
+    p0(pindex) = dy;
+    lb(pindex) = dy;
+    ub(pindex) = dy;
 else
     error('numel(pindex) NE numel(tepochs)');
 end
@@ -285,12 +286,6 @@ for i = 1:mparam
     end
 end
 
-% bounds matrix
-% must be an nx2 matrix of bounds on parameter
-% where n is the number of parameters.
-bounds(:,1) = lb;
-bounds(:,2) = ub;
-%size(bounds)
 
 mfree = 0;
 for i=1:mparam
@@ -311,22 +306,28 @@ if mfree == 0 && ianneal ~= 0
     ianneal = 0;
 end
     
+%% bounds matrix
+% must be an nx2 matrix of bounds on parameter
+% where n is the number of parameters.
+bounds(:,1) = lb;
+bounds(:,2) = ub;
+%size(bounds)
 
-% set up parameter structure PST for passing to optimizer
+%% build parameter structure PST00 for null model
 psig = NaN*ones(size(p0));
-p1 = NaN*ones(size(p0));
 for i=1:numel(p0)
     pflags{i} = 'N#';
 end
-PST = build_pst(fitfun,mparam,p0,p1,psig,pnames,bounds,datafilename,pscl,pflags);
-ierr = check_struct(PST);
-ierr2 = write_pst(PST,fnamepstin);
-
-% null model
-%PST00 = PST;
-%PST00.p1 = zeros(size(PST00.p1));
 PST00 = build_pst(fitfun,mparam,zeros(size(p0)),zeros(size(p0)),zeros(size(p0))...
     ,pnames,bounds,datafilename,pscl,pflags);
+
+
+%% build parameter structure PST0 for initial estimate
+p1 = p0;
+PST0 = build_pst(fitfun,mparam,p0,p1,psig,pnames,bounds,datafilename,pscl,pflags);
+ierr = check_struct(PST0);
+ierr2 = write_pst(PST0,fnamepstin);
+
 
 % call fitting function first time to initialize
 % temporary storage structure TST
@@ -334,21 +335,17 @@ ierr = check_struct(DST);
 clear rng
 clear TST
 fprintf(1,'Calling fitting function for first time to initialize.\n');
-[rng,TST] = feval(fitfun,DST,PST);
+[rng,TST] = feval(fitfun,DST,PST0);
 % 20150519 Try to avoid using feval
 %fhandle = @fitfun;
 % fhandle = @funfit28
 % [rng,TST] = fhandle(DST,PST);
 DST.phamod = rng;
 
-% % evaluate fitting function at initial estimate of parameter vector
-PST0 = PST;
-PST0.p1=PST0.p0;
-
 % evaluate function at initial estimate
 clear mdl0;
 fprintf(1,'Calling fitting function for second time\n');
- mdl0 = feval(fitfun,DST,PST0,TST);
+mdl0 = feval(fitfun,DST,PST0,TST);
 % 20150519 Try to avoid using feval
 % fhandle = @fitfun;
 % mdl0 = fhandle(DST,PST0,TST);
@@ -395,12 +392,21 @@ switch ianneal
         % evaluate costs of null model and initial model in cycles
         p00 = zeros(size(p0)); % null model
         
-        %cost00  = feval(objfun,p00,fitfun,DST,PST,TST); % cost of null model
+%         %cost00  = feval(objfun,p00,fitfun,DST,PST,TST); % cost of null model
+%         fprintf(1,'Starting to calculate cost of null    estimate\n');
+%         cost00  = feval(objfun,p00,'funnull',DST,PST00,TST); % cost of null model
+%         fprintf(1,'Starting to calculate cost of initial estimate\n');
+%         cost0   = feval(objfun,p0, fitfun,DST,PST0,TST); % cost of initial model
+%         msig = nan(size(p0)); % uncertainty of model parameters
+        % 20160524 reduce number of arguments to 4
+       %cost00  = feval(objfun,p00,fitfun,DST,PST,TST); % cost of null model
         fprintf(1,'Starting to calculate cost of null    estimate\n');
-        cost00  = feval(objfun,p00,'funnull',DST,PST,TST); % cost of null model
+        PST00.fitfun = 'funnull';
+        cost00  = feval(objfun,DST,PST00,TST); % cost of null model
         fprintf(1,'Starting to calculate cost of initial estimate\n');
-        cost0   = feval(objfun,p0, fitfun,DST,PST,TST); % cost of initial model
-        msig = nan(size(p0)); % uncertainty of model parameters
+        PST0.fitfun = fitfun;
+        cost0   = feval(objfun,DST,PST0,TST); % cost of initial model
+        msig = nan(size(PST0.p0)); % uncertainty of model parameters
         istatcode = 0;
 %     case 3
 %         fprintf(1,'ianneal is 3, so runnning untested code in %s...\n',mfilename);
@@ -526,40 +532,41 @@ switch ianneal
         %[p1,f,model,energy,count] = anneal5(objfun,bounds,options,fitfun,DST,PST,TST);
         
         %function [mhat,fval,model,energy,count]=constrainedopt1(FUN,bounds,OPTIONS,varargin)
-        [p1,f,model,energy,count] = constrainedopt1(objfun,bounds,options,fitfun,DST,PST,TST);
+        [p1,f,model,energy,count] = constrainedopt1(objfun,bounds,options,fitfun,DST,PST0,TST);
         fprintf (1,'\nAnnealing ended after %15.0f seconds\n',toc(tanneal));
         msig = nan(size(p0));
         
         
     case 2
         %start annealing
-        fprintf (1,'\nStarting anneal5 with recording....\n');
+        fprintf (1,'\nStarting annealing with recording....\n');
         options(7) = 2;  % use this for anneal2
         tanneal=tic;
-        [p1,f,trials,energy,count] = anneal5(objfun,bounds,options,fitfun,DST,PST,TST);
+        %[p1,f,trials,energy,count] = anneal5(objfun,bounds,options,fitfun,DST,PST0,TST);
+        [p1,f,trials,energy,count] = anneal6(objfun,options,DST,PST0,TST);
         
         fprintf (1,'\nAnnealing ended after %15.0f seconds\n',toc(tanneal));
         trials = trials';
         acosts1= trials(:,1);        % cost values are in first column
         temps  = trials(:,2);        % temperatures are in second column
         trials = trials(:,3:end);% trial parameter values are in remaining columns
-        % calculate uncertainties in estimated parameters by bootstrap
-        % resampling (100 times slower than simulated annealing)
-        if saopt6 == 3
-            options(7) = 0;  % quiet
-           %options(7) = 2;  % verbose     
-           %[pj1,msig,costj1]=fminjackknife2(objfun,bounds,p1,options,fitfun,DST,PST,TST);
-            [pj1,msig,costj1,pboot]=bootstrapanneal1(objfun,bounds,p1,options,fitfun,DST,PST,TST);
-            nf=nf+1;
-            h(nf) = plot_pairwise_correlations1(pboot,pnames);
-            feval(printfun,sprintf('%s_BOOTSCATTER',runname));
-        end
+%         % calculate uncertainties in estimated parameters by bootstrap
+%         % resampling (100 times slower than simulated annealing)
+%         if saopt6 == 3
+%             options(7) = 0;  % quiet
+%            %options(7) = 2;  % verbose     
+%            %[pj1,msig,costj1]=fminjackknife2(objfun,bounds,p1,options,fitfun,DST,PST,TST);
+%             [pj1,msig,costj1,pboot]=bootstrapanneal1(objfun,bounds,p1,options,fitfun,DST,PST0,TST);
+%             nf=nf+1;
+%             h(nf) = plot_pairwise_correlations1(pboot,pnames);
+%             feval(printfun,sprintf('%s_BOOTSCATTER',runname));
+%         end
     case 3
         fprintf (1,'\nStarting annealing using SIMANN...\n');
         acosts1(1)=NaN;
         tanneal=tic;
         %[p1,F,model,energy,count]=simann1(objfun,bounds,options,fitfun,DST,PST,TST);
-        [DST,PST,TST] = simann1(objfun,bounds,options,fitfun,DST,PST,TST)
+        [DST,PST1,TST] = simann1(objfun,bounds,options,fitfun,DST,PST0,TST)
         fprintf (1,'\nAnnealing using SIMANN ended after %15.0f seconds\n',toc(tanneal));
     case 4
         if surrogate ~= 1
@@ -569,7 +576,7 @@ switch ianneal
         
         maxiter = nsaruns;
        
-        [TSTP, PST4, trials] = anneal_with_surrogate(objfun, DST, PST, TST, maxiter...
+        [TSTP, PST4, trials] = anneal_with_surrogate(objfun, DST, PST0, TST, maxiter...
             , verbose, imode, nf, runname, printfun, options);
         p1 = PST4.p1;
         msig = nan(size(p1));
@@ -589,35 +596,30 @@ switch ianneal
         fprintf (1,'\nOptimization ended after %15.2f seconds and %d evaluations\n',toc(tanneal),count);
     case 6                
         %[PSTout,h,mskip] = mcmc2(PST,DST,TST,mstepscale,nburnin,nskip,niter);
-        [PSTout,h,mskip] = mcmc3(PST,DST,TST,mstepscale,nburnin,nskip,niter);
-        p1 = PSTout.p1;
-        msig = PSTout.sigma;
+        [PST1,h,mskip] = mcmc3(PST0,DST,TST,mstepscale,nburnin,nskip,niter);
+        p1 = PST1.p1;
+        msig = PST1.sigma;
         acosts1(1)=NaN;
     otherwise
         error(sprintf('Unknown value of ianneal = %d\n',ianneal));
 end; % switch on ianneal
 
-% save final estimate
-PST1       = PST;
+%% save final estimate in structure PST1
+PST1       = PST0;
 PST1.p0    = colvec(p0); 
 PST1.p1    = colvec(p1);
 PST1.sigma = colvec(msig);
 
+%% cost of final estimate
+cost1 = feval(objfun,DST,PST1,TST);
 
+%% print results
 fprintf(1        ,'\n\nI          Parameter_Name               P0(initial)     P1(final)     Adj   PlusMinusBnd\n');
 for i = 1:mparam
-%    if findstr(pnames{i},'time_fn') > 0 | ( abs(p1(i)) > 1. & abs(p1(i)) < 1000)
-%       fmtstr = '%3d %#28s %10.3f %10.3f %10.0f %10.3f %10.3f\n';
-%    else
-%       fmtstr = '%3d %#28s %10.2e %10.2e %10.0f %10.2e %10.2e\n';
-%    end
-
    fmtstr = getfmt(p1(i),pnames{i});
    fprintf(1,fmtstr,pflag{i},i,pnames{i},p0(i),p1(i),p1(i)-p0(i),NaN,NaN,(ub(i)+lb(i))/2.0);
 end
 
-% cost of final estimate
-cost1 = feval(objfun,p1,fitfun,DST,PST,TST);
 
 for fd=[1 fidtxtout]
    fprintf(fd,'\n');

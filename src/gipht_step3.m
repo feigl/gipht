@@ -33,9 +33,14 @@ cstddev1 = NaN;
 % decide how to handle statistics
 switch pselect
     case {1,2,3,5} % observable is phase
-        % Assume phase residuals are distributed as Von Mises to calculate
-        % critical value of cost at 69 percent confidence
-        istatcode = 1;
+        if strcmp(objfun,'funcoststdnres') == 1
+            % assume (weighte) unwrapped phase residuals are normally distributed
+            istatcode = 8;
+        else
+            % Assume phase residuals are distributed as Von Mises to calculate
+            % critical value of cost at 69 percent confidence
+            istatcode = 1;
+        end
     case 7 % observable is gradient
         if strcmp(objfun,'funcostrarcscaled') == 1
             % Assume residuals of gradient values are distributed as Gamma to calculate
@@ -98,7 +103,7 @@ switch ianneal
         mdl00 = feval('funnull',DST,PST00,TST); % null
         %mdl00 = mdl00 + mean_direction(DST.phaobs);
         % initial model
-        mdl0  = feval(fitfun,DST,PST  ,TST); % initl
+        mdl0  = feval(fitfun,DST,PST0  ,TST); % initl
         % final model
         mdl1  = feval(fitfun,DST,PST1 ,TST); % final
         %     case 3
@@ -182,13 +187,17 @@ elseif strcmp(objfun,'funcostrms') == 1
     costs00 = abs(DST.phaobs-wrm00);
     costs0  = abs(DST.phaobs-wrm0);
     costs1  = abs(DST.phaobs-wrm1);
+elseif strcmp(objfun,'funcoststdnres') == 1
+    costs00 = DST.phaobs;
+    costs0  = DST.phaobs-mdl0;
+    costs1  = DST.phaobs-mdl1;
 else
     error(sprintf('Unknown value of objfun %s\n',objfun));
 end
 % values of total costs in cycles
-cost00 = feval(objfun,p00,fitfun,DST,PST,TST);
-cost0  = feval(objfun,p0, fitfun,DST,PST,TST);
-cost1  = feval(objfun,p1, fitfun,DST,PST,TST);
+cost00 = feval(objfun,DST,PST00,TST);
+cost0  = feval(objfun,DST,PST0, TST);
+cost1  = feval(objfun,DST,PST1, TST);
 
 % mean resultant lengths of resdiduals
 Rbar00 = rbarrad(res00);
@@ -351,6 +360,9 @@ if istatcode ~= 0
         case 7
             crit69 = NaN;
             fprintf(1,'Using MCMC statistics ISTATCODE = %d\n',istatcode);
+        case 8
+            crit69 = NaN;
+            fprintf(1,'Using Gaussian statistics ISTATCODE = %d\n',istatcode);
         otherwise
             warning(sprintf('Unknown value of ISTATCODE = %d\n',istatcode));
     end

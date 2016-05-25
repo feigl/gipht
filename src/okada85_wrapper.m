@@ -65,6 +65,16 @@ OPEN   =    pg(10);                       % tensile opening in meters
 
 E =     xyobs(1,:) - pg(6);               % relative position of obs point wrt to fault centroid
 N =     xyobs(2,:) - pg(7);               % relative position of obs point wrt to fault centroid
+
+% Emax = max(abs(E));
+% Nmax = max(abs(N));
+% if Emax > 1.e4 || Nmax > 1.e4 || hypot(Emax,Nmax) > 1.e4
+%     warning('Observation point is more than 10 km from fault centroid:');
+%     Emax
+%     Nmax
+% end
+
+
 DEPTH = pg(3);                            % relative position of obs point wrt to fault centroid
 
 NU    = nu;                               % Poisson's ratio
@@ -87,7 +97,7 @@ NU    = nu;                               % Poisson's ratio
 % title('displacement magnitude in meters');
 % xlabel('U [m]');
 % ylabel('number of occurrences');
-
+% 
 % disp 'uE'; size(uE)
 
 uENZ(1,:) = uE;

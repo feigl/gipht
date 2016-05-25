@@ -19,6 +19,9 @@ function [xs, ys, zs, xdot, ydot, zdot, mjd1950, sec, orbnum] = readorb(orbfile)
 % GPS Week   641 Day of week  5, GPS Seconds 432000 Day of Week Fri
 % Decimal Year  1992.31148
 
+narginchk(1,1);
+nargoutchk(9,9);
+
 if fexist(orbfile)    
     [mjd1950,sec,orbnum,xs,ys,zs,xdot,ydot,zdot] = textread(orbfile,'%d%f%d%*[^\n]\n%f%f%f\n%f%f%f\n',-1);
     

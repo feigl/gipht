@@ -1,21 +1,12 @@
-function cost1 = funcostrarc(p,fitfun,DST,PST,TST)
-%function cost1 = funcostrarc(p,fitfun,DST,PST,TST)
+function cost1 = funcostrarc(DST,PST,TST)
+%function cost1 = funcostrarc(DST,PST,TST)
 % cost function for phase model is mean of dev = arc(obs,mod)
+% 20160524 reduce number of arguments to 4
 
-nargchk(5, 5, nargin);
+narginchk(3, 3);
 
-if numel(p) ~= numel(PST.p0)
-    error(sprintf('Dimension mismatch %d %d\n',numel(p),numel(PST.p0)));
-end
-PST.p1 = p;
-% field of costs in DN [0,127]
-%costs = funcostsiarc1(p,fitfun,xyzm,tepochs,bpest,dops,DD,unitv,xd,yd,ippix1);
-%costs = funcostsiarc1(p,fitfun,varargin{:});
-%costs = funcostsiarc1(p,fitfun,xyzm,tepochs,bpest,dops,DD,unitv,xd,yd,ippix1,ifast,partials);
-% field of costs on DN [0, 
-%costs = funcostsrarc(p,fitfun,xyzm,tepochs,bpest,dops,DD,unitv,xd,yd,ippix1,ifast,partials);
-costs = funcostsrarc(fitfun,DST,PST,TST);
-%size(costs)
+% field of costs (angular devation) in radians
+costs = funcostsrarc(DST,PST,TST);
 
 % 20140807 prune out NaN
 iok = isfinite(costs);

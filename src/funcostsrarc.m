@@ -1,4 +1,5 @@
-function costs = funcostsrarc(fitfun,DST,PST,TST)
+function costs = funcostsrarc(DST,PST,TST)
+%function costs = funcostsrarc(fitfun,DST,PST,TST)
 %function costs = funcostsrarc(p,fitfun,xyzm,tepochs,bpest,dops,DD,unitv,xd,yd,ippix1,ifast,partials)
 %function costs = funcostsrarc(p,fitfun,varargin)
 %function costs = funcostsrarc(p,fitfun,xyzm,tepochs,bpest,dops,DD,unitv,xd,yd,ippix1)
@@ -26,6 +27,12 @@ function costs = funcostsrarc(fitfun,DST,PST,TST)
 % unwrapped phase in radians
 %[uwm, dummyforpartials] = feval(fitfun,p,xyzm,tepochs,bpest,dops,DD,unitv,ippix1,ifast,partials);
 %[uwm, dummyforpartials] = feval(fitfun,DST,PST,TST);
+% 20160524change number of arguments
+%narginchk(4, 4);
+narginchk(3, 3);
+
+fitfun = str2func(PST.fitfun);
+
 uwm = feval(fitfun,DST,PST,TST);
 
 %     if (size(uwm) ~= size(xd))

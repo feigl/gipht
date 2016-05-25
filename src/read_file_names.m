@@ -1,4 +1,4 @@
-function [pfnames, mdate, imast, sdate, islav, hamb, ddays, t0, t1] = read_file_names(file_name)
+function [pfnames, mdate, imast, sdate, islav, hamb, ddays, t1, t2, data_types] = read_file_names(file_name)
 % read the phase file names and decimal years for master and slave
 % FILE_NAMES.DAT format
 %  decimal.year_master  decimal.year_slave  phase_file_name  % comments
@@ -7,36 +7,106 @@ function [pfnames, mdate, imast, sdate, islav, hamb, ddays, t0, t1] = read_file_
 % [pfnames, mdate, imast, sdate, islav, hamb, ddays, t0, t1] = read_file_names(file_name)
 % [1xNcel, 1xNcel, Nx1dbl, 1xNcel, Nx1dbl, Nx1dbl, Nx1dbl, Nx1dbl, Nx1dbl] where N=#pairs
 % for use with DIAPASON DTOOLS
+% 20160524 handle file names from GMT5SAR
 fprintf(1,'%s begins ...\n',mfilename);
 
+%% check to see that file exists
+if fexist(file_name) == 0 
+    error(sprintf('Cannot open file named %s containing names of phase files.\n',file_name));
+    return
+end
+
+%% decide to read GMT grid files or not
+if numel(strfind(file_name,'grd')) > 0
+    file_type = 2;
+else
+    file_type = 1;
+end
+
+%% open file
 fid = fopen(file_name,'r');
 if fid <= 0 
-    error 'Cannot open phase file_names descriptor'
+    error(sprintf('Cannot open file named %s containing names of phase files.\n',file_name));
     return
 end
 
-% Read the arguments into a Cell Array
-	idat=textscan(fid,'%f%f%s','CommentStyle','%');
-fclose(fid);
 
-t0 = idat{1};     % First column of dat file is the Master Date
-t1 = idat{2};     % Second column of dat file is the Slave Date
-n0 = idat{3};     % Third column of dat file is the phase file names
-
-% Check if any pairs were read
-np = numel(n0);
-if np < 1
-    fprintf(1,'ERROR No lines in %s \n',file_name);
-    error(sprintf('Cannot read phase file names dat file named %s',file_name)); 
-    return
+switch file_type
+    case 1
+        %% old format with decimal years
+        % 1992.59836065574 1993.46027397260 ../intf/1992220_1993169/phasefilt_ll.grd     % wrapped phase in radians
+        % 1992.59836065574 1993.46027397260 ../intf/1992220_1993169/unwrap_mask_ll.grd   % unwrapped phase in radians
+        
+        % Read the arguments into a Cell Array
+        CDAT=textscan(fid,'%f%f%s','CommentStyle','%');
+        fclose(fid);
+        [nrows,ncols] = size(CDAT);
+        if ncols == 3 && nrows > 0
+            t1    = CDAT{1};  % First column of dat file is the Master Date
+            t2    = CDAT{2};  % Second column of dat file is the Slave Date
+            names = CDAT{3};  % Third column of dat file is the phase file names
+            np = nrows;
+            data_types = zeros(np,1);
+        else
+            error(sprintf('miscount with file_type = %d',file_type))
+        end
+    case 2
+        %% new format with GMT grid files
+        %  ../intf/1992220_1993169/phasefilt_ll.grd     % wrapped phase in radians
+        %  ../intf/1992220_1993169/unwrap_mask_ll.grd   % unwrapped phase in radians
+        
+        % Read the arguments into a Cell Array
+        CDAT=textscan(fid,'%s','CommentStyle','%');fclose(fid);
+        [nrows,ncols] = size(CDAT);
+        if ncols == 1 && nrows > 0
+            names = CDAT{1}; % First column of dat file is the phase file names
+            np = nrows;
+            data_types = nan(np,1);
+            for i=1:np
+                str1 = char(names(i))
+                % find first underscore in file name
+                iusc = strfind(str1,'_');iusc=iusc(1);
+                yyyy1 = str2num(str1(iusc-7:iusc-4));
+                yyyy2 = str2num(str1(iusc+1:iusc+4));
+                doy1 = str2num(str1(iusc-3:iusc-1));
+                doy2  = str2num(str1(iusc+5:iusc+7));
+                [y1,m1,d1] = yeardoy2yyyyymmdd(yyyy1,doy1);
+                [y2,m2,d2] = yeardoy2yyyyymmdd(yyyy2,doy2);
+                % t1 = datetime(y1,m1,d1,'TimeZone','UTC');t1.Format = 'yyyy-MM-dd_HH:mm:SSSSSS [ZZZZ]'  ; % 24 hour clock
+                % t2 = datetime(y2,m2,d2,'TimeZone','UTC');t2.Format = 'yyyy-MM-dd_HH:mm:SSSSSS [ZZZZ]'  ; % 24 hour clock
+                t1 = datetime(y1,m1,d1,'TimeZone','UTC');t1.Format = 'yyyy-MM-dd'  ; % 24 hour clock
+                t2 = datetime(y2,m2,d2,'TimeZone','UTC');t2.Format = 'yyyy-MM-dd'  ; % 24 hour clock
+                                
+                % try to guess data type from file name
+                if numel(strfind(str1,'phasefilt_ll')) > 0
+                    data_types(i) = 0;
+                elseif numel(strfind(str1,'unwrap_mask_ll')) > 0
+                    data_types(i) = 2;
+                else
+                    errror(sprintf('cannot parse data type from file name %s\n',str1));
+                end
+            end
+        else
+            error(sprintf('miscount with file_type = %d',file_type))
+        end
+    otherwise
+        error(sprintf('Unknown case: file_type is %d\n',file_type));
 end
 
-% Check that three args were read for each pair
-if np ~= numel(t0) || np ~= numel(t1)
-    fprintf(1,'ERROR formatting problem in %s \n',file_name);
-    error 'Check phase file names file format' 
-    return
-end
+% % Check if any pairs were read
+% np = numel(n0);
+% if np < 1
+%     fprintf(1,'ERROR No lines in %s \n',file_name);
+%     error(sprintf('Cannot read phase file names dat file named %s',file_name)); 
+%     return
+% end
+% 
+% % Check that three args were read for each pair
+% if np ~= numel(t0) || np ~= numel(t1)
+%     fprintf(1,'ERROR formatting problem in %s \n',file_name);
+%     error 'Check phase file names file format' 
+%     return
+% end
 fprintf(1,'Read %4d pairs of phase files \n',np);
 
 % Now building dummy arguments to match interferogram.lst code
@@ -61,7 +131,7 @@ for N = 1:np
 	uddays(N) = 100 * ipair;
 end
 % pfnames = n0';
-pfnames = n0;
+pfnames = names;
 mdate = umdate;
 sdate = usdate;
 hamb = uhamb;

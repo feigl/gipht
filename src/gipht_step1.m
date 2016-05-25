@@ -8,6 +8,7 @@
 % 2010-NOV-04 Write 2nd DEM descriptor for subregion
 % 2012-JAN-12 try to pass test on simulated data
 % 2012-OCT-01 back to filtered psp instead of unfiltered pha
+% 20160524    read GMT grid files from GMT5SAR
 
 fprintf(1,'\n\n----------------   %s begins at %s ----------\n',upper(mfilename),datestr(now,31));
 
@@ -90,14 +91,15 @@ else
 end
 
 % list of file names
-if strfind(ilist,'file_names') > 0
+if numel(strfind(ilist,'file_names')) > 0
     % read the phase file names from file_names.dat
     disp('Name of list of phase files');
-    [pfnames, mdate, imast, sdate, islav, hamb, ddays, t0, t1] = read_file_names(ilist);
+    [pfnames, mdate, imast, sdate, islav, hamb, ddays, t1, t2, data_types] = read_file_names(ilist);
 else
     % read the list of interferograms to get pairs marked with little 'a'
     disp('Name of list of interferograms');
-    [mdate, imast, sdate, islav, hamb, ddays, t0, t1] = read_igram_list(ilist,'a');
+    [mdate, imast, sdate, islav, hamb, ddays, t1, t2] = read_igram_list(ilist,'a');
+    %% TODO define data_types
     
     % define the file names based on usual convention using DIAPASON and DTOOLS
     for i=1:numel(imast);
@@ -175,8 +177,9 @@ if numel(orbfile) > 0
 end
 
 if nk == numel(pfnames)
-    disp('Number of interferogram files (pairs) to adjust');
-    np = length(imast)
+     %np = length(imast)
+    np = nk;
+    fprintf(1,'Number of interferogram files (pairs) to adjust = %d\n',np);
 else
     error(sprintf('Missing %d of %d interferogram files\n'...
         ,numel(pfnames)-nk,numel(pfnames)));
@@ -191,25 +194,34 @@ bperp = 10000 ./ hamb;
 
 % find the species
 dispflag = 0;
-[species, DD, tepochs, iepochs, iuniqorbs, uniqdates] = findspecies(t0,t1,dispflag,imast,mdate,islav,sdate);
+%[species, DD, tepochs, iepochs, iuniqorbs, uniqdates] = findspecies(t1,t2,dispflag,imast,mdate,islav,sdate);
+% t1 = dyear(year(t1),month(t1),day(t1));
+% t2 = dyear(year(t2),month(t2),day(t2));
+% [species, DD, tepochs, iepochs, iuniqorbs, uniqdates] = findtrees(t1,t2,dispflag,imast,mdate,islav,sdate)
+[trees, DD, tepochs, iepochs, iuniqorbs, uniqdates] = findtrees2(t1,t2)
 
-disp('Number of distinct epochs overall'); me = length(tepochs)
-disp('Number of species overall');         mfam = me - rank(DD)
+%% number of epochs
+me = length(tepochs);
+fprintf(1,'Number of distinct epochs overall me = %d\n',me);
+mfam = me - rank(DD);
 
-[ns,ms] = size(species);
-if ns ~= mfam
-    error(sprintf('Error counting species: %d %d\n',ns,mfam));
+%% number of trees
+[ntrees,ms] = size(trees);
+if ntrees == mfam
+    fprintf(1,'Number of distinct trees (components) overall: ntrees = %d\n',ntrees);         
+else
+    error(sprintf('Error counting components: %d %d\n',ntrees,mfam));
 end
 
-% loop over species to count the number of pairs needed
+%% loop over trees to count the number of pairs needed
 np4 = 0;
-for i=1:ns
+for i=1:ntrees
     fprintf(1,        'Species %1s:',char(i+64));
     fprintf(fidtxtout,'Species %1s:',char(i+64));
     for j=1:ms
-        if isfinite(species(i,j)) == 1
-            fprintf(1,         ' %5d',species(i,j));
-            fprintf(fidtxtout, ' %5d',species(i,j));
+        if isfinite(trees(i,j)) == 1
+            fprintf(1,         ' %5d',trees(i,j));
+            fprintf(fidtxtout, ' %5d',trees(i,j));
             if j > 1
                 np4 = np4 +1;
             end
@@ -219,8 +231,9 @@ for i=1:ns
     fprintf(fidtxtout,'\n');
 end
 
-%    % loop over epochs to list pairs
-np2 = 0;np3=0;
+%% loop over epochs to list pairs
+np2 = 0;
+np3=0;
 for k=1:me
     % index of master
     %kmast = find(DD(k,:) == -1);
@@ -235,12 +248,19 @@ for k=1:me
         error('pair index not found!');
     end
     
-    [is,jm] = find(species == k);
-    % is is index to species
-    % jm is index of member within species
+    [is,jm] = find(trees == k);
+    % is is index to trees
+    % jm is index of member within trees
     for kk=1:numel(kp)
         np3 = np3+1;
         %imast(kp(kk))
+        
+        char(is+64)
+        jm
+        kp(kk)
+        imast(kp(kk))
+        islav(kp(kk))
+        char(pfnames{kp(kk)})
         
         tmp=sprintf('Species %1s Member %2d Pair %3d M %6d S %6d %80s',char(is+64),jm,kp(kk),imast(kp(kk)),islav(kp(kk)),char(pfnames{kp(kk)}));
         pairlist{np3}=tmp;
@@ -253,15 +273,16 @@ for k=1:numel(pairlist)
     fprintf(fidtxtout,'%s\n',char(pairlist{k}));
 end
 
+%% TODO replace with Elena's functions
 % estimate the pseudoabsolute baselines
-bpest = adjustbp(tepochs,DD,bperp, species,iuniqorbs, uniqdates);
+bpest = adjustbp(tepochs,DD,bperp, trees,iuniqorbs, uniqdates);
 nf=nf+1;h(nf)=figure;
-%plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, 0, 'orbital separation (Bperp) [m]');
-%ktour = plotbp(tepochs, bpest, DD, species,iuniqorbs, uniqdates, 3);
+%plotbp(tepochs, bpest, DD, trees, iuniqorbs, uniqdates, 0, 'orbital separation (Bperp) [m]');
+%ktour = plotbp(tepochs, bpest, DD, trees,iuniqorbs, uniqdates, 3);
 
 % Call Elena's function 20150901
 % function h = plot_trees(tepochs, scores, DD, trees,xlab,ylab)
-plot_trees(tepochs, bpest, DD, species, 'year', 'B_perp [m]');
+plot_trees(tepochs, bpest, DD, trees, 'year', 'B_perp [m]');
 
 %feval(printfun,sprintf('%s_%02d',mfilename,nf));
 %feval(printfun,sprintf('%s_SPECIES',runname));
@@ -275,7 +296,7 @@ end
 dops = zeros(size(tepochs));
 
 % find out about the DEM
-[isgeo,y1,x1,nl,nc,l1,c1,ml,mc,dl,dc,fi2,lat0,lon0,y0,x0,hemisphere,iutmzone] = read_dem_descriptor(demdescfile);
+[isgeo,y1,x1,nl,nc,l1,c1,ml,mc,dl,dc,fi2,lat0,lon0,y0,x0,hemisphere,iutmzone,isgmtgrid] = read_dem_descriptor(demdescfile);
 
 % Handle longitude west of Greenwich > 180
 % if isgeo == 1
@@ -625,7 +646,7 @@ else           % GEOGRAPHIC (longitude, latitude) coordinates in degrees
     
     if strcmp(utmzone0,utmzone1) == 0
         warning(sprintf('WARNING: UTM zones do not match for center of subregion. %s %s\nApproximating...\n'...
-            ,utmzone0,utmzone1));
+            ,char(utmzone0),char(utmzone1)));
         format bank
         xcenter = xcenter2
         ycenter = ycenter2
@@ -643,7 +664,15 @@ ymin = min(yax);
 ymax = max(yax);
 
 % READ THE DEM
-i2dem = read_i2(fi2,nc);
+if isgmtgrid
+    [demx,demy,demz] = grdread2(demdescfile);
+    i2dem = int16(demz);
+    islow = find(i2dem < -200);
+    i2dem(islow) = NaN;
+    clear demx demy demz;
+else
+    i2dem = read_i2(fi2,nc);
+end
 [nrdem,ncdem]=size(i2dem);
 fprintf(1,'I2DEM has %d rows and %d columns\n',nrdem,ncdem);
 figure;imagesc(i2dem);
@@ -878,13 +907,17 @@ if abs(ncsub - mc_sub) > 0
     nerrors = nerrors + 1;
 end
 
-% copy the input descriptor file to the output descriptor file, changing only the parameters above
-ierr = write_dem_descriptor(demdescfile,demdescfile2,isgeo,y1,x1,nl,nc,l1_sub,c1_sub,ml_sub,mc_sub,dl,dc,fi2,lat0,lon0,y0,x0,hemisphere,iutmzone);
-
-if ierr == 0
-    fprintf(1,'Wrote DEM descriptor for subregion to file named %s\n',demdescfile2);
+if isgmtgrid
+    fprintf(1,'Using DEM from GMT grid file named %s. Not writing a new descriptor in Diapason format.\n',demdescfile);
 else
-    error(sprintf('Could not write DEM descriptor for subregion to file named %s\n',demdescfile2));
+    % copy the input descriptor file to the output descriptor file, changing only the parameters above
+    ierr = write_dem_descriptor(demdescfile,demdescfile2,isgeo,y1,x1,nl,nc,l1_sub,c1_sub,ml_sub,mc_sub,dl,dc,fi2,lat0,lon0,y0,x0,hemisphere,iutmzone);
+    
+    if ierr == 0
+        fprintf(1,'Wrote DEM descriptor for subregion to file named %s\n',demdescfile2);
+    else
+        error(sprintf('Could not write DEM descriptor for subregion to file named %s\n',demdescfile2));
+    end
 end
 
 % make a stack
@@ -921,40 +954,66 @@ if (pselect == 2 || fnewer(orbsavefile,'gipht.in') == 0) && fexist(orbsavefile) 
     end
 end
 
-% set pointers for indices of pixels
+%% set pointers for indices of pixels
 ippix1 = zeros(np,1); i1 = 0; % index to first pixel in pair
 ippix2 = zeros(np,1); i2 = 0; % index to last pixel in pair
 
-% loop over pairs
+%% loop over pairs
 nk=0;ndata1=0;i1=0;i2=0;kk=0;
-
 for i = 1:np
     npixinpair=0;
     
-    % index master and slave
+    %% index master and slave
     kmast = find(DD(i,:) == -1);
     kslav = find(DD(i,:) == +1);
     
-    %read phase data from interferogram
+    %%read phase data from interferogram
     %2009-JUN-18 phaimg = read_pha(fn0,ncols)/256; % in cycles
     
     fn0 = pfnames{i};
     nbytes = fsize(fn0);
     if  nbytes > 0
-        phaimg = read_pha(fn0,ncols,nrows); % in DN [-128, 127]
+        if isgmtgrid
+            % read GMT grid file
+            format long
+            INFO = grdinfo3(fn0)
+            [tmpx,tmpy,tmpz] = grdread2(fn0);
+            phaimg = double(tmpz*256/2./pi); % in DN
+            %clear tmpx tmpy tmpz
+            whos tmpx
+            whos xax
+            figure;hist(tmpx-xax)
+        else
+            phaimg = read_pha(fn0,ncols,nrows); % in DN [-128, 127]
+        end
     else
         phaimg = [];
         warning(sprintf('Phase file named %s is non-existant or empty\n',fn0));
         nerrors = nerrors + 1;
     end
     
-    %figure;imagesc(phaimg);axis ij;xlabel('column index J');ylabel('row index I');title('before flipud');hold on;plot(jcenter,icenter,'k*');
-    %helene try to flip the image
-    if dl>0
-        phaimg=flipud(phaimg);
-        warning('DL > 0 flipping phaimg');
-        %figure;imagesc(phaimg);axis ij;xlabel('column index J');ylabel('row index I');title('after flipud');hold on;plot(jcenter,icenter,'k*');        
+    
+    
+    %% show the image
+    figure;imagesc(phaimg);
+    axis ij;xlabel('column index J');
+    ylabel('row index I');
+    title('before flipud');hold on;
+    plot(jcenter,icenter,'k*');
+    
+    %% helene try to flip the image
+    if isgmtgrid
+        fprintf(1,'Not flipping.\n');
+    else
+        if dl>0
+            phaimg=flipud(phaimg);
+            warning('DL > 0 flipping phaimg');
+            %figure;imagesc(phaimg);axis ij;xlabel('column index J');ylabel('row index I');title('after flipud');hold on;plot(jcenter,icenter,'k*');
+        end
     end
+        
+    
+    %% count the number of pixels
     nbytes = numel(phaimg);
     if nbytes == nrows*ncols
         nk=nk+1; % count it as a success
@@ -964,7 +1023,7 @@ for i = 1:np
         nerrors = nerrors + 1;
     end
     
-    % read the coherence file if needed
+    %% read the coherence file if needed
     if pselect == 4
         fnc = strrep(strrep(fn0,'smp','coh'),'.pha','.byt');
         cohimg = read_oct(fnc,ncols);
@@ -974,12 +1033,12 @@ for i = 1:np
     % phar = 0.1+0.2*randn([nrows,ncols]);
     % phaimg = angle(complex(cos(phar*2*pi),sin(phar*2*pi)))/2/pi;
     
-    titlestr = sprintf('Phase: Pair %3d %s orbs %5d %5d years %7.1f to %7.1f Dt = %.4f yr NROWS = %d by NCOLS= %d'...
+    titlestr = sprintf('Phase: Pair %3d %s orbs %5d %5d %12s to %12s Dt = %.4f yr NROWS = %d by NCOLS= %d'...
         ,i,strrep(fn0,'_','\_'),iuniqorbs(kmast),iuniqorbs(kslav)...
-        ,tepochs(kmast),tepochs(kslav),tepochs(kslav)-tepochs(kmast)...
+        ,tepochs(kmast),tepochs(kslav),years(duration(tepochs(kslav)-tepochs(kmast)))...
         ,nrows,ncols);
     
-    % display the whole image
+    %% display the whole image
     nf=nf+1;h(nf)=figure;
     
 %     if dl < 0
@@ -1003,14 +1062,20 @@ for i = 1:np
         error(sprintf('ERROR: too many errors (%d) to continue!\n',nerrors));
     end
     
+    %% perform quadtree partitioning using pha2qls program
     if ismember(pselect,[3,5,6,7,9])
-        % perform quadtree partitioning using pha2qls program
-        % WITH GRADIENTS
-        qlsnam=strrep(fn0,'.pha','.qls');
-        if numel(strfind(fn0,'psp_')) > 0
-            qspnam=strrep(fn0,'psp_','qsp_');
-            grxnam=strrep(fn0,'psp_','grx_');grxnam=strrep(grxnam,'.pha','.i2');
-            grynam=strrep(fn0,'psp_','gry_');grynam=strrep(grynam,'.pha','.i2');
+        if isgmtgrid
+            phanam=strrep(fn0,'.grd','.pha');
+            write_pha(phanam,int8(phaimg)); % 1-byte integers such that 1 DN = (1 cycle)/256
+        else
+            phanam = fn0;
+        end
+    
+        qlsnam=strrep(phanam,'.pha','.qls');
+        if numel(strfind(phanam,'psp_')) > 0
+            qspnam=strrep(phanam,'psp_','qsp_');
+            grxnam=strrep(phanam,'psp_','grx_');grxnam=strrep(grxnam,'.pha','.i2');
+            grynam=strrep(phanam,'psp_','gry_');grynam=strrep(grynam,'.pha','.i2');
         else
             qspnam='qsp.pha';
             grxnam='grx.i2';
@@ -1025,9 +1090,9 @@ for i = 1:np
         % perform quadtree resampling
         if fexist(qspnam) <= 0 || fexist(qlsnam) <= 0 || fexist(grxnam) <= 0 || fexist(grynam) <= 0 ...
                 || fnewer(qspnam,'gipht.in') == 1 ...
-                || fnewer(qspnam,fn0)     == 1 ...
-                || fsize(qspnam) ~= fsize(fn0)
-            nquad1 = pha2qls(fn0,ncols,nrows,qspnam,grxnam,grynam,qlsnam,ithresh,pixinpatch,maxcmd,maxpix,pha2qlsname);
+                || fnewer(qspnam,phanam)     == 1 ...
+                || fsize(qspnam) ~= fsize(phanam)
+            nquad1 = pha2qls(phanam,ncols,nrows,qspnam,grxnam,grynam,qlsnam,ithresh,pixinpatch,maxcmd,maxpix,pha2qlsname);
         end
         
         % read binary files in DN
@@ -1524,13 +1589,13 @@ for i = 1:np
     cmapblackzero;
     feval(printfun,sprintf('%s_obs_P%02d',runname,i));
     
-    %     %plot wrapped phase in histogram
-    %     nf=nf+1;h(nf)=figure;hold on;title(titlestr);
-    %     %hist([double(phao(i1:i2)) double(phao(i1:i2))+256]/256,64)  %show again, plus 1 cycle to visualize trends
-    %     hist2(double(phao(i1:i2))/DNPC,64);
-    %     axis xy;%axis ([-0.5 1.5 0 Inf]);
-    %     xlabel('wrapped phase (cycles)');ylabel('number of occurences');
-    %     feval(printfun,sprintf('%s_Histogram_P%02d',runname,i));
+    %plot wrapped phase in histogram
+    nf=nf+1;h(nf)=figure;hold on;title(titlestr);
+    %hist([double(phao(i1:i2)) double(phao(i1:i2))+256]/256,64)  %show again, plus 1 cycle to visualize trends
+    hist2(double(phao(i1:i2))/DNPC,64);
+    axis xy;%axis ([-0.5 1.5 0 Inf]);
+    xlabel('wrapped phase (cycles)');ylabel('number of occurences');
+    feval(printfun,sprintf('%s_Histogram_P%02d',runname,i));
     
     % plot wrapped phase as a function of topographic elevation
     nf=nf+1;h(nf)=figure;hold on;title(titlestr);
@@ -1775,8 +1840,8 @@ check_struct(DST,1); % print min, max, values
 
 % % % plot the pseudoabsolute baselines
 % % nf=nf+1;h(nf)=figure;
-% % plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, 0);
-% % ktour = plotbp(tepochs, bpest, DD, species,iuniqorbs, uniqdates, 3);
+% % plotbp(tepochs, bpest, DD, trees, iuniqorbs, uniqdates, 0);
+% % ktour = plotbp(tepochs, bpest, DD, trees,iuniqorbs, uniqdates, 3);
 % % feval(printfun,sprintf('%s_%02d',mfilename,nf));
 %
 

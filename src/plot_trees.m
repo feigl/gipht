@@ -37,7 +37,7 @@ for ifile = [1 fidtxtout]
 end
 
 
-nargchk(4,8,nargin);
+narginchk(4,8);
 if nargin <= 6
    plotts = 0;
 end

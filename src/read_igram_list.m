@@ -1,7 +1,8 @@
-function [mdate, imast, sdate, islav, hamb, ddays, t0, t1] = read_igram_list(igram_list_file,key)
+function [mdate, imast, sdate, islav, hamb, ddays, t1, t2] = read_igram_list(igram_list_file,key)
 % read a list of interferometric pairs, 1 per line, with 'key' on the line
 % [mdate, imast, sdate, islav, hamb, ddays, t0, t1] = read_igram_list(igram_list_file,key)
 % for use with DIAPASON DTOOLS
+% 20160524 use datetime structures for t1 and t2
 fprintf(1,'%s begins ...\n',mfilename);
 
 fid = fopen(igram_list_file,'r');
@@ -19,23 +20,28 @@ while 1 % for each pair
         fprintf(ftmp,'%s',line1);
         fclose(ftmp);
         %     [myr(i) uobso{i} mdy(i) syr(i) smo{i} sdy(i) imast(i) islav(i) hamb(i) ddays(i) t0(i) t1(i)] = textread ('adj.tmp','%d %3s %d %d %3s %d %d %d %f %f %f %f%*[^\n]');
-        [myr mmo mdy syr smo sdy imast(i) islav(i) hamb(i) ddays(i) t0(i) t1(i)] = textread ('tmp.txt','%s %s %s %s %s %s %d %d %f %f %f %f%*[^\n]');
+        %[myr(i) mmostr{i} mdy(i) syr(i) smostr{i} sdy(i) imast(i) islav(i) hamb(i) ddays(i) y1(i) y2(i)] = textread('tmp.txt','%d %s %d %d %s %d %d %d %f %f %f %f%*[^\n]')
+        [myr mmostr mdy syr smostr sdy imast(i) islav(i) hamb(i) ddays0 y1 y2] = textread ('tmp.txt','%d %s %d %d %s %d %d %d %f %f %f %f%*[^\n]')
         %     mstr = sprintf('%s-%s-%s',myr{1},mmo{1},mdy{1});
         %     sstr = sprintf('%s-%s-%s',syr{1},smo{1},sdy{1});
         %     2009-DEC-02 pad with zeros
-        if numel(str2num(myr{1}))>0 & numel(str2num(mmo{1}))>0 & numel(str2num(mdy{1}))>0
-            mstr = sprintf('%04d-%02d-%02d',str2num(myr{1}),str2num(mmo{1}),str2num(mdy{1}));
-        else
-            mstr = sprintf('%s-%s-%s',myr{1},mmo{1},mdy{1});
-        end
-        if numel(str2num(syr{1}))>0 & numel(str2num(smo{1}))>0 & numel(str2num(sdy{1}))>0
-            sstr = sprintf('%04d-%02d-%02d',str2num(syr{1}),str2num(smo{1}),str2num(sdy{1}));
-        else
-            sstr = sprintf('%s-%s-%s',syr{1},smo{1},sdy{1});
-        end
+
+        mmo = monthstr2monthnum(char(mmostr{1}));
+        tm = datetime(myr,mmo,mdy,'TimeZone','UTC');
+        tm.Format = 'yyyy-MM-dd'  ; % 24 hour clock
+        mstr = sprintf('%s',tm);
         
+        smo = monthstr2monthnum(char(smostr{1}));
+        ts = datetime(syr,smo,sdy,'TimeZone','UTC');
+        ts.Format = 'yyyy-MM-dd'  ; % 24 hour clock
+        sstr = sprintf('%s',ts);
+         
         mdate{i} = mstr;
         sdate{i} = sstr;
+        
+        t1(i) = tm;
+        t2(i) = ts;
+        ddays(i) = days(ts-tm);
     end
 end
 
@@ -51,8 +57,8 @@ imast = imast';
 islav = islav';
 hamb = hamb';
 ddays = ddays';
-t0 = t0';
-t1 = t1';
+% t1 = t1';
+% t2 = t2';
 
 fprintf(1,'Read %4d pairs containing key %s\n',i,key);
 

@@ -31,33 +31,41 @@ function [ue, un, uu, mjdn, secn, distn, velon, incid]=lookvector(alon,alat,ahit
 % 2009-JUL-22 check arguments
 % 2011-JUN-27 test on Landers
 
-
-if nargin ~= 4
-   error  'Wrong number of arguments.'
-end
+narginchk(4,4);
+nargoutchk(3,8);
 
 if abs(alat) > 90
    error(sprintf('Impossible latitude: %f\n,',alat));
 end
 
-if alon > 360 | alon < -180
+if alon > 360 || alon < -180
    error(sprintf('Impossible longitude: %f\n,',alon));
 end
 
-if ahit > 9000e3 | ahit < -100
+if ahit > 9000e3 || ahit < -100
    error(sprintf('Impossible height: %f\n,',ahit));
 end
 
-[xs, ys, zs, xdot, ydot, zdot, mjd, sec, orbnum] = readorb(orbfile);
+[xs, ys, zs, xdot, ydot, zdot, mjd, sec, orbnum] = readorb(orbfile)
 
 [xa, ya, za] = wgs84toxyz(alon, alat, ahit);
 
 [slon, slat, srad] = carsph(xa, ya, za);
 
-[xn, yn, zn, mjdn, secn, distn, velon] = nearestpassage(xs, ys, zs...
-    , xa, ya, za...
+% 20151121 - incorrect calling sequence of output arguments
+% [xn, yn, zn, mjdn, secn, distn, velon, ] = nearestpassage(xs, ys, zs ...
+%     , xa, ya, za...
+%     , mjd, sec ...
+%     , xdot, ydot, zdot);
+
+% 20151121 use all 8 output arguments
+[xn, yn, zn, un, vn, wn, mjdn, secn] = nearestpassage(xs, ys, zs ...
+    , xa, ya, za ...
     , mjd, sec ...
     , xdot, ydot, zdot);
+
+distn = sqrt(xn^2 + yn^2 + zn^2);
+velon = sqrt(un^2 + vn^2 + wn^2);
 
 % from ground to satellite
 dx = xn - xa;

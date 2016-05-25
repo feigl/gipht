@@ -9,11 +9,11 @@ function [xn, yn, zn, un, vn, wn, mjdn, secn] = nearestpassage(xs, ys, zs, xt, y
 %  secs              == epochs of satellite state vectors in seconds of day
 %  xt, yt, zt       == Position Vectors of Target
 %                      in Cartesian Geocentric X, Y, Z meters
-%  xs, ys, zs       == Position Vectors of Satellite 
+%  xs, ys, zs       == Position Vectors of Satellite
 %                      in Cartesian Geocentric X, Y, Z meters
-%  xdot, ydot, zdot == Velocity Vectors of Satellite 
+%  xdot, ydot, zdot == Velocity Vectors of Satellite
 %                      in Cartesian Geocentric X, Y, Z meters/second
-%  
+%
 % OUTPUTS:
 %
 %  mjdn             == epoch of satellite state vector at nearest passage in Modified Julian Day
@@ -23,6 +23,10 @@ function [xn, yn, zn, un, vn, wn, mjdn, secn] = nearestpassage(xs, ys, zs, xt, y
 %  un, vn, wn,      == Velocity Vector of Satellite at nearest passage
 %                      in Cartesian Geocentric X, Y, Z meters/second
 %  Kurt Feigl 2011-JUL-02
+
+
+narginchk(11,11);
+nargoutchk(8,8);
 
 mjd0 = min(mjd);
 
@@ -59,12 +63,12 @@ tstep = mean(diff(t));
 dt = tstep/10.0;
 while dt > 0.001
     % distance between satellite at [xs, ys, zs] and target at [xt, yt, zt]
-     dist = sqrt ( (xs - xt).^2 + (ys - yt).^2 + (zs - zt).^2 );
+    dist = sqrt ( (xs - xt).^2 + (ys - yt).^2 + (zs - zt).^2 );
     
-%     fprintf (1,'i, t, dist, dt = %12.4f\n',dt);
-%     for i=1:n
-%       fprintf (1,'%6d %12.4f %12.4f\n',i,t(i),dist(i));
-%     end
+    %     fprintf (1,'i, t, dist, dt = %12.4f\n',dt);
+    %     for i=1:n
+    %       fprintf (1,'%6d %12.4f %12.4f\n',i,t(i),dist(i));
+    %     end
     
     % pointer to minimum distance
     imin = find(abs(dist-min(dist)) < 1.0e-6);
@@ -83,23 +87,23 @@ while dt > 0.001
     wn = zdot(imin);
     distn = dist(imin);
     secn = mod(t(imin),86400.0);
-%    mjdn = floor(t(imin)/86400.0) + min(mjd);
+    %    mjdn = floor(t(imin)/86400.0) + min(mjd);
     mjdn = floor(t(imin)/86400.0) + mjd0;
     
-%     % draw a picture
-%     figure; hold on;
-%     plot(t,dist,'k.-');
-%     plot(t(imin),dist(imin),'ro');
-%     plot([min(t)   max(t)],[dist(imin) dist(imin)],'r-');
-%     plot([t(imin) t(imin)],[ min(dist)  max(dist)],'r-');
-%     xlabel('time (s)');
-%     ylabel('distance in meters');
-%     title(sprintf('Nearest passage is %#20.4f meters at MJD %16d and %#20.4f seconds\n',dist(imin),mjdn,secn));
+    %     % draw a picture
+    %     figure; hold on;
+    %     plot(t,dist,'k.-');
+    %     plot(t(imin),dist(imin),'ro');
+    %     plot([min(t)   max(t)],[dist(imin) dist(imin)],'r-');
+    %     plot([t(imin) t(imin)],[ min(dist)  max(dist)],'r-');
+    %     xlabel('time (s)');
+    %     ylabel('distance in meters');
+    %     title(sprintf('Nearest passage is %#20.4f meters at MJD %16d and %#20.4f seconds\n',dist(imin),mjdn,secn));
     
     % % Interpolate using Matlab splines
     i1 = max([imin-2,1]);
     i2 = min([imin+2,n]);
-
+    
     ti    = [       t(i1):dt:t(i2)];
     xi    = interp1(t(i1:i2),xs(i1:i2)  ,ti,'spline');
     yi    = interp1(t(i1:i2),ys(i1:i2)  ,ti,'spline');
@@ -107,7 +111,7 @@ while dt > 0.001
     xdoti = interp1(t(i1:i2),xdot(i1:i2),ti,'spline');
     ydoti = interp1(t(i1:i2),ydot(i1:i2),ti,'spline');
     zdoti = interp1(t(i1:i2),zdot(i1:i2),ti,'spline');
-%     mjdi  = interp1(t(i1:i2),mjd(i1:i2),ti,'spline');
+    %     mjdi  = interp1(t(i1:i2),mjd(i1:i2),ti,'spline');
     
     % set up for next iteration
     xs = xi;
@@ -119,7 +123,6 @@ while dt > 0.001
     t    = ti;
     n = numel(xs);
     dt = dt/10;
-%     mjd = mjdi;
+    %     mjd = mjdi;
 end
 return;
-

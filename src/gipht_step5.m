@@ -142,12 +142,24 @@ for i = 1:np
     kpairs = find(DST.k == i);
     j1 = DST.i(kpairs(1));
     j2 = DST.i(kpairs(end));
-    time_span = DD1 * colvec(tepochs) % in years
+    % 20160524
+    %time_span = DD1 * colvec(tepochs); % in years
+    time_span = years(tepochs(kslav)-tepochs(kmast));
     
     fprintf(1,'Starting, stopping indices j1,j2 %d %d\n',j1,j2);
     
-    % read observed phase values at all pixels for this pair
-    phaimg = 2*pi*double(read_pha(pfnames{i},ncols))/256.0; % radians 2010-JAN-11
+    %% read observed phase values at all pixels for this pair
+    if isgmtgrid
+        % read GMT grid file
+        format long
+        INFO = grdinfo3(fn0)
+        [tmpx,tmpy,phaimg] = grdread2(fn0); % GMT grid file is assumed to be in radians
+        clear tmpx tmpy tmpz
+    else
+        phaimg = 2*pi*double(read_pha(pfnames{i},ncols))/256.0; % radians 2010-JAN-11
+    end
+    
+    
     %phao = rowvec(phaimg(isub,jsub));
     phao = phaimg(isub,jsub);
     %     if dl>0
@@ -618,9 +630,9 @@ for i = 1:np
     end
     
     
-    titlestr = sprintf('Pair %3d orbs %5d %5d years %6.1f to %6.1f Dt = %.4f yr Cost0 = %6.4f Cost1=%6.4f %s '...
+    titlestr = sprintf('Pair %3d orbs %5d %5d years %s to %s Dt = %.4f yr Cost0 = %6.4f Cost1=%6.4f %s '...
         ,i,iuniqorbs(kmast),iuniqorbs(kslav)...
-        ,tepochs(kmast),tepochs(kslav),tepochs(kslav)-tepochs(kmast)...
+        ,tepochs(kmast),tepochs(kslav),years(tepochs(kslav)-tepochs(kmast))...
         ,nanmean(colvec(devs_all0))/DNPC,nanmean(colvec(devs_all1))/DNPC...
         ,strrep(runname,'_','\_'));
     
@@ -940,8 +952,11 @@ for i = 1:np
     
     % Make profiles
     % decide to show rate or not
-    itref =get_parameter_index('Reference_Epoch_in_years________',pnames);
-    if abs(PST.p1(itref)) > 0
+    itref = get_parameter_index('Reference_Epoch_in_years________',pnames);
+%   20151121 not defined in final estimate
+%   if abs(PST.p1(itref)) > 0
+%   if abs(PST.p0(itref)) > 0
+    if abs(PST1.p0(itref)) > 0
         y0lab='displacement';
         y2lab='mm';
         time_span = 1.0;
