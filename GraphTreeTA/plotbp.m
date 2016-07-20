@@ -1,4 +1,4 @@
-function ktours = plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, plotts,ylab, cal_date)
+function ktours = plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, plotts, ylab, cal_date)
 %function ktours = plotbp(tepochs, bpest, DD, trees, iuniqorbs, uniqdates, plotts,ylab)
 %
 % plot pseudo-absolute Bperp as a function of time 
@@ -33,6 +33,7 @@ function ktours = plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, plot
 %
 % Elena C. Baluyut, UW-Madison
 % 2015-01-30 add text to plot showing month and day of epochs per interval
+% 2015-10-12 add option to specify scaling value label for y axis 
 
 FigHandle = figure;
 
@@ -59,7 +60,7 @@ if (max(bpest)-min(bpest) < 1.0)
    if max(tepochs) < 1990
       icase = 3;
       
-      xlab = '$B_{\perp}$ (m)';
+      xlab = '$\mathbf{B_{\perp}}$[m]';
       ylab = 'Azimuthal Doppler/PRF';
       Tend = 10;
       yrbp = 100/0.1; % 100 m of Bperp is like 0.1 PRF of Doppler separatio
@@ -79,7 +80,7 @@ else
     else
         icase = 1;
         xlab = 'year';
-        ylab = '$B_{\perp}$ (m)';
+        ylab = '$\mathbf{B_{\perp}}$[m]';
         Tend = 25;
         yrbp = 1/1000; % 1 year of time separation is like 1000 m of orbits separation
     end

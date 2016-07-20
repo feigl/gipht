@@ -61,6 +61,12 @@ function ft = time_function(tfunc, ti, tbreaks, metaparams)
 % 
 % 2014-JUL-15 Kurt Feigl
 % 2015 - 04 - 17 Elena C. Baluyut, UW-Madison
+%
+% UPDATES:
+% 2015-10-12 - add Okmok parameterization for modified exponential
+% okmokexp3, ECB 
+
+
 
 %    If the persistent variable does not exist the first time you issue
 %     the persistent statement, it will be initialized to the empty matrix.
@@ -191,6 +197,30 @@ if numel(tbreaks) > 0
             else
                 ft(jj) = 0;
             end
+          
+        case {'okmokexp3'} % 2 exprdecay with parameterizations with secular rate in between. For Okmok test case. Example of combining time functions.
+            jj=2;
+            mparams = 2;
+            ft = zeros(mparams,1);
+            tswitch1=metaparams(3); % switch time
+            tswitch2=metaparams(4); % switch time
+            if tstart >= tswitch1
+                disp('error')
+            end
+            
+            if ti >= tstart && ti < tswitch1
+                dt1 = ti - tstart;
+                ft(1) = 1.0-exp(-1*dt1/metaparams(2)); % rate decays exponentially
+                ft(2) = 0;
+            elseif ti >= tswitch1 <= tswitch2
+                dt1 = ti - tstart;
+                dt2 = ti - tswitch1;
+                ft(1) = 1.0-exp(-1*dt1/metaparams(2)); % rate decays exponentially
+                ft(2) = dt2; 
+            else
+                ft(1) = 0;
+                ft(2) = 0;
+            end    
             
         case {'okmokexp4'} % 2 exprdecay with parameterizations with secular rate in between. For Okmok test case. Example of combining time functions.
             jj=3;

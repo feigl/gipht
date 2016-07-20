@@ -178,10 +178,10 @@ if rd > 0
             warning('Performing temporal adjustment with more than one tree can lead to oscillatory solution');
         end
     end
-    figure;spy(G);hold on;
-    xlabel('column');ylabel('row');
-    title(sprintf('G matrix for %s has ndat = %d rows and mparams = %d columns'...
-        ,strrep(mfilename,'_',' '),ndat,mparams));
+%     figure;spy(G);hold on;
+%     xlabel('column');ylabel('row');
+%     title(sprintf('G matrix for %s has ndat = %d rows and mparams = %d columns'...
+%         ,strrep(mfilename,'_',' '),ndat,mparams));
     
     fprintf(1,'Consider reducing the number of tbreaks.\n');
     warning('Rank defiency persists!');
@@ -212,9 +212,9 @@ else %continue with inversion
     
     V = incidence_to_cov(Q, dsig);
     
-    figure
-    spy(V);
-    title('data covariance matrix V');
+%     figure
+%     spy(V);
+%     title('data covariance matrix V');
     
   %% Perform the inversion using classic linear algebra solution to least-squares with pseudo-inverse
     

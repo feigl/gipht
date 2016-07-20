@@ -23,7 +23,7 @@ function [xcenter, ycenter, halfwidth, halfheight, npix, pselect, tquake...
 % 2011-JUL-03: Kurt: figopt
 % 2011-JUL-23: Kurt: maxpix
 % 2014-MAR-16: Kurt: surrogate
-
+format
 fprintf(1,'%s begin reading input control file named %s...\n',mfilename,fname);
 
 fid = fopen(fname,'r');

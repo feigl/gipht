@@ -1,8 +1,10 @@
-function [x, sig, mse, Vx] = ls_with_cov(A, B, V)
+function [x, sig, mse, Vx] = ls_with_cov_bayes(m0, Vm, A, B, V)
 % function [x, sig, mse, Vx] = ls_with_cov(A, B, V)
 % Gives the least-squares solution to A*x = B with the inverse data covariance matrix V as the weighting matrix.
 %
 % INPUTS:
+%   m0 - prior information on model
+%   Vm - prior model covariance
 %   A - design matrix, size[n - by - m]
 %   B - data vector, size[n - by- 1]
 %   V - data covariance matrix, size[n - by - n]
@@ -19,17 +21,16 @@ function [x, sig, mse, Vx] = ls_with_cov(A, B, V)
 % 2014-9-19
 
 % Find weighting matrix    
- %[S, rs] = pinveb(V); % calculates pseudoinverse similarly to pinv, but returns L-curve and rank
-  S = pinv(V);       % use when L-curve, etc. not needed
+ [S] = pinv(V); % calculates pseudoinverse similarly to pinv, but returns L-curve and rank
+ 
  
 % Calculate least-squares estimator
  %[Ga, rga] = pinveb(A'*S*A); % calculates pseudoinverse similarly to pinv, but returns L-curve and rank
 %   if rga > 10e6
 %      warning('nearly singular, consider reducing the number of parameters')
 %   end
-  Ga = pinv(A'*S*A);        % use when L-curve, etc. not needed
- 
-    x = Ga*A'*S*B;
+
+    x = m0 + Vm*A'*pinv(V+A*Vm*A')*(B-A*m0); % formula from Tarantola & Nercessian 1984
   
 % Calculate statistics
     [n, m] = size(A);
