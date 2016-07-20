@@ -27,10 +27,14 @@ index = 1:numel(tu); % assign epoch index numbers
 % Display 
 figure;
 h = bar(index, Wd_norm);
-title('Variance in Epoch-wise Measurements by Epoch Index')
-xlabel('epoch index')
-h = ylabel('uncertainty in \DeltaV');
-set(h, 'Interpreter', 'tex');
+%set(h, 'Interpreter', 'tex');
+ht = title('Standard Deviation in Epoch-wise Measurements by Epoch Index')
+hx = xlabel('epoch index');
+hy = ylabel('uncertainty in \DeltaV');
+set(hy, 'Interpreter', 'tex');
+set(ht,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','color','k');
+set(hy,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','color','k');
+set(hx,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','color','k');
 
 % Find calendar dates from decimal years
 [ cal_string ] = print_caldate( tu );

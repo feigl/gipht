@@ -29,7 +29,7 @@ function h1 = plotpairs(tm,ts,Qdiff,Qdsig,Qdmod ...
 % Updates:
 %   2014-07-15 add tbreaks
 %   2015-07-27 add options for fit (ref_pts);  Elena C. Baluyut, UW-Madison
-
+%   2015-10-12 change axis labels to print in latex format; ECB 
 
 % Read arguments
 error(nargchk(12,16,nargin)); % incorrect number of input arguments
@@ -44,20 +44,24 @@ tmid = (tm+ts)/2;
 tu = unique([tm ts]);
 
 % Start figure
-h1 = figure('color','w'); hold on; set(h1,'DefaultTextInterpreter','None'); 
+h1 = figure('color','w'); hold on; set(h1,'DefaultTextInterpreter','none'); 
+%hax = axes;
 
-if isreal(Qfsigl) == 0 || isreal(Qfsigu) == 0
-    Qfsigl 
-    Qfsigu
-end
+% if isreal(Qfsigl) == 0 || isreal(Qfsigu) == 0
+%     Qfsigl 
+%     Qfsigu
+% end
 
 % Draw green, vertical lines at times when slope breaks
 if exist('tbreaks','var') == 1
     for i=1:numel(tbreaks)
-        plot([tbreaks(i) tbreaks(i)],[min(Qfsigl) max(Qfsigu)],'g--');
+        %if sum(isfinite([Qdsig; Qfsigl; Qfsigu])) < numel([Qdsig; Qfsigl; Qfsigu])
+            plot([tbreaks(i) tbreaks(i)],[min(Qdfit)-max(Qdsig) max(Qdfit)+max(Qdsig)],'g--'); %get(hax,'YLim')
+        %else 
+        %    plot([tbreaks(i) tbreaks(i)],[min(Qfsigl) max(Qfsigu)],'g--'); %get(hax,'YLim')
+        %end
     end
 end
-
 % Plot observed values of differential change in red
 if numel(Qdfit) > 0
     for i=1:ndat
@@ -98,7 +102,6 @@ if numel(Qdfit) > 0
     plot(tfit,Qfsigu,'k-.','LineWidth',1); % upper envelope 
 end
 
-
 % Adjust plotting format
 axis([floor(min(tu)) ceil(max(tu)) -Inf +Inf]);
 axis auto
@@ -106,7 +109,9 @@ axis auto
 set(gca,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','Xcolor','k','Ycolor','k');
 h=title (titlestring); set(h,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','HorizontalAlignment','Center');
 h=xlabel(xlab); set(h,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','color','k');
-h=ylabel(ylab); set(h,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','color','k');
+h=ylabel(ylab, 'Interpreter', 'latex'); set(h,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','color','k');
+
+
 
 
 return
