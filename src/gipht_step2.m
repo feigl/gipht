@@ -206,13 +206,17 @@ for k=1:me  %    % loop over epochs
     end
 end
 
-% handle time function
+%% handle time function
 pindex=get_parameter_index('time_fn',pnames);
 if numel(pindex) == numel(tepochs)
-    dy = dyear(year(tepochs),month(tepochs),day(tepochs));
-    p0(pindex) = dy;
-    lb(pindex) = dy;
-    ub(pindex) = dy;
+%     decyears = dyear(year(tepochs),month(tepochs),day(tepochs));
+%     p0(pindex) = decyears;
+%     lb(pindex) = decyears;
+%     ub(pindex) = decyears;
+    decyears = dyear(year(tepochs),month(tepochs),day(tepochs));
+    p0(pindex) = decyears;
+    lb(pindex) = decyears;
+    ub(pindex) = decyears;
 else
     error('numel(pindex) NE numel(tepochs)');
 end

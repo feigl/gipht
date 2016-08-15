@@ -2,10 +2,10 @@ function DST = build_dst(fitfun,xyzm,tepochs,bpest,dops,DD,unitv...
     ,xd,yd,ippix1,mpercy,idatatype...
     ,dx,dy,dz,orbvm,orbvs,alon,alat...
     ,qii1,qii2,qjj1,qjj2...
-    ,phasig)
+    ,phasig,kindex,kmasts,kslavs)
 % write all the data needed for a model to a data structure called DST
 
-if nargin < 19
+if nargin < 22
     error('Not enough arguments');
 end
 
@@ -39,25 +39,25 @@ for i=1:3
     xyzm0(i,:) = xyzm(i,:)-mean(xyzm(i,:));
 end
 
-kmasts = zeros(ndata,1);
-kslavs = zeros(ndata,1);
-for k=1:np
-    i1 = ippix1(k);
-    if k < np
-        %i2 = ippix1(k+1);
-        i2 = ippix1(k+1)-1;
-    else
-        i2 = ndata;
-    end
-    npixinpair=i2-i1+1;
-    
-    kmast = find(DD(k,:) == -1);
-    kslav = find(DD(k,:) == +1);
-    
-    kmasts(i1:i2) = kmast;
-    kslavs(i1:i2) = kslav;
-    kindex(i1:i2) = k;    
-end
+% kmasts = zeros(ndata,1);
+% kslavs = zeros(ndata,1);
+% for k=1:np
+%     i1 = ippix1(k);
+%     if k < np
+%         %i2 = ippix1(k+1);
+%         i2 = ippix1(k+1)-1;
+%     else
+%         i2 = ndata;
+%     end
+%     npixinpair=i2-i1+1;
+%     
+%     kmast = find(DD(k,:) == -1);
+%     kslav = find(DD(k,:) == +1);
+%     
+%     kmasts(i1:i2) = kmast;
+%     kslavs(i1:i2) = kslav;
+%     kindex(i1:i2) = k;    
+% end
 
 DST.i            = [1:ndata]';
 DST.idatatype    = idatatype*ones(ndata,1);

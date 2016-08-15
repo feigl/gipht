@@ -1,4 +1,4 @@
-function [pfnames, mdate, imast, sdate, islav, hamb, ddays, t1, t2, data_types] = read_file_names(file_name)
+function [pfnames, mdate, imast, sdate, islav, hamb, ddays, t1, t2, idatatypes, mpercys] = read_file_names(file_name)
 % read the phase file names and decimal years for master and slave
 % FILE_NAMES.DAT format
 %  decimal.year_master  decimal.year_slave  phase_file_name  % comments
@@ -46,7 +46,7 @@ switch file_type
             t2    = CDAT{2};  % Second column of dat file is the Slave Date
             names = CDAT{3};  % Third column of dat file is the phase file names
             np = nrows;
-            data_types = zeros(np,1);
+            idatatypes = zeros(np,1);
         else
             error(sprintf('miscount with file_type = %d',file_type))
         end
@@ -56,35 +56,45 @@ switch file_type
         %  ../intf/1992220_1993169/unwrap_mask_ll.grd   % unwrapped phase in radians
         
         % Read the arguments into a Cell Array
-        CDAT=textscan(fid,'%s','CommentStyle','%');fclose(fid);
+        CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','%');
+        fclose(fid);
         [nrows,ncols] = size(CDAT);
-        if ncols == 1 && nrows > 0
-            names = CDAT{1}; % First column of dat file is the phase file names
+        if ncols == 5 && nrows > 0
+            yyyymmdd1    = CDAT{1};  % Master Date
+            yyyymmdd2    = CDAT{2};  % Slave Date
+            idatatypes   = CDAT{3};  % data type
+            mpercys      = CDAT{4};  % fringe spacing meters per cycle
+            names        = CDAT{5};  % third column of dat file is the grid file name
+            
             np = nrows;
-            data_types = nan(np,1);
             for i=1:np
-                str1 = char(names(i))
-                % find first underscore in file name
-                iusc = strfind(str1,'_');iusc=iusc(1);
-                yyyy1 = str2num(str1(iusc-7:iusc-4));
-                yyyy2 = str2num(str1(iusc+1:iusc+4));
-                doy1 = str2num(str1(iusc-3:iusc-1));
-                doy2  = str2num(str1(iusc+5:iusc+7));
-                [y1,m1,d1] = yeardoy2yyyyymmdd(yyyy1,doy1);
-                [y2,m2,d2] = yeardoy2yyyyymmdd(yyyy2,doy2);
+                str1 = char(yyyymmdd1(i));
+                str2 = char(yyyymmdd2(i));
+                y1 = str2num(str1(1:4));
+                y2 = str2num(str2(1:4));
+                m1 = str2num(str1(5:6));
+                m2 = str2num(str2(5:6));
+                d1 = str2num(str1(7:8));
+                d2 = str2num(str2(7:8));
+                
+                
+                %[y1,m1,d1] = yeardoy2yyyyymmdd(yyyy1,doy1);
+                %[y2,m2,d2] = yeardoy2yyyyymmdd(yyyy2,doy2);
                 % t1 = datetime(y1,m1,d1,'TimeZone','UTC');t1.Format = 'yyyy-MM-dd_HH:mm:SSSSSS [ZZZZ]'  ; % 24 hour clock
                 % t2 = datetime(y2,m2,d2,'TimeZone','UTC');t2.Format = 'yyyy-MM-dd_HH:mm:SSSSSS [ZZZZ]'  ; % 24 hour clock
-                t1 = datetime(y1,m1,d1,'TimeZone','UTC');t1.Format = 'yyyy-MM-dd'  ; % 24 hour clock
-                t2 = datetime(y2,m2,d2,'TimeZone','UTC');t2.Format = 'yyyy-MM-dd'  ; % 24 hour clock
+                t1(i) = datetime(y1,m1,d1,'TimeZone','UTC');t1.Format = 'yyyy-MM-dd'  ; % 24 hour clock
+                t2(i) = datetime(y2,m2,d2,'TimeZone','UTC');t2.Format = 'yyyy-MM-dd'  ; % 24 hour clock
                                 
-                % try to guess data type from file name
-                if numel(strfind(str1,'phasefilt_ll')) > 0
-                    data_types(i) = 0;
-                elseif numel(strfind(str1,'unwrap_mask_ll')) > 0
-                    data_types(i) = 2;
-                else
-                    errror(sprintf('cannot parse data type from file name %s\n',str1));
-                end
+%                 % try to guess data type from file name
+%                 if numel(strfind(str1,'phasefilt')) > 0
+%                     idatatypes(i) = 0;
+%                 elseif numel(strfind(str1,'qgradx')) > 0
+%                     idatatypes(i) = -1;
+%                 elseif numel(strfind(str1,'unwrap_mask')) > 0
+%                     idatatypes(i) = 2;
+%                 else
+%                     errror(sprintf('cannot parse data type from file name %s\n',str1));
+%                 end
             end
         else
             error(sprintf('miscount with file_type = %d',file_type))
@@ -92,6 +102,10 @@ switch file_type
     otherwise
         error(sprintf('Unknown case: file_type is %d\n',file_type));
 end
+
+%% make column vectors
+idatatypes = colvec(idatatypes)
+mpercys = colvec(mpercys)
 
 % % Check if any pairs were read
 % np = numel(n0);

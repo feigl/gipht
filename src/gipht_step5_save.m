@@ -104,17 +104,9 @@ cx = colvec(xmesh3);
 % Zmesh=reshape(bz,nlmesh,ncmesh);
 disp 'Done making meshes'
 
-%% initialize unit vector
 unitv1 = nan(3,ndata);
 
-%% coordinates for profile
-xprof = (xmin+xmax)/2.;
-yprof = (ymin+ymax)/2.;
-iprof = find(abs(demy-yprof) < dy);iprof=iprof(1);
-jprof = find(abs(demx-xprof) < dx);jprof=jprof(1);
-
-
-%% dimension arrays to store images as panels in a square mosaic
+% dimension arrays to store images as panels in a square mosaic
 if np > 1 && np < 36
     oims = zeros(np,nlmesh3,ncmesh3);
     mims = zeros(np,nlmesh3,ncmesh3);
@@ -149,7 +141,6 @@ for i = 1:np
     
     kmast = find(DD(i,:) == -1);
     kslav = find(DD(i,:) == +1);
-    
     % select row corresponding to this pair
     DD1 = DD(i,:);
     
@@ -168,11 +159,6 @@ for i = 1:np
     %% read observed phase values at all pixels for this pair
     fn0 = pfnames{i};
     [tmpx,tmpy,phao] = grdread3(fn0); % GMT grid file is assumed to be in radians
-    ndata = numel(phao);
-    
-    kmasts = kmast*ones(ndata,1);
-    kslavs = kslav*ones(ndata,1);
-
       
     if bitget(figopt,2) == 1
         % recalculate model at each pixel individually
@@ -349,7 +335,7 @@ for i = 1:np
             ,zeros(ndata,1),zeros(ndata,1),ippix1,mpercy,idatatype...
             ,dx1,dy1,dz1,orbvm1,orbvs1,clond1,clatd1...
             ,qii1,qii2,qjj1,qjj2...
-            ,phasig,kindex,kmasts,kslavs);
+            ,phasig);
         %             % call fitting function first time to initialize
         %             % calculate modeled values for phase, NOT gradient
         for ii=1:numel(DST2.idatatype)
@@ -386,12 +372,12 @@ for i = 1:np
         % phase residuals for all pixels in this pair
         nf=nf+1;h(nf)=figure;
         res1 = rwrapm(DST.phaobs-DST.phamod);
-%         % Test for von Miseness
-%         [Sm,VMnessString1] = vonmisesness (colvec(res1))    % Mardia and Jupp
-%         [U2,VMnessString2] = vonmisesness2(colvec(res1))    % Fisher
-%         % make QQ plot
-%         qqplotvonmises(colvec(res1)/2.0/pi);
-%         feval(printfun,sprintf('%s_QQPLOT_%03d_von_mises',runname,i));
+        % Test for von Miseness
+        [Sm,VMnessString1] = vonmisesness (colvec(res1))    % Mardia and Jupp
+        [U2,VMnessString2] = vonmisesness2(colvec(res1))    % Fisher
+        % make QQ plot
+        qqplotvonmises(colvec(res1)/2.0/pi);
+        feval(printfun,sprintf('%s_QQPLOT_%03d_von_mises',runname,i));
         
         % get vector values
         if bitget(figopt,3) == 1
@@ -640,9 +626,7 @@ for i = 1:np
     imD = reshape(double(devs_all0)/DNPC ,nlmesh3,ncmesh3);tlD = 'Dev0';
     %if pselect == 3 || pselect == 5 || pselect == 7
     if ismember(pselect,[3,5,7])
-        %% TODO 20160814need to find quad-tree
-        %imE = reshape(     double(qhao)/DNPC ,nlmesh3,ncmesh3);tlE = 'Final';
-        imE = reshape(     double(phao)/DNPC ,nlmesh3,ncmesh3);tlE = 'Final';
+        imE = reshape(     double(qhao)/DNPC ,nlmesh3,ncmesh3);tlE = 'Final';
     else
         imE = reshape(     double(phao)/DNPC ,nlmesh3,ncmesh3);tlE = 'Final';
     end
@@ -724,31 +708,26 @@ for i = 1:np
     % Write phase to binary .pha files and instructions for using them
     %    log_phases(runname, i, imA, imF, imG, imH, imE, uns, mds, urs, ucs);
     %   2012-JUN-25 make everything into meters
-%     log_phases(runname, i, imA, imF, imG, imH, imE...
-%         , 1.0e3*uns, 1.0e3*mds, 1.0e3*urs, 1.0e3*ucs...
-%         , 1.0e3*omr, 1.0e3*omx, 1.0e3*omy, 1.0e3*omz...
-%         , 1.0e3*umr, 1.0e3*umx, 1.0e3*umy, 1.0e3*umz);
-    write_grids(runname, i, imA, imF, imG, imH, imE...
-        , uns, mds, urs, ucs...
-        , omr, omx, omy, omz...
-        , umr, umx, umy, umz...
-        , demx,demy);
-%     fprintf(1,'\nTo plot binary phase files, consider following commands:\n');
-%     fprintf(1,'autoigram.gmt %s_%03d_MODL.pha -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_RESD.pha -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_COST.pha -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_OBSV.pha -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_QUAD.pha -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UOBS.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UMOD.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_URES.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UDEV.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UOMX.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UOMY.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UOMZ.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UUMX.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UUMY.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UUMZ.i2  -S -G -D %s\n',runname,i,demdescfile2);
+    log_phases(runname, i, imA, imF, imG, imH, imE...
+        , 1.0e3*uns, 1.0e3*mds, 1.0e3*urs, 1.0e3*ucs...
+        , 1.0e3*omr, 1.0e3*omx, 1.0e3*omy, 1.0e3*omz...
+        , 1.0e3*umr, 1.0e3*umx, 1.0e3*umy, 1.0e3*umz);
+    fprintf(1,'\nTo plot binary phase files, consider following commands:\n');
+    fprintf(1,'autoigram.gmt %s_%03d_MODL.pha -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_RESD.pha -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_COST.pha -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_OBSV.pha -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_QUAD.pha -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_UOBS.i2  -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_UMOD.i2  -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_URES.i2  -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_UDEV.i2  -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_UOMX.i2  -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_UOMY.i2  -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_UOMZ.i2  -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_UUMX.i2  -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_UUMY.i2  -S -G -D %s\n',runname,i,demdescfile2);
+    fprintf(1,'autoigram.gmt %s_%03d_UUMZ.i2  -S -G -D %s\n',runname,i,demdescfile2);
     
     % set color table
     %climit=[min(min([imA imB imC imD imE imF imG imH])) max(max([imA imB imC imD imE imF imG imH]))];

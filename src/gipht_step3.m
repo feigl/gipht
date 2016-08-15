@@ -682,9 +682,9 @@ qnames{iq} = sprintf('Total_Net_Volume_Increase_in_m3');
 iii=get_parameter_index('Okada1_Length_in_m______________',pnames);
 %if psig(iii) > 0
 if p0(iii) > 0
-    for i=1:10
-        utmzone10(i,:)=utmzone0;
-    end
+%     for i=1:10
+%         utmzone10(i,:)=utmzone0;
+%     end
 %     % Geographic coordinates of Okada centroid
 %     [Xcorners10,Ycorners10,Hcorners10,Ncorners] = disloc_to_seismo(p0(iii:iii+9));
 %     [LatCorners10,LonCorners10]=utm2deg(Xcorners10,Ycorners10,utmzone10);
