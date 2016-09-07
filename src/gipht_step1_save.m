@@ -770,7 +770,8 @@ switch pselect
         %         > In RandStream.RandStream>RandStream.setDefaultStream at 456
         %         In gipht_step1 at 691
         %         In gipht at 119
-        %20130624 - My understanding is that if we do NOT initialize, then the RNG
+  
+    case 2      %20130624 - My understanding is that if we do NOT initialize, then the RNG
         %will generate a different number in each session of GIPHT.
 
 
@@ -785,7 +786,6 @@ switch pselect
         jkeep = jcenter + floor(abs(jrand)) .* sign(jrand);
         fprintf(1,'Saving %d pixel indices to ikeep.mat and jkeep.mat.\n',npix);
         save ikeep ikeep; save jkeep jkeep
-    case 2
         % See if files exist
         fdi = fopen ('ikeep.mat','r'); fdj = fopen ('jkeep.mat','r');
         if fdi == -1 || fdj == -1

@@ -72,7 +72,7 @@
 % U.S. Patent No. 7,446,705.
 % 
 % Copyright (c) Kurt Feigl, Cliff Thurber, Lee Powell, Peter Sobol, Aaron
-% Masters, S. Tabrez Ali, Elena C. Baluyut, University of Wisconsin-Madison
+% Masters, S. Tabrez Ali, Elena C. Reinisch, University of Wisconsin-Madison
 % 
 % This program is free software: you can redistribute it and/or modify it
 % under the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by
@@ -88,19 +88,28 @@
 % along with this program. If not, see
 % http://www.gnu.org/licenses/lgpl.html.
 
+%function PSTOUT = gipht(OPT)
+% ,xcenter, ycenter, halfwidth, halfheight, npix, pselect, tquake...
+%     , unitv0, ithresh, maxcmd, pixinpatch, maxpix, ianneal, nprocessors, interpcell ...
+%     , ilist, fnparin, fnparout, objfun, fitfun, demdescfile, orbfile, cohfile...
+%     , mpercy, datafilename, nsaruns, parmfilename, saopt6, figopt, printfun, orbopt...
+%     , pha2qlsname, phaseprefix, surrogate, verbose)
+
 % initialize variables
-clear all;
+%clear all;
+
 % deal with slashes on Windows boxes
 if ispc == 1
     set(0,'DefaultTextInterpreter','none');
 end
-close all; nf=0;format compact; 
+close all; nf=0;
+format compact; 
 echo off all
 
 %splashtext = sprintf('%80s\n',help('gipht.m'));
 
 fprintf(1,'\n\nGeneral Inversion of Phase Technique (GIPhT)\n\n');
-versionnum = 2.92;
+versionnum = 3.0;
 D=dir(which('gipht'));
 versiondat = D.date;
 versionstr = sprintf('GIPhT Development version %.1f of %s'...
@@ -166,6 +175,8 @@ tstart = tic;
 %      Lesser GNU Public License
 % 2015-JUN v. 2.9.2
 %     handle Quadtree data in 14-column format from JPL
+% 2016 v. 3.0
+%     use GMT grid files projected into UTM for all input
 
 % initialize paths
 %giphtpath
@@ -174,26 +185,41 @@ tstart = tic;
 
 %license_check;
 
+%% define a directory with a unique name by using a time stamp
 clockstr = clock;
 runname=sprintf('%04d%02d%02d_%02d%02d%02d'...
-   ,clockstr(1),clockstr(2),clockstr(3),clockstr(4),clockstr(5),round(clockstr(6)))
+   ,clockstr(1),clockstr(2),clockstr(3)...
+   ,clockstr(4),clockstr(5),round(clockstr(6)))
 rundir = sprintf('%s',['x_' runname filesep 'x']);
 %system(sprintf('mkdir -p x_%s',runname));
 unix(sprintf('mkdir -p x_%s',runname));
 runname=rundir;
-diary(sprintf('%s.log',runname));
 
+%% remove any lingering mat files
+if fexist('gipht.mat') 
+    fdelete('gipht.mat')
+end
+
+%% create a log file
+diary(sprintf('%s.log',runname));
 if fexist(sprintf('%s.log',runname)) ~= 1
     warning('Cannot open diary file named %s\n',sprintf('%s.log',runname));
 end
 
-% When there is no display, this returns [1 1 1 1] instead of an actual screen size. However, this relies on behavior that isn't actually specified (by the doc, for instance) to work in any particular way, so may be subject to change in the future. If you were going to use this many times, it might be wise to wrap it in a function (e.g. create an "isdisplay.m" function file), so you can easily change the implementation in the future, if needed. (This method worked as of MATLAB R2008a.) 
+%% try to handle the case without a screen
+% When there is no display, this returns [1 1 1 1] instead of an actual
+% screen size. However, this relies on behavior that isn't actually
+% specified (by the doc, for instance) to work in any particular way, so
+% may be subject to change in the future. If you were going to use this
+% many times, it might be wise to wrap it in a function (e.g. create an
+% "isdisplay.m" function file), so you can easily change the implementation
+% in the future, if needed. (This method worked as of MATLAB R2008a.)
 ss4 = get(0, 'ScreenSize');
 if ss4 == [1 1 1 1 ]
 %warning('off','all');
 end
 
-% % Make a figure with splash message
+%% Make a figure with splash message
 % figure;set(gca,'Visible','Off');axis([0 30 0 20]); hold on;
 % h=text(0.05,10,char(splashtext));
 % set(h,'FontName','Helvetica','Fontsize',10,'FontWeight','bold');
@@ -201,6 +227,22 @@ end
 
 % count the errors
 nerrors = 0;
+
+%% set name of file for input control keywords
+if exist('OPT','var') == 1
+    if isfield(OPT,'fning') == 1
+        if isempty(OPT.fning) == 1
+            OPT.fning='gipht.in';
+        else
+            fprintf(1,'Using inherited input file named %s\n',char(OPT.fning));
+        end
+    else
+        OPT=struct('fning','gipht.in');
+    end
+else
+    OPT=struct('fning','gipht.in');
+end
+
 
 % Now run the following steps:
 gipht_step1; % read in phase files, select pixels
@@ -215,3 +257,8 @@ fprintf(1,'\n\n----------------   %s ended normally at %s ----------\n',upper(mf
 fprintf(1,    '----------------   Elapsed time: %.0f seconds\n',telapsed);
 
 diary off
+
+fngout = 'gipht.gout';
+return
+
+

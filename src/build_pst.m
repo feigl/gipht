@@ -1,10 +1,11 @@
-function PST = build_pst(fitfun,mparam,p0,p1,psig,pnames,bounds,datafilename,pscl,pflag)
+function PST = build_pst(fitfun,mparam,p0,p1,psig,pnames,bounds,datafilename,pscl,pflag,timefun)
 %function ierr = write_fitfunin(fnamein,fitfun,mparams,p,pnames,bounds,pscl)
 % Build a PST structure containing parameters with name fname
 % Kurt 20101111 add scale factor 
+% Kurt 20160818 add timefun
 
 
-if nargin ~= 10
+if nargin ~= 11
     error('Wrong number of arguments');
 end
 
@@ -12,6 +13,7 @@ end
 PST.mparam       = mparam;
 PST.datafilename = datafilename;
 PST.fitfun       = fitfun;
+PST.timefun      = timefun;
 
 for i = 1:mparam
     PST.i(i)      = i;           % index of parameter

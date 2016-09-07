@@ -4,7 +4,7 @@
 # run pha2qls.c to perform quad-tree resampling on a phase file
 if ($#argv < 1) then
 cat - << ENDOFDOC
-$0:t Last modification 20150810
+$0:t Last modification 20150819 Kurt Feigl
 
 perform Quad-tree resampling on wrapped phase
 usage pha2qls [options] input.pha nx ny 
@@ -29,9 +29,6 @@ Options:
                  -d 3  == combines 1 & 2
 
 ENDOFDOC
-
-# cat ../In*/title.txt | awk 'NF==15{printf("%4s-%3s-%2s %6d %10.4f %3s %3s\n",$1,$2,$3,$7,$11,$13,$14)}' | sort -nu
-if ($isverbose) echo 'cat ../In*/title.txt | awk ''$10 > 0{print $0}'' | sort -k13n -k14n -k11n -k12n -u | awk '{print $0,"ad"}' >! $listfile '
 
 exit 1
 endif
@@ -210,6 +207,12 @@ set qmask = $INFILE:r\_qmaskn.grd
 #                  -d 1  == Warning to stdout if a patch write exceeds nx,ny bounds or if a patch write overwrites an existing patch
 #                  -d 2  == echos input qls data to stdout
 #                  -d 3  == combines 1 & 2
+
+if (! -e /Users/feigl/gipht/pha2qls/pha2qls.maci64 ) then
+  echo "ERROR: cannot find executable for pha2qls.c"
+  exit 1
+endif
+
 
 /Users/feigl/gipht/pha2qls/pha2qls.maci64 tmp.pha $ncols $nrows \
 $VERBOSE -P quadt.pha -X gradx.i2 -Y grady.i2 -T qls.txt \

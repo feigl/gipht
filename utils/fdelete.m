@@ -1,4 +1,5 @@
 function ierr=fdelete(fname)
+%function ierr=fdelete(fname)
 % % delete a file named fname 
 
 % find out if file exists

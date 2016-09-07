@@ -11,9 +11,12 @@
 
 fprintf(1,'\n\n----------------   %s begins at %s ----------\n',upper(mfilename),datestr(now,31));
 
-clearvars
-load
-fidtxtout = fopen(txtoutname,'a');
+clear vars
+if fexist('gipht.mat') == 1
+    load('gipht.mat');
+end
+
+fidtxtout = fopen(fnparout,'a');
 
 En00 = NaN;
 En0  = NaN;
@@ -306,11 +309,11 @@ if istatcode ~= 0
                 %crit69=kappa2cmd(Kappa69,ndata,mean_direction(colvec(res1)))/2.0/pi  % critical value of circular mean deviation (cost) in cycles
                 crit69=kappa2cmd(Kappa69,ndata)/2.0/pi  % critical value of circular mean deviation (cost) in cycles, assuming zero mean
                 %crit95=kappa2cmd(Kappa95,ndata,mean_direction(reshape(double(res1)/DNPC,numel(res1),1))*pi*2)/pi/2;  % critical value of circular mean deviation (cost) in cycles
-                %fprintf(1,'Critical Value of Circ. Mean Dev. = %.4f cycles per datum for %6d observations at 95 percent confidence\n',crit95, numel(xd));
+                %fprintf(1,'Critical Value of Circ. Mean Dev. = %.4f %sfor %6d observations at 95 percent confidence\n',crit95, numel(xd));
                 %crit69=kappa2cost(Kappa69);  % critical value of cost in cycles
                 %crit95=kappa2cost(Kappa95);  % critical value of cost in cycles
-                %fprintf(1,'Critical Value of cost = %.4f cycles per datum for %6d observations at 69 percent confidence\n',crit69, numel(xd));
-                %fprintf(1,'Critical Value of cost = %.4f cycles per datum for %6d observations at 95 percent confidence\n',crit95, numel(xd));
+                %fprintf(1,'Critical Value of cost = %.4f %sfor %6d observations at 69 percent confidence\n',crit69, numel(xd));
+                %fprintf(1,'Critical Value of cost = %.4f %sfor %6d observations at 95 percent confidence\n',crit95, numel(xd));
             else
                 istatcode = -1 * istatcode;
             end
@@ -554,15 +557,15 @@ end
 
 %fclose(fidtxtout);
 if fidtxtout < 100
-    fidtxtout=fopen(txtoutname,'a');
+    fidtxtout=fopen(fnparout,'a');
 end
 for fd=[1 fidtxtout]
-    fprintf(fd,'Cost  of null  model   = %.7f cycles per datum for %6d observations in inverted data set %s\n',cost00,  ndata, runname);
-    fprintf(fd,'Cost  of initl model   = %.7f cycles per datum for %6d observations in inverted data set %s\n',cost0,   ndata, runname);
-    fprintf(fd,'Cost  of final model   = %.7f cycles per datum for %6d observations in inverted data set %s\n',cost1,   ndata, runname);
-    fprintf(fd,'Cost  improvement      = %.7f cycles per datum for %6d observations in inverted data set %s\n',cost0-cost1,   ndata, runname);
+    fprintf(fd,'Cost  of null  model   = %.7f %s for %6d observations in inverted data set %s\n',cost00,  datalabel, ndata, runname);
+    fprintf(fd,'Cost  of initl model   = %.7f %s for %6d observations in inverted data set %s\n',cost0,   datalabel, ndata, runname);
+    fprintf(fd,'Cost  of final model   = %.7f %s for %6d observations in inverted data set %s\n',cost1,   datalabel, ndata, runname);
+    fprintf(fd,'Cost  improvement      = %.7f %s for %6d observations in inverted data set %s\n',cost0-cost1,   datalabel, ndata, runname);
 if isfinite(crit69)==1
-    fprintf(fd,'Critical value of cost = %.7f cycles per datum for %6d observations in inverted data set %s\n',crit69,  ndata, runname);
+    fprintf(fd,'Critical value of cost = %.7f %sfor %6d observations in inverted data set %s\n',crit69,  datalabel, ndata, runname);
 end
     if istatcode == 1
         
@@ -1040,24 +1043,27 @@ for i=iq1:iq2
     fprintf(1        ,outfmt,qflags{i},i+mparam,qnames{i} ,q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
     fprintf(fidtxtout,outfmt,qflags{i},i+mparam,qnames{i}, q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
 end
+fclose(fidtxtout);
 
-
+%% update parameter list
 PST1.sigma = colvec(psig);
-write_pst(PST1,'PST.OUT');
+%write_pst(PST1,'PST.OUT');
+write_gin(PST1,fnparout);
 
 clear h;
 
-save('qsave.mat','iq','iq1','iq2','qflags','qnames','q0','q1','qsig');
+%% save variables for next step
+%save('qsave.mat','iq','iq1','iq2','qflags','qnames','q0','q1','qsig');
 %if ismember(ianneal,[1,2])==1
-if isfinite(acosts1(1)) == 1
-    iok = find(isfinite(acosts1)==1);
-    fprintf(1,'Saving %d sets of trial values of parameters and their costs\n',numel(iok));
-    acosts1=acosts1(iok);
-    trials=trials(iok,:);
-    save('trialvals.mat','trials','acosts1','pnames','crit69','cost00','cost0','cost1','runname','p0','p1');
-end
+% if isfinite(acosts1(1)) == 1
+%     iok = find(isfinite(acosts1)==1);
+%     fprintf(1,'Saving %d sets of trial values of parameters and their costs\n',numel(iok));
+%     acosts1=acosts1(iok);
+%     trials=trials(iok,:);
+%     save('trialvals.mat','trials','acosts1','pnames','crit69','cost00','cost0','cost1','runname','p0','p1');
+% end
 
-save;
+save('gipht.mat');
 
 fprintf(1,'\n\n----------------   %s ended normally at %s ----------\n',upper(mfilename),datestr(now,31));
 

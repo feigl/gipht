@@ -17,7 +17,7 @@ function gipht_splash
 % along with this program. If not, see http://www.gnu.org/licenses/lgpl.html .
 % 
 % Source code: Copyright (c) Kurt Feigl, Cliff Thurber, Lee Powell, Peter
-% Sobol, Aaron Masters Elena Baluyut, S. Tabrez Ali 
+% Sobol, Aaron Masters, Elena C. Reinisch, S. Tabrez Ali 
 % University of Wisconsin-Madison'
 
 return

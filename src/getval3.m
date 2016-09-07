@@ -1,9 +1,17 @@
-function val=getval2(keys,vals,keyin,itype,nv)
-%function val=getval2(keys,vals,keyin,itype,nv)
+function val=getval3(OPT,keys,vals,keyin,itype)
+%function val=getval3(val,keys,vals,keyin,itype)
 % given a set of keywords, search for keyin and return in val
 
-if exist('val','var') == 0
+if isfield(OPT,keyin) == 0
+    %fprintf(1,'Creating field in OPT structure from key %s\n',keyin);
+    OPT.(keyin) = [];
+end
+
+if isempty(OPT.(keyin)) == 0
+    val=OPT.(keyin); 
+else
     val=[];
+    nv = numel(vals);
     for i=1:nv
         k1 = strfind(keys{i},keyin);
         if numel(k1) > 0
@@ -39,4 +47,5 @@ if exist('val','var') == 0
         end
     end
 end
+
 return

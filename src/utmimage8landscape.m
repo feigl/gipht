@@ -1,9 +1,11 @@
 function h1 = utmimage8landscape(im1,im2,im3,im4,im5,im6,im7,im8...
                        ,tl1,tl2,tl3,tl4,tl5,tl6,tl7,tl8....
-            ,wesn,titlestr,climit,dotxutm,dotyutm,ctab,cbar,mysyms,marksizes)
+            ,wesn,titlestr,climit,dotxutm,dotyutm,ctab,cbar,mysyms,marksizes...
+            ,idatatype)
 % function h1 = utmimage8landscape(im1,im2,im3,im4,im5,im6,im7,im8...
 %                        ,tl1,tl2,tl3,tl4,tl5,tl6,tl7,tl8....
-%             ,wesn,titlestr,climit,dotxutm,dotyutm,ctab,cbar,mysyms,marksizes)
+%             ,wesn,titlestr,climit,dotxutm,dotyutm,ctab,cbar,mysyms,marksizes...
+%             ,idatatype)
 %
 %          obs   mod  res  dev
 %  initial 1=a   2=b  3=c  4=d
@@ -84,7 +86,7 @@ colormap(ctab);
 % draw panels in smart order to see tick labels
 
 subplot('position',[0.825  0.325*rat   0.225 0.225*rat]*rs);
-utmimage(im4,xutmmin,xutmmax,yutmmin,yutmmax,tl4,'d',climit,dotxutm, dotyutm,ctab,mysyms{4},marksizes(4),0,0);
+utmimage(im4,xutmmin,xutmmax,yutmmin,yutmmax,tl4,'d',climit,dotxutm, dotyutm,ctab,mysyms{4},marksizes(4),0,0,idatatype);
 if cbar == 1  
    ha=text(1.45 ,-0.850,labb            ,'Units','normalized','Clipping','off','FontName','Helvetica-Bold','HorizontalAlignment','Right'  ,'VerticalAlignment','Bottom','rotation', 0);
    ha=text(1.45 , 0.000,labm            ,'Units','normalized','Clipping','off','FontName','Helvetica-Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',90);    
@@ -93,19 +95,19 @@ if cbar == 1
 end
 
 subplot('position',[0.600  0.325*rat   0.225 0.225*rat]*rs);
-utmimage(im3,xutmmin,xutmmax,yutmmin,yutmmax,tl3,'c',climit, dotxutm,dotyutm,ctab,mysyms{3},marksizes(3),0,0);
+utmimage(im3,xutmmin,xutmmax,yutmmin,yutmmax,tl3,'c',climit, dotxutm,dotyutm,ctab,mysyms{3},marksizes(3),0,0,idatatype);
 if cbar == 1  
    ha=text(0.5  , 1.0      ,'Residual','Units','normalized','Clipping','off','FontName','Helvetica-Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',0);    
 end
 
 subplot('position',[0.375  0.325*rat   0.225 0.225*rat]*rs);
-utmimage(im2,xutmmin,xutmmax,yutmmin,yutmmax,tl2,'b',climit, dotxutm,dotyutm,ctab,mysyms{2},marksizes(2),0,0);
+utmimage(im2,xutmmin,xutmmax,yutmmin,yutmmax,tl2,'b',climit, dotxutm,dotyutm,ctab,mysyms{2},marksizes(2),0,0,idatatype);
 if cbar == 1  
    ha=text(0.5  , 1.0      ,'Modeled','Units','normalized','Clipping','off','FontName','Helvetica-Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',0);    
 end
 
 subplot('position',[0.150    0.325*rat   0.225 0.225*rat]*rs);
-utmimage(im1,xutmmin,xutmmax,yutmmin,yutmmax,tl1,'a',climit, dotxutm,dotyutm,ctab,mysyms{1},marksizes(1),0,0);
+utmimage(im1,xutmmin,xutmmax,yutmmin,yutmmax,tl1,'a',climit, dotxutm,dotyutm,ctab,mysyms{1},marksizes(1),0,0,idatatype);
 if cbar == 1  
    ha=text(0.50  ,  1.0      ,'Observed','Units','normalized','Clipping','off','FontName','Helvetica-Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',0);    
    ha=text(-0.25,+0.1, 'Northing (km)','Units','normalized','Clipping','off','FontName','Helvetica-Bold','rotation',90,'HorizontalAlignment','Left','VerticalAlignment','Top');
@@ -117,22 +119,22 @@ if cbar == 1
 end
 
 subplot('position',[0.825  0.1*rat  0.225 0.225*rat]*rs);%colormap('jet');
-utmimage(im8,xutmmin,xutmmax,yutmmin,yutmmax,tl8,'h',climit,dotxutm, dotyutm,ctab,mysyms{8},marksizes(8),0,0);
+utmimage(im8,xutmmin,xutmmax,yutmmin,yutmmax,tl8,'h',climit,dotxutm, dotyutm,ctab,mysyms{8},marksizes(8),0,0,idatatype);
 
 
 subplot('position',[0.600  0.1*rat  0.225 0.225*rat]*rs);
-utmimage(im7,xutmmin,xutmmax,yutmmin,yutmmax,tl7,'g',climit ,dotxutm, dotyutm,ctab,mysyms{7},marksizes(7),0,0);
+utmimage(im7,xutmmin,xutmmax,yutmmin,yutmmax,tl7,'g',climit ,dotxutm, dotyutm,ctab,mysyms{7},marksizes(7),0,0,idatatype);
 
 
 subplot('position',[0.375  0.1*rat  0.225 0.225*rat]*rs);
-utmimage(im6,xutmmin,xutmmax,yutmmin,yutmmax,tl6,'f',climit  ,dotxutm, dotyutm,ctab,mysyms{6},marksizes(6),0,0);
+utmimage(im6,xutmmin,xutmmax,yutmmin,yutmmax,tl6,'f',climit  ,dotxutm, dotyutm,ctab,mysyms{6},marksizes(6),0,0,idatatype);
 
 if cbar == 1
    ha=text(+0.2,-0.03    , 'Easting (km)','Units','normalized','Clipping','off','FontName','Helvetica-Bold','rotation', 0,'HorizontalAlignment','Left','VerticalAlignment','Top');
 end
 
 subplot('position',[0.15  0.1*rat  0.225 0.225*rat]*rs);
-utmimage(im5,xutmmin,xutmmax,yutmmin,yutmmax,tl5,'e',climit,  dotxutm, dotyutm,ctab,mysyms{5},marksizes(5),1,1);
+utmimage(im5,xutmmin,xutmmax,yutmmin,yutmmax,tl5,'e',climit,  dotxutm, dotyutm,ctab,mysyms{5},marksizes(5),1,1,idatatype);
 
 
 % Wasted a lot of time trying unsuccessfully to make all this stuff work

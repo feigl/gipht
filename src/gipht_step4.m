@@ -2,12 +2,17 @@
 % 2014-06-03
 fprintf(1,'\n\n----------------   %s begins at %s ----------\n',upper(mfilename),datestr(now,31));
 
-clearvars;
-load
+clear vars;
+if fexist('gipht.mat') == 1
+    load('gipht.mat');
+end
 
 
-% only makes sense to do this for gradient from list
-if ~ismember(pselect,[7,9])
+
+%% only makes sense to do this for gradient from list
+%% TODO fix this script to handle grids from GMT
+%if ~ismember(pselect,[7,9])
+if ~ismember(pselect,[0])
     fprintf(1,'Skipping %s because pselect = %d\n',mfilename,pselect);
     return
 end
@@ -414,8 +419,8 @@ end
 clear phao imA imB imC imD imE imF imG imH;
 clear h;
 
-save('step4.mat');
-save('qsave.mat','iq','iq1','iq2','qflags','qnames','q0','q1','qsig');
+save('gipht.mat');
+%save('qsave.mat','iq','iq1','iq2','qflags','qnames','q0','q1','qsig');
 
 fprintf(1,'\n\n----------------   %s ended normally at %s ----------\n',upper(mfilename),datestr(now,31));
 

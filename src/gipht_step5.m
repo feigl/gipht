@@ -10,10 +10,14 @@
 
 fprintf(1,'\n\n----------------   %s begins at %s ----------\n',upper(mfilename),datestr(now,31));
 
-clearvars;
-load;
-load('qsave.mat');
-fidtxtout = fopen(txtoutname,'a');
+clear vars;
+if fexist('gipht.mat') == 1
+    load('gipht.mat');
+end
+
+%load;
+%load('qsave.mat');
+fidtxtout = fopen(fnparout,'a');
 % iq1 = iq;
 % iq2 = iq;
 
@@ -24,7 +28,7 @@ fidtxtout = fopen(txtoutname,'a');
 %figopt % 1xx request grids and profiles of vector components of displacement
 
 
-% % Restore exact model instead of Taylor
+%% Restore exact model instead of Taylor
 % if ianneal == 4
 %     fitfun = PST.fitfun;
 % end
@@ -167,7 +171,8 @@ for i = 1:np
     
     %% read observed phase values at all pixels for this pair
     fn0 = pfnames{i};
-    [tmpx,tmpy,phao] = grdread3(fn0); % GMT grid file is assumed to be in radians
+    [tmpx,tmpy,tmpz] = grdread3(fn0); % GMT grid file 
+    phao = double(tmpz)*FACTIN;
     ndata = numel(phao);
     
     kmasts = kmast*ones(ndata,1);
@@ -346,14 +351,14 @@ for i = 1:np
         storage=[];
         clear DST2;
         DST2 = build_dst(fitfun,xyzm1,tepochs,bpest,dops,DD1,unitv1...
-            ,zeros(ndata,1),zeros(ndata,1),ippix1,mpercy,idatatype...
+            ,zeros(ndata,1),zeros(ndata,1),ippix1,mpercys(i),idatatype...
             ,dx1,dy1,dz1,orbvm1,orbvs1,clond1,clatd1...
             ,qii1,qii2,qjj1,qjj2...
             ,phasig,kindex,kmasts,kslavs);
         %             % call fitting function first time to initialize
         %             % calculate modeled values for phase, NOT gradient
         for ii=1:numel(DST2.idatatype)
-            DST2.idatatype(ii) = 0;
+            DST2.idatatype(ii) = idatatype1;
         end
         
         % use exact fitting function
@@ -509,9 +514,9 @@ for i = 1:np
     totcost0  = nanmean(colvec(devs_all0(iok)));
     totcost1  = nanmean(colvec(devs_all1(iok)));
     
-    fprintf(1,'Total L1 Norm Cost of null  model = %.4f cycles per datum for %6d observations in sub-region\n', totcost00/DNPC,numel(iok));
-    fprintf(1,'Total L1 Norm Cost of initl model = %.4f cycles per datum for %6d observations in sub-region\n', totcost0/DNPC,numel(iok));
-    fprintf(1,'Total L1 Norm Cost of final model = %.4f cycles per datum for %6d observations in sub-region\n', totcost1/DNPC,numel(iok));
+    fprintf(1,'Total L1 Norm Cost of null  model = %12.4f %s for %6d observations in sub-region\n', totcost00/DNPC,datalabel,numel(iok));
+    fprintf(1,'Total L1 Norm Cost of initl model = %12.4f %s for %6d observations in sub-region\n', totcost0/DNPC,datalabel,numel(iok));
+    fprintf(1,'Total L1 Norm Cost of final model = %12.4f %s for %6d observations in sub-region\n', totcost1/DNPC,datalabel,numel(iok));
     
     % Added 2008-JUL-17 Kurt
     xax2 = [xmin, xmax];
@@ -733,31 +738,15 @@ for i = 1:np
         , omr, omx, omy, omz...
         , umr, umx, umy, umz...
         , demx,demy);
-%     fprintf(1,'\nTo plot binary phase files, consider following commands:\n');
-%     fprintf(1,'autoigram.gmt %s_%03d_MODL.pha -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_RESD.pha -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_COST.pha -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_OBSV.pha -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_QUAD.pha -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UOBS.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UMOD.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_URES.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UDEV.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UOMX.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UOMY.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UOMZ.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UUMX.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UUMY.i2  -S -G -D %s\n',runname,i,demdescfile2);
-%     fprintf(1,'autoigram.gmt %s_%03d_UUMZ.i2  -S -G -D %s\n',runname,i,demdescfile2);
     
     % set color table
-    %climit=[min(min([imA imB imC imD imE imF imG imH])) max(max([imA imB imC imD imE imF imG imH]))];
-    climit=[-0.5, +0.5];
-    %    ctab = cmapblackzero; % black at zero in central value
-    %   ctab = colormap('jet');
-    %ctab = cmapblacknan;close(gcf);
-    %
-    %    if figopt == 0
+    switch idatatype
+        case 0
+            climit=[-0.5, +0.5];
+        otherwise
+            climit(1) = nanmin(nanmin([imA imB imC imD imE imF imG imH])); 
+            climit(2) = nanmax(nanmax([imA imB imC imD imE imF imG imH]));
+    end
     
     if bitget(figopt,1) == 1
         % show missing pixels as black
@@ -766,20 +755,8 @@ for i = 1:np
     else
         ctab = colormap('jet');
     end
-    
-    
-    %     nf=nf+1;h(nf)=figure;imagesc(imA);hold on;
-    %     colorbar;title(sprintf('Pair %#3d OBS1 in cycles',i));axis equal; axis tight;axis ij;xlabel('Pixel Index');ylabel('Pixel Index');
-    %     nf=nf+1;h(nf)=figure;imagesc(imF);hold on;
-    %     colorbar;title(sprintf('Pair %#3d MOD1 in cycles',i));axis equal; axis tight;axis ij;xlabel('Pixel Index');ylabel('Pixel Index');
-    %     nf=nf+1;h(nf)=figure;imagesc(imG);hold on;
-    %     colorbar;title(sprintf('Pair %#3d RES1 in cycles',i));axis equal; axis tight;axis ij;xlabel('Pixel Index');ylabel('Pixel Index');
-    %     nf=nf+1;h(nf)=figure;imagesc(imH);hold on;
-    %     colorbar;title(sprintf('Pair %#3d DEV1 in cycles',i));axis equal; axis tight;axis ij;xlabel('Pixel Index');ylabel('Pixel Index');
-    
-    % get centroid of Okada source
-%     xcentroid = q1(get_parameter_index('Okada1_Centroid_Easting_in_m____',qnames));
-%     ycentroid = q1(get_parameter_index('Okada1_Centroid_Northing_in_m___',qnames));
+        
+    %% get centroid of Okada source
     xcentroid = p1(get_parameter_index('Okada1_Centroid_Easting_in_m____',qnames));
     ycentroid = p1(get_parameter_index('Okada1_Centroid_Northing_in_m___',qnames));
     icentroid = NaN;
@@ -797,16 +774,9 @@ for i = 1:np
         end
     end
     
-    % draw symbols at centers of sources, UTM coordinates must be in kilomters
-    %     dotx=PST1.p1(get_parameter_index('Easting', pnames))/1000.0;
-    %     doty=PST1.p1(get_parameter_index('Northing',pnames))/1000.0;
-    %     pindex=get_parameter_index('Mogi1_Easting', PST.names);
-    %     pindex=get_parameter_index('Mogi2_Easting', PST.names);
-    %     qindex=get_parameter_index('Centroid_UTM_X_in_meters',qnames);
-    %     qindex=get_parameter_index('Centroid_UTM_Y_in_meters',qnames);
-    dotx = xcentroid/1000.0;
-    doty = ycentroid/1000.0;
-    
+    % draw symbols at centers of sources, UTM coordinates are in meters
+    dotx = xcentroid;
+    doty = ycentroid;   
     mysym='w*';
     marksize = 10;
     for ii=1:8
@@ -815,144 +785,27 @@ for i = 1:np
     end
     
     
-    
-%     %   nf=nf+1;h(nf)=utmimage(pixarr,xutmmin,xutmmax,yutmmin,yutmmax,...
-%     % titlestr,cornerlabel,climit,dotx,doty,ctab,mysym,marksize,...
-%     %                        drawxlabels,drawylabels)
-%     % label OBS with calendar date in YYYY-MM-DD
-%     datelabel=strcat(mdate,{' to '},  sdate);
-%     nf=nf+1;h(nf)=figure;
-%     istat=utmimage(imA,xmin,xmax,ymin,ymax,...
-%         titlestr,'OBS',climit,dotx,doty,ctab,mysym,marksize ...
-%         ,0,0,datelabel);
-%     % printjpg('imA.jpg')
-%     % print (gcf,'obs.jpg','-djpeg','-r 600')
-%     print(gcf,sprintf('%s_P%03d_OBS.eps',runname,i),'-depsc','-r 1200','-tiff')
-%     %print(gcf,'obs.png','-dpng','-r 1200');
-%     close;
-%     
-%     % do not label MOD with calendar date in YYYY-MM-DD
-%     datelabel = '';
-%     nf=nf+1;h(nf)=figure;
-%     istat=utmimage(imF,xmin,xmax,ymin,ymax,...
-%         titlestr,'MOD',climit,dotx,doty,ctab,mysym,marksize ...
-%         ,0,0,datelabel);
-%     % printjpg('imA.jpg')
-%     %print (gcf,'mod.jpg','-djpeg','-r 600')
-%     print(gcf,sprintf('%s_P%03d_MOD.eps',runname,i),'-depsc','-r 1200','-tiff');
-%     close;
-%     
-%     % do not label DEV with calendar date in YYYY-MM-DD
-%     nf=nf+1;h(nf)=figure;
-%     istat=utmimage(imH,xmin,xmax,ymin,ymax,...
-%         titlestr,'DEV',climit,dotx,doty,ctab,mysym,marksize...
-%         ,0,0,datelabel);
-%     % printjpg('imA.jpg')
-%     % print (gcf,'dev.jpg','-djpeg','-r 600')
-%     print(gcf,sprintf('%s_P%03d_DEV.eps',runname,i),'-depsc','-r 1200','-tiff');
-%     close;
-    
-    
-    % imagesc(imA);hold on;
-    % colorbar;title(sprintf('Pair %#3d OBS1 in cycles',i));axis equal; axis tight;axis ij;xlabel('Pixel Index');ylabel('Pixel Index');
-    
-    % nf=nf+1;h(nf)=figure;imagesc(imF);hold on;
-    % colorbar;title(sprintf('Pair %#3d MOD1 in cycles',i));axis equal; axis tight;axis ij;xlabel('Pixel Index');ylabel('Pixel Index');
-    
-    %nf=nf+1;h(nf)=figure;imagesc(imH);hold on;
-    % colorbar;title(sprintf('Pair %#3d DEV1 in cycles',i));axis equal; axis tight;axis ij;xlabel('Pixel Index');ylabel('Pixel Index');
-    
-    
-    
-    %   This plot is black and causes a segmentation violation.
-    %     % make scatter plot
-    %     nf=nf+1;h(nf)=figure;
-    %     iok=find(colvec(abs(imE))>0);
-    %     plot(colvec(imE(iok)),colvec(imF(iok)),'k+');axis square;
-    %     xlabel('Observed Phase (cycles)');ylabel('Modeled Phase (cycles)');title('Final Estimate')
-    %     printpdf (sprintf('%s_%03d_SCATTER',runname,i));
-    
-    
     nf=nf+1; h(nf)=utmimage8(imA,imB,imC,imD,imE,imF,imG,imH...
         ,tlA,tlB,tlC,tlD,tlE,tlF,tlG,tlH...
-        ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes);
+        ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes,idatatype1,datalabel);
     %     ,wesn,titlestr,climit,[Xcorners11 NaN Xcorners21]/1000,[Ycorners11 NaN Ycorners21]/1000,ctab,1,mysyms,marksizes);
     feval(printfun,sprintf('%s_%03d_8PAN',runname,i));
-    nf=nf+1; h(nf)=utmimage8landscape(imA,imB,imC,imD,imE,imF,imG,imH...
-        ,tlA,tlB,tlC,tlD,tlE,tlF,tlG,tlH...
-        ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes);
-    %     ,wesn,titlestr,climit,[Xcorners11 NaN Xcorners21]/1000,[Ycorners11 NaN Ycorners21]/1000,ctab,1,mysyms,marksizes);
-    %printjpg(sprintf('%s_%03d_8PANLS.jpg',runname,i));
-    feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
+%     nf=nf+1; h(nf)=utmimage8landscape(imA,imB,imC,imD,imE,imF,imG,imH...
+%         ,tlA,tlB,tlC,tlD,tlE,tlF,tlG,tlH...
+%         ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes,idatatype);
+%     %     ,wesn,titlestr,climit,[Xcorners11 NaN Xcorners21]/1000,[Ycorners11 NaN Ycorners21]/1000,ctab,1,mysyms,marksizes);
+%     %printjpg(sprintf('%s_%03d_8PANLS.jpg',runname,i));
+%     feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
     % make 4-panel plot of wrapped phase
     tlA = ''; tlF = '';
+    datelabel = '';
     nf=nf+1; h(nf)=utmimage4(imA,imF,imG,imH ...
         ,tlA,tlF,tlG,tlH ...
-        ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes);
+        ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes...
+        ,datelabel,idatatype1,datalabel);
     feval(printfun,sprintf('%s_%03d_4PAN',runname,i));
     
-    if bitget(figopt,3) == 1 && bitget(figopt,2) == 1
-        % make 4-panel plot of unwrapped phase
-        %         climitmm = 1.0e3*[nanmin([rowvec(uns) rowvec(mds) rowvec(urs) rowvec(ucs)]) ...
-        %             nanmax([rowvec(uns) rowvec(mds) rowvec(urs) rowvec(ucs)])]
-        umin = min([rowvec(uns) rowvec(mds) rowvec(urs) rowvec(ucs)])
-        umax = max([rowvec(uns) rowvec(mds) rowvec(urs) rowvec(ucs)])
-        climitmm = 1000*[umin umax]
-        nf=nf+1; h(nf)=utmimage4(1000*uns,1000*mds,1000*urs,1000*ucs ...
-            ,'UNS & URS','MDS & UCS','','' ...
-            ,wesn,titlestr,climitmm,dotx,doty,ctab,1,mysyms,marksizes);
-        feval(printfun,sprintf('%s_%03d_4UNW',runname,i));
-        
-        % make 4-panel plot of vector displacement
-        omin = quantile([rowvec(omr) rowvec(omx) rowvec(omy) rowvec(omz)],0.05)
-        omax = quantile([rowvec(omr) rowvec(omx) rowvec(omy) rowvec(omz)],0.95)
-        
-        %omin = min([rowvec(omr) rowvec(omx) rowvec(omy) rowvec(omz)])
-        %omax = max([rowvec(omr) rowvec(omx) rowvec(omy) rowvec(omz)])
-        climitmm = 1000*[omin omax]
-        nf=nf+1; h(nf)=utmimage4(1000*omr,1000*omx,1000*omy,1000*omz ...
-            ,'observed R and N','observed E and U','','' ...
-            ,wesn,titlestr,climitmm,dotx,doty,ctab,1,mysyms,marksizes);
-        feval(printfun,sprintf('%s_%03d_4ENUobs',runname,i));
-        
-        % make 4-panel plot of MODELED vector displacement
-        umind = quantile([rowvec(umr) rowvec(umx) rowvec(umy) rowvec(umz)],0.05)
-        umaxd = quantile([rowvec(umr) rowvec(umx) rowvec(umy) rowvec(umz)],0.95)
-        %         umind = min([rowvec(umr) rowvec(umx) rowvec(umy) rowvec(umz)])
-        %         umaxd = max([rowvec(umr) rowvec(umx) rowvec(umy) rowvec(umz)])
-        climitmm = 1000*[umind umaxd]
-        %helene 19 OCT 2012
-        %climitmm = [umind umaxd]
-        nf=nf+1; h(nf)=utmimage4(1000*umr,1000*umx,1000*umy,1000*umz ...
-            ,'modeled R and N','modeled E and U','','' ...
-            ,wesn,titlestr,climitmm,dotx,doty,ctab,1,mysyms,marksizes);
-        feval(printfun,sprintf('%s_%03d_4ENUmod',runname,i));
-        
-        % modeled vertical component only
-        umind = min(rowvec(umz));
-        umaxd = max(rowvec(umz));
-        climitmm = 1000*[umind umaxd];
-        datelabel=strcat(mdate,{' to '},  sdate);
-        nf=nf+1;h(nf)=figure;
-        istat=utmimage(1000*umz,xmin,xmax,ymin,ymax,...
-            titlestr,'UMZ in mm',climitmm,dotx,doty,0,mysym,marksize ...
-            ,1,1,datelabel);
-        colorbar;
-        %         h(nf) = figure;hold on;axis ij;
-        %         imagesc(umz);
-        %         colorbar;
-        feval(printfun,sprintf('%s_%03d_UMZ',runname,i));
-        
-        % try improfile on UMR betwen MAUL and PUEL
-        % GPS station UTM coordinates
-        %a=load('/data/chile/GMT/GPSstation.utm');
-        %x=a(:,1);
-        %y=a(:,2);
-        % draw the profile
-        %figure;
-        %improfile(h(nf),[x(1) x(2)],[y(1) y(2)])
-    end
-    
+     
     
     % Make profiles
     % decide to show rate or not
@@ -1256,9 +1109,14 @@ qscl = nan(iq,1);
 pqscl = [colvec(pscl); colvec(qscl)];
 
 % write the parameter structure to a file
-PSTF = build_pst(fitfun,pqnum,pq0,pq1,pqsig,pqnames,pqbounds,datafilename,pqscl,pqflags);
+PSTF = build_pst(fitfun,pqnum,pq0,pq1,pqsig,pqnames,pqbounds,datafilename,pqscl,pqflags,timefun);
 write_pst(PSTF,'PST.OUT');
-ierr = print_parameters_nicely(PSTF,txtoutname);
+ierr = print_parameters_nicely(PSTF,fnparout);
+clear h;
+
+%% This file is too big to save.
+%% save('gipht.mat');
+fdelete('gipht.mat');
 
 fprintf(1,'\n\n----------------   %s ended normally at %s ----------\n',upper(mfilename),datestr(now,31));
 

@@ -13,7 +13,8 @@ if nfn == 10
         PST.scale(i) = 1.0;
     end
 %elseif nfn == 11
-elseif nfn == 12
+%elseif nfn == 12
+elseif nfn == 13
     %fprintf(1,'Found %d fields in PST structure.\n',nfn);
 else
     error(sprintf('Wrong number of fields in PST. Found %d . Expected 12\n',nfn));

@@ -41,11 +41,12 @@ isgmtgrid = 0;
 if numel(strfind(demdescfile,'.grd')) > 0
     isgmtgrid = 1;
     INFO=grdinfo3(demdescfile)
-    if numel(findstr(INFO.xname,'longitude')) > 0;
+    if numel(findstr(INFO.xname,'longitude')) > 0
         isgeo = 1;
+        error(sprintf('DEM is NOT in UTM coordinates.\nNeed to run GMT script named prepare_grids_for_gipht.csh.\n'));
     else
         isgeo = 0;
-        warning('DEM is not in latitude longitude, assuming meters');
+        warning('Assuming DEM is in meters');
     end
     if INFO.dx > 0
         x1 = INFO.xmin;

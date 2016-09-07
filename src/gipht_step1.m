@@ -12,38 +12,71 @@
 
 fprintf(1,'\n\n----------------   %s begins at %s ----------\n',upper(mfilename),datestr(now,31));
 
-[xcenter, ycenter, halfwidth, halfheight, npix, pselect, tquake...
-    , unitv0, ithresh, maxcmd, pixinpatch, maxpix, ianneal, nprocessors, interpcell ...
-    , ilist, txtinname, txtoutname, objfun, fitfun, demdescfile, orbfile, cohfile...
-    , mpercy, datafilename, nsaruns, parmfilename, saopt6, figopt, printfun, orbopt...
-    , pha2qlsname, phaseprefix, surrogate, verbose]...
-    = read_input_controls('gipht.in',runname);
+% [xcenter, ycenter, halfwidth, halfheight, npix, pselect, tquake...
+%     , unitv0, ithresh, maxcmd, pixinpatch, maxpix, ianneal, nprocessors, interpcell ...
+%     , ilist, fnparin, fnparout, objfun, fitfun, demdescfile, orbfile, cohfile...
+%     , mpercy, datafilename, nsaruns, parmfilename, saopt6, figopt, printfun, orbopt...
+%     , pha2qlsname, phaseprefix, surrogate, verbose]...
+%     = read_input_controls('gipht.in',runname);
 
-% record fitting function
-fitfun_exact = fitfun;
+if fexist('gipht.mat') == 1
+    load('gipht.mat');
+end
+
+if exist('OPT','var') == 0
+    OPT = struct([]);
+end
+
+%% unpack options
+OPT = read_input_controls(OPT);
+% functions
+objfun       = OPT.objfun;
+fitfun       = OPT.fitfun;
+fitfun_exact = OPT.fitfun;
+printfun     = OPT.printfun;
+timefun      = OPT.timefun;
+% variables
+figopt       = OPT.figopt;
+ianneal      = OPT.ianneal;
+ilist        = OPT.ilist;
+pselect      = OPT.pselect;
+npix         = OPT.npix;
+orbopt       = OPT.orbopt;
+unitv0       = OPT.unitv;
+saopt6       = OPT.saopt6;
+% file names
+datafilename = OPT.datafilename;
+fnparin      = OPT.fnparin;
+fnparout     = OPT.fnparout;
+demdescfile  = OPT.demdescfile;
+orbfile      = OPT.orbfile;
+nsaruns      = OPT.nsaruns;
+verbose      = OPT.verbose;
+nprocessors  = OPT.nprocessors;
+
 
 % how to handle statistics
 istatcode = 0;
 
 % name for DEM descriptor file that describes subregion
-demdescfile2 = sprintf('gipht_subregion.dat');
+%demdescfile2 = sprintf('gipht_subregion.dat');
 
 % name for DST file
-fnamedst = 'dst_sample.dst';
+%fnamedst = 'dst_sample.dst';
 
 % name for PST file
-fnamepstin = 'pst_in.pst';
+%fnamepstin = 'pst_in.pst';
 
 % name of file to save orbits
 orbsavefile = sprintf('orbits.mat');
 orbits_loaded = 0;
 
 % open some output files
-fidtxtout=fopen(txtoutname,'w');
+fidtxtout=fopen(OPT.fnparout,'w');
 if fidtxtout <= 0
-    error(sprintf('Cannot open output file %s\n',txtoutname));
+    error(sprintf('Cannot open output file %s\n',OPT.fnparout));
 end
-fprintf(fidtxtout,'%s %s %s\n',txtoutname,runname,versionstr);
+fprintf(fidtxtout,'%s %s %s\n',OPT.fnparout,runname,versionstr);
 %fprintf(fidtxtout,'%80s\n',splashtext);
 
 % % deal with parallel processing if requested
@@ -65,22 +98,24 @@ fprintf(fidtxtout,'%s %s %s\n',txtoutname,runname,versionstr);
 %     end
 % end
 
-% directory to look for orbit files
-if numel(orbfile) > 0
-    if orbfile(end) == '/'
-        orbdir = orbfile;
-    else
-        orbdir = '';
-    end
-else
-    orbdir = '';
-end
+% % directory to look for orbit files
+% if numel(orbfile) > 0
+%     if orbfile(end) == '/'
+%         orbdir = orbfile;
+%     else
+%         orbdir = '';
+%     end
+% else
+%     orbdir = '';
+% end
 
-% list of file names
-if numel(strfind(ilist,'file_names')) > 0
+%% list of file names
+if fexist(OPT.ilist) > 0
     % read the phase file names from file_names.dat
     disp('Name of list of phase files');
-    [pfnames, mdate, imast, sdate, islav, hamb, ddays, t1, t2, idatatypes, mpercys] = read_file_names(ilist);
+    [pfnames, mdate, imast, sdate, islav, hamb, ddays, t1, t2, idatatypes, mpercys] = read_file_names(OPT.ilist);
+else
+    error(sprintf('Could not find file named %s listing phase files\n',OPT.ilist));
 end
 
 % Check that all files exist
@@ -99,15 +134,18 @@ ndatatypes = sum(idatatypes)/nk;
 switch ndatatypes
     case 0  % wrapped phase
         idatatype1 = 0;
-        DNPC = 2 * pi;
+        FACTIN = 1; % .grd file contains radians
+        DNPC = 2 * pi;     
         datalabel = '[cycles]'
     case -1; % east component of gradient
         idatatype1 = -1;
+        FACTIN = 1; % grd file contains dimensionless strain
         DNPC = 1;
         datalabel = '[dimless]'
-    case 2   % unwrapped range change in meters
+    case 2   % range change in meters after unwrapping
         idatatype1 = 2;
-        DNPC = 1.0e-3;
+        FACTIN = 1.; % grd file contains meters
+        DNPC = 1.0e-3;     
         datalabel = '[mm]';
     otherwise
         error(sprintf('unknown ndatatypes %d\n',ndatatypes));
@@ -167,7 +205,7 @@ end
 bperp = ones(size(imast));
 
 %% find the disconnected trees
-[trees, DD, tepochs, iepochs, iuniqorbs, uniqdates] = findtrees2(t1,t2)
+[trees, DD, tepochs, iepochs, iuniqorbs, uniqdates] = findtrees2(t1,t2);
 
 %% number of epochs
 me = length(tepochs);
@@ -264,6 +302,8 @@ xsubmin = nanmin(demx);
 xsubmax = nanmax(demx);
 ysubmin = nanmin(demy);
 ysubmax = nanmax(demy);
+xcenter = mean([xsubmin, xsubmax]);
+ycenter = mean([ysubmin, ysubmax]);
 
 
 %% Decide how to select pixels
@@ -276,12 +316,12 @@ switch pselect
         fprintf(1,'Reading previous pixel indices from existing files ikeep.mat and jkeep.mat.\n');
     case 3
         fprintf(1,'Selecting pixels using quadtree subsampling, then randomly\n');
-    case 4
-        fprintf(1,'Selecting pixels based on coherence.\n');
+%     case 4
+%         fprintf(1,'Selecting pixels based on coherence.\n');
     case 5
         fprintf(1,'Selecting pixels using pha2qls resampling.\n');
-    case 6
-        fprintf(1,'Selecting pixels based on quadtree of stacked phase.\n');
+%     case 6
+%         fprintf(1,'Selecting pixels based on quadtree of stacked phase.\n');
     case 7
         fprintf(1,'Selecting pixels using pha2qls. Values are range gradient.\n');
     case 9
@@ -316,47 +356,67 @@ for i = 1:np
     fn0 = pfnames{i};
     nbytes = fsize(fn0);
     if  nbytes > 0
+        fprintf(1,'Extracting information from GMT UTM grid file named %s\n',fn0);
         INFO = grdinfo3(fn0)
         nf=nf+1;h(nf) = map_grd(fn0,cmapblackzero(1));
         feval(printfun,sprintf('%s_obs_P%02d',runname,i));  
-        [grdx,grdy,grdd] = grdread3(fn0);
-        
-        % mask if requested
-        if idatatype1 == 0 && pselect == 5
-            fnmsk = strrep(fn0,'qphase','qmaskn');
-            [mskx,msky,mskd] = grdread3(fnmsk);
-            grdd = grdd .* mskd;
-        end        
-    else
+        [grdx,grdy,grdd] = grdread3(fn0);       
+     else
         phaimg = [];
         warning(sprintf('Phase file named %s is non-existant or empty\n',fn0));
         nerrors = nerrors + 1;
     end
     
-    %% verify that grids are same size
-    if numel(grdx) ~= ncols 
-        error(sprintf('number of columns (%d) in data file is not equal to the number of columns (%d) in DEM\n',numel(grdx),ncols));  
-    end  
-    if numel(grdy) ~= nrows 
-        error(sprintf('number of rows (%d) in data file is not equal to the number of rows (%d) in DEM\n',numel(grdy),nrows));  
-    end 
+    %% decide about masking
+    switch pselect
+        case {5,7}
+            fprintf(1,'Masking.\n');
+            fnmsk = strrep(fn0,'qphase','qmaskn');
+            if fexist(fnmsk) == 1
+                fprintf(1,'Opening mask file named %s ...\n',fnmsk);
+                [mskx,msky,mskd] = grdread3(fnmsk);
+            else
+                warning(sprintf('Could not open mask file named %s . Taking all pixels',fnmsk));
+                mskx = grdx;
+                msky = grdy;
+                mskd = grdd;
+            end
+        otherwise
+            warning(sprintf('Not masking.\n'));
+            mskx = grdx;
+            msky = grdy;
+            mskd = grdd;
+    end
+
     
-    %% select finite data
-    kok = find(isfinite(grdd)==1);
+    %% verify that grids are same size
+    if numel(grdx) ~= ncols || numel(mskx) ~= ncols
+        error(sprintf('number of columns in data file (%d) or mask file (%d) is not equal to the number of columns (%d) in DEM\n'...
+            ,numel(grdx),numel(mskx),ncols));  
+    end  
+    if numel(grdy) ~= nrows || numel(msky) ~= nrows
+        error(sprintf('number of rows in data file (%d) or mask file (%d) is not equal to the number of columns (%d) in DEM\n'...
+            ,numel(grdy),numel(msky),nrows));  
+    end  
+    
+    %% select the pixels
+    kok = select_pixels(pselect,npix,grdd,mskd);
     [iok,jok] = ind2sub(size(grdd),kok);
+    
+    %% extract the data and load into arrays
     ndata1 = numel(kok);
     i2 = i2+ndata1;
-    phao(i1:i2)   = grdd(kok);
-    xyzm(1,i1:i2) = grdx(jok);
-    xyzm(2,i1:i2) = grdy(iok);
-    xyzm(3,i1:i2) = demz(kok);
+    phao(i1:i2)   = double(grdd(kok))*FACTIN;
+    %% TODO fix the next two lines X and Y coordinates from vectors
+    xyzm(1,i1:i2) = double(grdx(jok));
+    xyzm(2,i1:i2) = double(grdy(iok));
+    % elevation is a grid
+    xyzm(3,i1:i2) = double(demz(kok));
     alat(i1:i2) = nan(size(kok));
     alon(i1:i2) = nan(size(kok));
     kindex(i1:i2) = i;
     kmasts(i1:i2) = kmast*ones(size(kok));
     kslavs(i1:i2) = kslav*ones(size(kok));
-
-    
     
     fprintf(1,'Minimal values in meters         for xyzm %10.1f %10.1f %10.1f \n',min(xyzm(1,i1:i2)),min(xyzm(2,i1:i2)),min(xyzm(3,i1:i2)));
     fprintf(1,'Maximal values in meters         for xyzm %10.1f %10.1f %10.1f \n',max(xyzm(1,i1:i2)),max(xyzm(2,i1:i2)),max(xyzm(3,i1:i2)));
@@ -448,7 +508,7 @@ dz(1) = 0;dz(2:ndata) = colvec(diff(xyzm(3,:)));
 % measurement uncertainty
 phasig = ones(size(phao));
 DST=build_dst(fitfun,xyzm,tepochs,bpest,dops,DD,unitv...
-    ,phao,NaN*ones(size(phao)),ippix1,mpercy,idatatype1...
+    ,phao,NaN*ones(size(phao)),ippix1,mpercys,idatatype1...
     ,dx,dy,dz,orbvm,orbvs,alon,alat...
     ,qii1,qii2,qjj1,qjj2...
     ,phasig,kindex,kmasts,kslavs);
@@ -476,6 +536,6 @@ clear inan imout iok i2dem isort phaimg phao rng xyzm;
 clear qgx qgy qi1 qi2 qim qim2 qj1 qj2 qjm qjm2 qqp qqq qsp qkw qlist;
 clear qi12 qiim qj12 qjjm;
 clear h;
-save;
+save('gipht.mat');
 
 fprintf(1,'\n\n----------------   %s ended normally at %s ----------\n',upper(mfilename),datestr(now,31));

@@ -1,5 +1,5 @@
 function DST = build_dst(fitfun,xyzm,tepochs,bpest,dops,DD,unitv...
-    ,xd,yd,ippix1,mpercy,idatatype...
+    ,xd,yd,ippix1,mpercys,idatatype...
     ,dx,dy,dz,orbvm,orbvs,alon,alat...
     ,qii1,qii2,qjj1,qjj2...
     ,phasig,kindex,kmasts,kslavs)
@@ -75,13 +75,13 @@ DST.uvx          = colvec(unitv(1,:));
 DST.uvy          = colvec(unitv(2,:));
 DST.uvz          = colvec(unitv(3,:));
 % 2012-JUN-25 vector values for fringe interval (mpercy = meters per cycle)
-if numel(mpercy) == ndata
-    DST.mpercy       = colvec(mpercy);
-elseif numel(mpercy) == 1
-    DST.mpercy       = mpercy*ones(ndata,1);
+if numel(mpercys) == ndata
+    DST.mpercy       = colvec(mpercys);
+elseif numel(mpercys) == 1
+    DST.mpercy       = mpercys*ones(ndata,1);
 else
     warning('Mismatch on mpercy\n');
-    DST.mpercy       = nanmean(mpercy)*ones(ndata,1);
+    DST.mpercy       = nanmean(mpercys)*ones(ndata,1);
 end
 DST.bmast        = colvec(bpest(kmasts));
 DST.bslav        = colvec(bpest(kslavs));

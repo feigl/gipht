@@ -1,6 +1,7 @@
 function h1 = utmimage4(im1,im2,im3,im4 ...
-                       ,tl1,tl2,tl3,tl4 ....
-            ,wesn,titlestr,climit,dotxutm,dotyutm,ctab,cbar,mysyms,marksizes)
+    ,tl1,tl2,tl3,tl4 ....
+    ,wesn,titlestr,climit,dotxutm,dotyutm,ctab,cbar,mysyms,marksizes...
+    ,datelabel,idatatype,datalabel)
 %  1=a     obs on [-0.5,+0.5]
 %  2=b     mod on [-0.5,+0.5]
 %  3=c     res on [-0.5,+0.5]
@@ -34,11 +35,11 @@ xutmdif = xutmmax-xutmmin;
 rat = (8/11)*(yutmdif/xutmdif);
 if rat > 1.0
     warning(sprintf('Scale ratio (%10.4f) is greater than 1.0\n',rat));
-    rs = min([1.0, 0.90/rat]); % rescale factor 2011-JUL-04 
+    rs = min([1.0, 0.90/rat]); % rescale factor 2011-JUL-04
 else
     rs = 1.0;
 end
-    
+
 nodot = 100;
 
 h1=figure;
@@ -60,7 +61,7 @@ if abs(nanmax(climit)-nanmin(climit)) > 1.0
 else
     labu = 'cycles';
     labt = '+1/2';
-    labb = '-1/2';   
+    labb = '-1/2';
 end
 colormap(ctab);
 
@@ -68,7 +69,8 @@ colormap(ctab);
 
 subplot('position',[0.325  0.775*rat  0.225 0.225*rat]*rs);colormap(ctab);
 utmimage(im2,xutmmin,xutmmax,yutmmin,yutmmax,tl2,'b',climit,dotxutm, ...
-         dotyutm,ctab,mysyms{2},marksizes(2),0,0);
+    dotyutm,ctab,mysyms{2},marksizes(2),0,0,...
+    datelabel,idatatype,datalabel);
 title(tl2,'FontName','Helvetica-Bold');
 if cbar ==1
     ha=colorbar('Position',[0.550 0.775*rat 0.015 0.2250*rat]*rs);
@@ -83,7 +85,8 @@ end
 
 
 subplot('position',[0.325  0.550*rat  0.225 0.225*rat]*rs);
-utmimage(im4,xutmmin,xutmmax,yutmmin,yutmmax,tl4,'d',climit,dotxutm, dotyutm,ctab,mysyms{4},marksizes(4),0,0);
+utmimage(im4,xutmmin,xutmmax,yutmmin,yutmmax,tl4,'d',climit,dotxutm, dotyutm,ctab,mysyms{4},marksizes(4),0,0,...
+    datelabel,idatatype,datalabel);
 if cbar ==1
     ha=colorbar('Position',[0.550 0.550*rat 0.015 0.2250*rat]*rs);
     set(ha,'YTickLabel',[]);
@@ -94,11 +97,12 @@ if cbar ==1
     ha=text(1.1,0.95,labt,'Units','normalized','Clipping','off','FontName','Helvetica-Bold');
     set(ha,'Color',labelcolor);  % 2011-JUL-04
     ha=text(+0.2,-0.05*rat , 'Easting (km)', 'Units','normalized','Clipping','off','FontName','Helvetica-Bold','rotation', 0,'HorizontalAlignment','Left','VerticalAlignment','Top');
-    set(ha,'Color',labelcolor);  % 2011-JUL-04    
+    set(ha,'Color',labelcolor);  % 2011-JUL-04
 end
 
 subplot('position',[0.1  0.775*rat   0.225 0.225*rat]*rs);
-utmimage(im1,xutmmin,xutmmax,yutmmin,yutmmax,tl1,'a',climit,dotxutm,dotyutm,ctab,mysyms{1},marksizes(1),0,0);
+utmimage(im1,xutmmin,xutmmax,yutmmin,yutmmax,tl1,'a',climit,dotxutm,dotyutm,ctab,mysyms{1},marksizes(1),0,0,...
+    datelabel,idatatype,datalabel);
 title(tl1,'FontName','Helvetica-Bold');
 if cbar == 1
     ha=text(-0.05,+0.375*rat, 'Northing (km)','Units','normalized','Clipping','off','FontName','Helvetica-Bold','rotation',90,'HorizontalAlignment','Left','VerticalAlignment','Bottom');
@@ -106,7 +110,8 @@ if cbar == 1
 end
 
 subplot('position',[0.1  0.550*rat   0.225 0.225*rat]*rs);
-utmimage(im3,xutmmin,xutmmax,yutmmin,yutmmax,tl3,'c',climit,dotxutm,dotyutm,ctab,mysyms{3},marksizes(3),1,1);
+utmimage(im3,xutmmin,xutmmax,yutmmin,yutmmax,tl3,'c',climit,dotxutm,dotyutm,ctab,mysyms{3},marksizes(3),1,1,...
+    datelabel,idatatype,datalabel);
 
 
 subplot('position',[0.65 0.1 0.02 0.9])

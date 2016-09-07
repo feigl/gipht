@@ -12,12 +12,10 @@ fprintf(1,'\n\n----------------   %s begins at %s ----------\n',upper(mfilename)
 
 %clear all
 clearvars
-load 
-%ianneal=0
-% load unitv unitv
 
-% number of figures
-%nf = nf+1;
+if fexist('gipht.mat') == 1
+    load('gipht.mat');
+end
 
 % Real and imaginary parts of phase
 %xd = cos(phao*2*pi); % argument in radians
@@ -49,16 +47,16 @@ lb=zeros(mparam,1);
 ub=zeros(mparam,1);
 
 % read initial and bounding values of parameters from file if extant
-fidtxtin = fopen(txtinname,'r');
-if fidtxtin > 0
-   fprintf(1,'Opened file named %s to read initial estimates of parameters.\n',txtinname);
+fidparin = fopen(fnparin,'r');
+if fidparin > 0
+   fprintf(1,'Opened file named %s to read initial estimates of parameters.\n',fnparin);
    for i = 1:mparam;
        parse_err=0;
        k=0;
-       frewind(fidtxtin);
-       aline = fgetl(fidtxtin);
+       frewind(fidparin);
+       aline = fgetl(fidparin);
        while 1
-           aline = fgetl(fidtxtin);
+           aline = fgetl(fidparin);
            % 2011-NOV-30 if aline < 0
            % 2011-NOV-30 allow blank lines
            if numel(aline) < 40
@@ -104,8 +102,39 @@ if fidtxtin > 0
            end
        end % while loop over lines of file
    end % loop over parameters
-   fclose(fidtxtin);
+   fclose(fidparin);
    fprintf(1,'\n Done reading parameters\n');
+
+%% TODO read table and make into a structure
+%    GINT = readtable('demoF14.gin','filetype','text','ReadVariableNames',true,'HeaderLines',0)
+% GINT = 
+%     model_name    ID             parameter_name               initial     plusminus
+%     __________    __    _________________________________    _________    _________
+%     'EPOCH'       0     'Bperp___@_epoch_000_in_m_______'            0       0     
+%     'EPOCH'       0     'E_grad__@_epoch_000_dimless____'            0       0     
+%     'EPOCH'       0     'N_grad__@_epoch_000_dimless____'            0       0     
+%     'EPOCH'       0     'U_grad__@_epoch_000_dimless____'            0       0     
+%     'OKADA'       1     'Centroid_Easting_in_m__________'     5.09e+05     300     
+%     'OKADA'       1     'Centroid_Northing_in_m_________'    3.802e+06     300     
+%     'OKADA'       1     'Centroid_Depth_in_m____________'         2000     500     
+%     'OKADA'       1     'Width_in_m_____________________'         2340     300     
+%     'OKADA'       1     'Length_in_m____________________'         2780     300     
+%     'OKADA'       1     'Dip_in_deg____________________'            50      10     
+%     'OKADA'       1     'Strike_CW_from_N_in_deg________'          283       5     
+%     'OKADA'       1     'Coplanar_slip_in_m_____________'         0.52    0.05     
+%     'OKADA'       1     'Rake_in_deg_CCW________________'           70      10     
+%     'OKADA'       1     'Tensile_Opening_in_m___________'            0       0     
+%     'OKADA'       1     'Poisson_Ratio_dimless__________'         0.25       0     
+%     'OKADA'       1     'Shear_Modulus_in_Pa____________'        3e+10       0     
+%     'TFUNC'       1     'Reference_Epoch_in_years_______'       1992.9       0     
+% PST = table2struct(GINT,'ToScalar',true)
+% PST = 
+%         model_name: {17x1 cell}
+%                 ID: [17x1 double]
+%     parameter_name: {17x1 cell}
+%            initial: [17x1 double]
+%          plusminus: [17x1 double]
+% PST.parameter_name(1)
 else
     warning(sprintf('Could not open input file: %s. Using zeros\n',txtinname));
 end % reading parameters from file
@@ -323,14 +352,14 @@ for i=1:numel(p0)
     pflags{i} = 'N#';
 end
 PST00 = build_pst(fitfun,mparam,zeros(size(p0)),zeros(size(p0)),zeros(size(p0))...
-    ,pnames,bounds,datafilename,pscl,pflags);
+    ,pnames,bounds,datafilename,pscl,pflags,timefun);
 
 
 %% build parameter structure PST0 for initial estimate
 p1 = p0;
-PST0 = build_pst(fitfun,mparam,p0,p1,psig,pnames,bounds,datafilename,pscl,pflags);
+PST0 = build_pst(fitfun,mparam,p0,p1,psig,pnames,bounds,datafilename,pscl,pflags,timefun);
 ierr = check_struct(PST0);
-ierr2 = write_pst(PST0,fnamepstin);
+%%ierr2 = write_pst(PST0,fnamepstin);
 
 
 % call fitting function first time to initialize
@@ -439,8 +468,8 @@ end
 
 
 fprintf(1,'\n');
-fprintf(1,'Total Average Cost of null     model = %.4f cycles per point for %10ld observations in data set for inversion\n',cost00,ndata);
-fprintf(1,'Total Average Cost of initial  model = %.4f cycles per point for %10ld observations in data set for inversion\n',cost0 ,ndata);
+fprintf(1,'Total Average Cost of null     model = %.4f %s for %10ld observations in data set for inversion\n',cost00,datalabel,ndata);
+fprintf(1,'Total Average Cost of initial  model = %.4f %s for %10ld observations in data set for inversion\n',cost0 ,datalabel,ndata);
 
 
 switch ianneal
@@ -496,8 +525,8 @@ switch ianneal
         %                       and 'interior-point' algorithm
         %                  3 = evaluate paramater uncertainties using
         %                      jackknife analysis and fmincon option above
-        %options(6) = 0;
-        options(6) = saopt6;
+        options(6) = 0;
+        %options(6) = saopt6;
         %       OPTIONS(7) = flag the tells the algorithm whether to display informative
         %                    output (default = 0); set to '1' if yes.
         %                    2 logs misfit and parameters values to file
@@ -627,9 +656,9 @@ end
 
 for fd=[1 fidtxtout]
    fprintf(fd,'\n');
-   fprintf(fd,'Total Average Cost of null    model = %.4f cycles per datum for %10ld observations in data set for inversion\n',cost00,ndata);
-   fprintf(fd,'Total Average Cost of initial model = %.4f cycles per datum for %10ld observations in data set for inversion\n',cost0, ndata);
-   fprintf(fd,'Total Average Cost of final   model = %.4f cycles per datum for %10ld observations in data set for inversion\n',cost1, ndata);
+   fprintf(fd,'Total Average Cost of null    model = %12.4f %s for %10ld observations in data set for inversion\n',cost00/DNPC, datalabel,ndata);
+   fprintf(fd,'Total Average Cost of initial model = %12.4f %s for %10ld observations in data set for inversion\n',cost0 /DNPC, datalabel,ndata);
+   fprintf(fd,'Total Average Cost of final   model = %12.4f %s for %10ld observations in data set for inversion\n',cost1 /DNPC, datalabel,ndata);
 
    % Final is WORSE than initial
    if cost1 > cost0
@@ -655,7 +684,7 @@ end
 % feval(printfun,sprintf('%s_Taylor1Check',runname));
 
 clear h;
-save;
+save('gipht.mat');
 
 fprintf(1,'\n\n----------------   %s ended normally at %s ----------\n',upper(mfilename),datestr(now,31));
 return

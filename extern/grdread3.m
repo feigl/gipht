@@ -77,7 +77,7 @@ switch nvars
         x=netcdf.getVar(ncid,0)';
         y=netcdf.getVar(ncid,1)';
         z=netcdf.getVar(ncid,2)';
-        d=netcdf.getVar(ncid,3)'; % what is in here?
+        grid_mapping=netcdf.getVar(ncid,3); % 
     case 6                       % old (v3) GMT netCDF grid file
         [dimname, dimlen] = netcdf.inqDim(ncid,1);
         if (dimname=='xysize'),             % make sure it really is v3 netCDF
@@ -115,7 +115,7 @@ switch nargout
         varargout{2}=y;
         varargout{3}=z;
         if nargout == 4 && nvars == 4
-            varargout{4}=d;
+            varargout{4}=grid_mapping;
         end
     otherwise
         error('grdread3: Incorrect number of output arguments!');

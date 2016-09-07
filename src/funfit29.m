@@ -416,6 +416,9 @@ elseif nin == 3 ...
     kRad_Vel   = TST.kRad_Vel;
     kPinel     = TST.kPinel;
     
+    % convert string to function handle
+    timefun = str2func(PST.timefun);
+    
 %     fprintf(1,'Unpacking parameter vector\n');
 
     % get values of parameters
@@ -811,7 +814,7 @@ elseif nin == 3 ...
     if abs(pg(kp)) > 0. 
         %fprintf(1,'Starting Radial Velocity Model\n');
         % get time difference in years
-        tdif_rv = DD * time_function(pt, 0.);       
+        tdif_rv = DD * timefun(pt, 0.);       
         switch idatatype1
             case {0,2}  % calculate displacement: observable is phase or unwrapped range
                 % calculate radial velocity field
@@ -880,7 +883,10 @@ elseif nin == 3 ...
  
     %time function in a column vector
     %tdif = DD * colvec(pt);
-    tdif = DD * time_function(pt, tquake);
+    %pt
+    %tquake
+    %DD
+    tdif = DD * timefun(pt, tquake);
     %fprintf(1,'Time difference in years %10.4f\n',tdif);
     
     %calculate range in meters
@@ -951,33 +957,5 @@ else
 end
 
 return
-
-function ft = time_function(tepochs, tquake)
-% return value of time function f(t)
-%    inputs:
-%          tepochs - me x 1 vector of epochs in years
-%          tquake  - scalar reference epoch in years
-%    output
-%          ft      - me x 1 vector containing value of time function
-%                    evaluated at each epoch
-
-[me, ncols] = size(tepochs);
-if ncols == 1
-    ft = zeros(me,1);
-    
-    if tquake >= nanmin(tepochs) && tquake <= nanmax(tepochs)
-        itime=find(tepochs >= tquake);
-        ft(itime) = 1.0;
-%         fprintf(1,'Using step function that turns on at epoch %f for %d epochs\n',tquake,numel(itime));
-    else
-        ft = tepochs - tquake;
-        %fprintf(1,'Linear in time (secular deformation) ft = %10.4f\n',ft);
-    end
-else
-    ncols
-    error('Dimension problem');
-end
-return
-
 
 

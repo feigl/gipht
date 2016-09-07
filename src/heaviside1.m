@@ -1,4 +1,5 @@
 function Y = heaviside1(X)
+%function Y = heaviside1(X)
 %HEAVISIDE1    Step function.
 %    HEAVISIDE1(X) is 0 for X < 0, 1 for X >= 0
 %    HEAVISIDE1(X) is not a function in the strict sense.
