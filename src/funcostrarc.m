@@ -2,7 +2,9 @@ function cost1 = funcostrarc(p,fitfun,DST,PST,TST)
 %function cost1 = funcostrarc(p,fitfun,DST,PST,TST)
 % cost function for phase model is mean of dev = arc(obs,mod)
 
-nargchk(5, 5, nargin);
+% nargchk(5, 5, nargin);
+% update for MATLAB 2016a
+narginchk(5, 5);
 
 if numel(p) ~= numel(PST.p0)
     error(sprintf('Dimension mismatch %d %d\n',numel(p),numel(PST.p0)));

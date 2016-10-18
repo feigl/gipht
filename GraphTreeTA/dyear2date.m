@@ -30,7 +30,7 @@ for i = 1:x
     if isequal(lp_yr, 1) == 1
         d_markers(2:end) = d_markers(2:end) + lp_yr; %adjust for extra day in February
     end
-    
+        
     dom = find(d_markers <= doy, 1, 'last'); %find day of year at beginning of the month
     
     if isempty(dom) == 1
