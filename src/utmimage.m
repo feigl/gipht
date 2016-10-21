@@ -97,12 +97,14 @@ if isreal(pixarr) ~= 1
     pixarr = real(pixarr);
 end
 
+% fprintf(1,'In %s extrema are %g %g +/- %g \n,',mfilename,nanmin(nanmin(pixarr)),nanmax(nanmax(pixarr)),std(colvec(pixarr)));
+
 switch idatatype
     case 2
        imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr);
     case 0
-        %image([xutmmin xutmmax],[yutmmax yutmmin],floor(33+64*pixarr)); % values are costs [0, 127]
-       image([xutmmin xutmmax],[yutmmax yutmmin],pixarr); %
+       %image([xutmmin xutmmax],[yutmmax yutmmin],floor(33+64*pixarr)); % values are costs [0, 127]
+       imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr); %
     case -1
          imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr);
     otherwise

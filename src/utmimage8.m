@@ -98,6 +98,7 @@ switch idatatype
 end
 
 
+% fprintf(1,'In %s extrema are %g %g +/- %g \n,',mfilename,nanmin(nanmin(im1)),nanmax(nanmax(im1)),std(colvec(im1)));
 
 colormap(ctab);
 
