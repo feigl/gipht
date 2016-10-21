@@ -30,7 +30,7 @@ end
 %% unpack options
 OPT = read_input_controls(OPT);
 % functions
-objfun       = OPT.objfun;
+%objfun       = OPT.objfun;
 fitfun       = OPT.fitfun;
 fitfun_exact = OPT.fitfun;
 printfun     = OPT.printfun;
@@ -127,29 +127,37 @@ for i=1:numel(pfnames)
         warning(sprintf('Cannot find  %80s\n',pfnames{i}));
     end
 end
+nk
 
 
-%% select data type
+%% select data type and objective function
 ndatatypes = sum(idatatypes)/nk;
 switch ndatatypes
     case 0  % wrapped phase
         idatatype1 = 0;
         FACTIN = 1; % .grd file contains radians
         DNPC = 2 * pi;     
-        datalabel = '[cycles]'
+        datalabel = '[cycles]';
+        objfun = 'funcostrarc';        % Objective Function mininum angle,  assumes zero mean, using arc function in radians
+        objlabel = '[cycles]';
     case -1; % east component of gradient
         idatatype1 = -1;
         FACTIN = 1; % grd file contains dimensionless strain
         DNPC = 1;
-        datalabel = '[dimless]'
+        datalabel = '[dimless]';
+        objfun = 'funcoststdnres';      % Objective function is sample standard deviation of normalized residual (should equal sqrt(chi2))
+        objlabel = '[dimless]';
     case 2   % range change in meters after unwrapping
         idatatype1 = 2;
         FACTIN = 1.; % grd file contains meters
         DNPC = 1.0e-3;     
         datalabel = '[mm]';
+        objfun = 'funcoststdnres';      % Objective function is sample standard deviation of normalized residual (should equal sqrt(chi2))
+        objlabel = '[dimless]';
     otherwise
         error(sprintf('unknown ndatatypes %d\n',ndatatypes));
 end
+
 
 %% count pairs
 if nk == numel(pfnames)
@@ -433,11 +441,11 @@ for i = 1:np
     
     %% plot data as a function of topographic elevation
     nf=nf+1;h(nf)=figure;hold on;title(titlestr);
-    subplot(4,1,1);plot(xyzm(1,i1:i2)/1e3, double(phao(i1:i2))/DNPC,'k+');xlabel('Easting (km)');ylabel(datalabel);
-    subplot(4,1,2);plot(xyzm(2,i1:i2)/1e3, double(phao(i1:i2))/DNPC,'k+');xlabel('Northing (km)');ylabel(datalabel);
-    subplot(4,1,3);plot(xyzm(3,i1:i2)/1e3, double(phao(i1:i2))/DNPC,'k+');xlabel('topographic elevation (km)');ylabel(datalabel);
+    subplot(4,1,1);plot(xyzm(1,i1:i2)/1e3, double(phao(i1:i2))/DNPC,'k.');xlabel('Easting (km)');ylabel(datalabel);
+    subplot(4,1,2);plot(xyzm(2,i1:i2)/1e3, double(phao(i1:i2))/DNPC,'k.');xlabel('Northing (km)');ylabel(datalabel);
+    subplot(4,1,3);plot(xyzm(3,i1:i2)/1e3, double(phao(i1:i2))/DNPC,'k.');xlabel('topographic elevation (km)');ylabel(datalabel);
     subplot(4,1,4);rdist = sqrt((xyzm(1,i1:i2)-xcenter).^2 +(xyzm(2,i1:i2)-ycenter).^2);
-    plot(rdist/1e3, double(phao(i1:i2))/DNPC,'k+'); xlabel('Radial distance from center of subregion (km)');ylabel(datalabel);
+    plot(rdist/1e3, double(phao(i1:i2))/DNPC,'k.'); xlabel('Radial distance from center of subregion (km)');ylabel(datalabel);
     feval(printfun,sprintf('%s_PositionVsPhase_P%02d',runname,i));
    
     %% deal with orbits
@@ -492,10 +500,12 @@ end
 
 %% build DST structure with data
 % 2011-OCT-03 NOTE!!! phao is written in RADIANS to DST file
-% differences in coordinates
+
+%% Step sizes equal differences in coordinates
 dx = grdx(2)-grdx(1);
 dy = grdy(2)-grdy(1);
-dz(1) = 0;dz(2:ndata) = colvec(diff(xyzm(3,:)));
+dz(1) = 0;
+dz(2:ndata) = colvec(diff(xyzm(3,:)));
 
 % do not need quad-tree indices
 %if ismember(pselect,[5,7]) == 0

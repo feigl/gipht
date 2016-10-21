@@ -53,76 +53,108 @@ set(h1,'PaperSize',[8.5 11.0]);
 set(h1,'Position',[1 1 1000 1000*rat]);
 
 
-% parse levels and extrema
-if abs(nanmax(climit)-nanmin(climit)) > 1.0
-    labu = 'mm';
-    labt = sprintf('%4.0f',max(climit));
-    labb = sprintf('%4.0f',min(climit));
-else
-    labu = 'cycles';
-    labt = '+1/2';
-    labb = '-1/2';
+%% parse levels and extrema
+switch idatatype
+    case 0
+        labu = 'cycles';
+        if abs(climit(2)-0.5) < 1e-6
+            labt = '+1/2 (cycle)';
+        else
+            labt = sprintf('%+4.1f',climit(1));
+        end
+        if abs(climit(1)+0.5) < 1e-6
+            labb = '-1/2 (cycle)';
+        else
+            labb = sprintf('%+4.1f',climit(2));
+        end
+    case -1
+        labu = 'strain';
+        zmin = nanmin(climit);
+        zmax = nanmax(climit);
+        labt = sprintf('%+5.1E',zmin);
+        labb = sprintf('%+5.1E',zmax);
+    case 2
+        labu = 'mm';
+        zmin = nanmin(climit);
+        zmax = nanmax(climit);
+        if abs(zmin) < 1000 && abs(zmin) < 1000 && abs(zmin) > 1 && abs(zmin) > 1
+            labt = sprintf('%+5.0f',zmin);
+            labb = sprintf('%+5.0f',zmax);
+         elseif abs(zmin) < 1 && abs(zmin) < 1 && abs(zmin) > 0.1 && abs(zmin) > 0.1
+            labt = sprintf('%+5.1f',zmin);
+            labb = sprintf('%+5.1f',zmax);
+        else
+            labt = sprintf('%+5.1E',zmin);
+            labb = sprintf('%+5.1E',zmax);
+        end      
+    otherwise
+        error(sprintf('unknown idatatype %d\n',idatatype));
 end
+
+
+%% set color
 colormap(ctab);
 
-% draw panels in smart order to see tick labels
+%% draw panels in smart order to see tick labels
 
-subplot('position',[0.325  0.775*rat  0.225 0.225*rat]*rs);colormap(ctab);
+subplot('position',[0.325  0.775*rat  0.225 0.225*rat]*rs);colormap(ctab);drawnow;
 utmimage(im2,xutmmin,xutmmax,yutmmin,yutmmax,tl2,'b',climit,dotxutm, ...
     dotyutm,ctab,mysyms{2},marksizes(2),0,0,...
     datelabel,idatatype,datalabel);
-title(tl2,'FontName','Helvetica-Bold');
+title(tl2,'FontName','Helvetica','FontWeight','Bold');
 if cbar ==1
     ha=colorbar('Position',[0.550 0.775*rat 0.015 0.2250*rat]*rs);
     set(ha,'YTickLabel',[]);
-    ha=text(1.1,0.05,labb,'Units','normalized','Clipping','off','FontName','Helvetica-Bold');
+    ha=text(1.1,0.05,labb,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold');
     set(ha,'Color',labelcolor);  % 2011-JUL-04
-    ha=text(1.1,0.50,labu,'Units','normalized','Clipping','off','FontName','Helvetica-Bold','rotation',90,'HorizontalAlignment','Center','VerticalAlignment','Top');
+    ha=text(1.1,0.50,labu,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','rotation',90,'HorizontalAlignment','Center','VerticalAlignment','Top');
     set(ha,'Color',labelcolor);  % 2011-JUL-04
-    ha=text(1.1,0.95,labt,'Units','normalized','Clipping','off','FontName','Helvetica-Bold');
+    ha=text(1.1,0.95,labt,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold');
     set(ha,'Color',labelcolor);  % 2011-JUL-04
 end
 
 
-subplot('position',[0.325  0.550*rat  0.225 0.225*rat]*rs);
+subplot('position',[0.325  0.550*rat  0.225 0.225*rat]*rs);drawnow;
 utmimage(im4,xutmmin,xutmmax,yutmmin,yutmmax,tl4,'d',climit,dotxutm, dotyutm,ctab,mysyms{4},marksizes(4),0,0,...
     datelabel,idatatype,datalabel);
 if cbar ==1
     ha=colorbar('Position',[0.550 0.550*rat 0.015 0.2250*rat]*rs);
     set(ha,'YTickLabel',[]);
-    ha=text(1.1,0.05,labb,'Units','normalized','Clipping','off','FontName','Helvetica-Bold');
+    ha=text(1.1,0.05,labb,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold');
     set(ha,'Color',labelcolor);  % 2011-JUL-04
-    ha=text(1.1,0.50, labu,'Units','normalized','Clipping','off','FontName','Helvetica-Bold','rotation',90,'HorizontalAlignment','Center','VerticalAlignment','Top');
+    ha=text(1.1,0.50, labu,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','rotation',90,'HorizontalAlignment','Center','VerticalAlignment','Top');
     set(ha,'Color',labelcolor);  % 2011-JUL-04
-    ha=text(1.1,0.95,labt,'Units','normalized','Clipping','off','FontName','Helvetica-Bold');
+    ha=text(1.1,0.95,labt,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold');
     set(ha,'Color',labelcolor);  % 2011-JUL-04
-    ha=text(+0.2,-0.05*rat , 'Easting (km)', 'Units','normalized','Clipping','off','FontName','Helvetica-Bold','rotation', 0,'HorizontalAlignment','Left','VerticalAlignment','Top');
+    ha=text(+0.2,-0.05*rat , 'Easting (km)', 'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','rotation', 0,'HorizontalAlignment','Left','VerticalAlignment','Top');
     set(ha,'Color',labelcolor);  % 2011-JUL-04
 end
 
-subplot('position',[0.1  0.775*rat   0.225 0.225*rat]*rs);
+subplot('position',[0.1  0.775*rat   0.225 0.225*rat]*rs);drawnow;
 utmimage(im1,xutmmin,xutmmax,yutmmin,yutmmax,tl1,'a',climit,dotxutm,dotyutm,ctab,mysyms{1},marksizes(1),0,0,...
     datelabel,idatatype,datalabel);
-title(tl1,'FontName','Helvetica-Bold');
+title(tl1,'FontName','Helvetica','FontWeight','Bold');
 if cbar == 1
-    ha=text(-0.05,+0.375*rat, 'Northing (km)','Units','normalized','Clipping','off','FontName','Helvetica-Bold','rotation',90,'HorizontalAlignment','Left','VerticalAlignment','Bottom');
+    ha=text(-0.05,+0.375*rat, 'Northing (km)','Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','rotation',90,'HorizontalAlignment','Left','VerticalAlignment','Bottom');
     set(ha,'Color',labelcolor);  % 2011-JUL-04
 end
 
-subplot('position',[0.1  0.550*rat   0.225 0.225*rat]*rs);
+subplot('position',[0.1  0.550*rat   0.225 0.225*rat]*rs);drawnow;
 utmimage(im3,xutmmin,xutmmax,yutmmin,yutmmax,tl3,'c',climit,dotxutm,dotyutm,ctab,mysyms{3},marksizes(3),1,1,...
     datelabel,idatatype,datalabel);
 
-
-subplot('position',[0.65 0.1 0.02 0.9])
+%% label with title at top
+subplot('position',[0.1 1.0*rat 0.5 0.05*rat]*rs,'Units','normalized');drawnow;
 axis off
-text(0.0,0.0,titlestr,...
-    'FontName','Helvetica','Fontsize',10,'FontWeight','normal',...
+% coordinates for text are inside the rectangle defined by subplot above
+text(0.1,0.1,titlestr,...
+    'FontName','Helvetica','Fontsize',10,'FontWeight','Bold',...
     'HorizontalAlignment','Left','VerticalAlignment','Bottom',...
-    'Units','Normalized','rotation', 90,'BackgroundColor',[1 1 1],...
+    'Clipping','off',...
+    'Units','Normalized','rotation', 0,...
     'margin',2);
 
-
+% 'BackgroundColor',[1 1 1],
 return;
 
 

@@ -59,9 +59,10 @@ set(h1,'PaperSize',[8.5 11.0]);
 set(h1,'Position',[1 1 1000 1000*rat]);
 
 
-% parse levels and extrema
+%% parse levels and extrema
 switch idatatype
     case 0
+        labu = 'cycles';
         if abs(climit(2)-0.5) < 1e-6
             labt = '+1/2 (cycle)';
         else
@@ -72,7 +73,14 @@ switch idatatype
         else
             labb = sprintf('%+4.1f',climit(2));
         end
-    case {-1,2}
+    case -1
+        labu = 'strain';
+        zmin = nanmin(climit);
+        zmax = nanmax(climit);
+        labt = sprintf('%+5.1E',zmin);
+        labb = sprintf('%+5.1E',zmax);
+    case 2
+        labu = 'mm';
         zmin = nanmin(climit);
         zmax = nanmax(climit);
         if abs(zmin) < 1000 && abs(zmin) < 1000 && abs(zmin) > 1 && abs(zmin) > 1
@@ -82,12 +90,13 @@ switch idatatype
             labt = sprintf('%+5.1f',zmin);
             labb = sprintf('%+5.1f',zmax);
         else
-            labt = sprintf('%+5.0G',zmin);
-            labb = sprintf('%+5.0G',zmax);
+            labt = sprintf('%+5.1E',zmin);
+            labb = sprintf('%+5.1E',zmax);
         end      
     otherwise
         error(sprintf('unknown idatatype %d\n',idatatype));
 end
+
 
 
 colormap(ctab);
@@ -174,14 +183,27 @@ utmimage(im4,xutmmin,xutmmax,yutmmin,yutmmax,tl4,'d',climit,dotxutm, dotyutm,cta
 subplot('position',[0.325  0.1*rat   0.225 0.225*rat]*rs);drawnow;
 utmimage(im8,xutmmin,xutmmax,yutmmin,yutmmax,tl8,'h',climit,dotxutm, dotyutm,ctab,mysyms{8},marksizes(8),1,1,'',idatatype,datalabel);
 
-subplot('position',[0.05 0.90 0.95 0.1*rat]);drawnow;
+% subplot('position',[0.05 0.90 0.95 0.1*rat]);drawnow;
+% axis off
+% text(0.0,0.0,strrep(titlestr,'\n',' ')...
+%     ,'Clipping','off'...
+%     ,'FontName','Helvetica','FontWeight','bold','Fontsize',10,'FontWeight','normal'...
+%     ,'HorizontalAlignment','Left','VerticalAlignment','Bottom'...
+%     ,'Units','Normalized','rotation', 0,'BackgroundColor',[1 1 1]...
+%     ,'margin',2);
+
+%% label with title at top
+%subplot('position',[0.1 1.0*rat 0.5 0.05*rat]*rs,'Units','normalized');drawnow;
+%% absolute top
+subplot('position',[0.1 0.95 0.5 0.05],'Units','normalized');drawnow;
 axis off
-text(0.0,0.0,strrep(titlestr,'\n',' ')...
-    ,'Clipping','off'...
-    ,'FontName','Helvetica','FontWeight','bold','Fontsize',10,'FontWeight','normal'...
-    ,'HorizontalAlignment','Left','VerticalAlignment','Bottom'...
-    ,'Units','Normalized','rotation', 0,'BackgroundColor',[1 1 1]...
-    ,'margin',2);
+% coordinates for text are inside the rectangle defined by subplot above
+text(0.1,0.1,titlestr,...
+    'FontName','Helvetica','Fontsize',10,'FontWeight','Bold',...
+    'HorizontalAlignment','Left','VerticalAlignment','Bottom',...
+    'Clipping','off',...
+    'Units','Normalized','rotation', 0,...
+    'margin',2);
 
 return;
 

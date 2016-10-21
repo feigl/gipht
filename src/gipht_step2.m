@@ -468,8 +468,8 @@ end
 
 
 fprintf(1,'\n');
-fprintf(1,'Total Average Cost of null     model = %.4f %s for %10ld observations in data set for inversion\n',cost00,datalabel,ndata);
-fprintf(1,'Total Average Cost of initial  model = %.4f %s for %10ld observations in data set for inversion\n',cost0 ,datalabel,ndata);
+fprintf(1,'Total Average Cost of null     model = %12.4G %s for %10ld observations in data set for inversion\n',cost00,objlabel,ndata);
+fprintf(1,'Total Average Cost of initial  model = %12.4G %s for %10ld observations in data set for inversion\n',cost0 ,objlabel,ndata);
 
 
 switch ianneal
@@ -572,6 +572,9 @@ switch ianneal
         
     case 2
         %start annealing
+        if idatatype1 == -1
+            warning('Annealing on range gradient observable is not yet implemented.\n');
+        end
         fprintf (1,'\nStarting annealing with recording....\n');
         options(7) = 2;  % use this for anneal2
         tanneal=tic;
@@ -656,9 +659,9 @@ end
 
 for fd=[1 fidtxtout]
    fprintf(fd,'\n');
-   fprintf(fd,'Total Average Cost of null    model = %12.4f %s for %10ld observations in data set for inversion\n',cost00/DNPC, datalabel,ndata);
-   fprintf(fd,'Total Average Cost of initial model = %12.4f %s for %10ld observations in data set for inversion\n',cost0 /DNPC, datalabel,ndata);
-   fprintf(fd,'Total Average Cost of final   model = %12.4f %s for %10ld observations in data set for inversion\n',cost1 /DNPC, datalabel,ndata);
+   fprintf(fd,'Total Average Cost of null    model = %12.4G %s for %10ld observations in data set for inversion\n',cost00, objlabel,ndata);
+   fprintf(fd,'Total Average Cost of initial model = %12.4G %s for %10ld observations in data set for inversion\n',cost0,  objlabel,ndata);
+   fprintf(fd,'Total Average Cost of final   model = %12.4G %s for %10ld observations in data set for inversion\n',cost1,  objlabel,ndata);
 
    % Final is WORSE than initial
    if cost1 > cost0

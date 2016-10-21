@@ -386,17 +386,17 @@ end
 %     error(sprintf ('ERROR: NSARUN invalid value in %s\n',OPT.fning));
 % end
 
-if OPT.ithresh < 0 || OPT.ithresh > 127
-    error(sprintf('ERROR: ithresh has invalid value of %f in %s\n',OPT.ithresh,OPT.fning));
-end
-
-if OPT.maxcmd < 0 || OPT.maxcmd > 127
-    error(sprintf('ERROR: maxcmd has invalid value of %f in %s\n',OPT.maxcmd,OPT.fning));
-end
-
-if OPT.pixinpatch < 0 || OPT.pixinpatch > 100
-    error(sprintf('ERROR: pixinpatch has invalid value of %f in %s\n',OPT.pixinpatch,OPT.fning));
-end
+% if OPT.ithresh < 0 || OPT.ithresh > 127
+%     error(sprintf('ERROR: ithresh has invalid value of %f in %s\n',OPT.ithresh,OPT.fning));
+% end
+% 
+% if OPT.maxcmd < 0 || OPT.maxcmd > 127
+%     error(sprintf('ERROR: maxcmd has invalid value of %f in %s\n',OPT.maxcmd,OPT.fning));
+% end
+% 
+% if OPT.pixinpatch < 0 || OPT.pixinpatch > 100
+%     error(sprintf('ERROR: pixinpatch has invalid value of %f in %s\n',OPT.pixinpatch,OPT.fning));
+% end
 
 % if interpcell < 0 || interpcell > 100e3
 %     error(sprintf('ERROR: interpcell has invalid value of %f in %s\n',interpcell,OPT.fning));

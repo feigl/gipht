@@ -171,14 +171,15 @@ for i = 1:np
     
     %% read observed phase values at all pixels for this pair
     fn0 = pfnames{i};
-    [tmpx,tmpy,tmpz] = grdread3(fn0); % GMT grid file 
+    %[tmpx,tmpy,tmpz] = grdread3(fn0); % GMT grid file 
+    [grdx,grdy,tmpz] = grdread3(fn0); % GMT grid file 
     phao = double(tmpz)*FACTIN;
     ndata = numel(phao);
     
     kmasts = kmast*ones(ndata,1);
     kslavs = kslav*ones(ndata,1);
 
-      
+    
     if bitget(figopt,2) == 1
         % recalculate model at each pixel individually
         i1=1;
@@ -194,9 +195,16 @@ for i = 1:np
         xyzm1(3,i1:i2) = rowvec(bz);
         
         % zero some values
-        dx1(i1:i2) = zeros(1,ndata); %
-        dy1(i1:i2) = zeros(1,ndata); %
-        dz1(i1:i2) = zeros(1,ndata); % topographic relief set to zero CAREFUL
+        %         dx1(i1:i2) = zeros(1,ndata); %
+        %         dy1(i1:i2) = zeros(1,ndata); %
+        %         dz1(i1:i2) = zeros(1,ndata); % topographic relief set to zero CAREFUL
+        % zero some values
+        
+        %% Step sizes equal differences in coordinates, assumed constant
+        dx1 = grdx(2)-grdx(1);
+        dy1 = grdy(2)-grdy(1);
+        dz1 = 0.; % topographic relief set to zero CAREFUL
+        
         fprintf(1,'In routine %s matrix of coordinates bx    has dimensions %d\n',mfilename,numel(bx));
         fprintf(1,'In routine %s matrix of coordinates xyzm1 has dimensions %d %d\n',mfilename,size(xyzm1));
     else
@@ -347,7 +355,10 @@ for i = 1:np
     % set up DST2 structure for interpolation
     if bitget(figopt,2) == 1
         % calculate modeled values for phase, NOT gradient
-        idatatype = 0;
+        %idatatype = 0;
+        % calculate modeled values for whatever we are using
+        idatatype = idatatype1;
+        
         storage=[];
         clear DST2;
         DST2 = build_dst(fitfun,xyzm1,tepochs,bpest,dops,DD1,unitv1...
@@ -355,6 +366,8 @@ for i = 1:np
             ,dx1,dy1,dz1,orbvm1,orbvs1,clond1,clatd1...
             ,qii1,qii2,qjj1,qjj2...
             ,phasig,kindex,kmasts,kslavs);
+        
+        
         %             % call fitting function first time to initialize
         %             % calculate modeled values for phase, NOT gradient
         for ii=1:numel(DST2.idatatype)
@@ -514,9 +527,9 @@ for i = 1:np
     totcost0  = nanmean(colvec(devs_all0(iok)));
     totcost1  = nanmean(colvec(devs_all1(iok)));
     
-    fprintf(1,'Total L1 Norm Cost of null  model = %12.4f %s for %6d observations in sub-region\n', totcost00/DNPC,datalabel,numel(iok));
-    fprintf(1,'Total L1 Norm Cost of initl model = %12.4f %s for %6d observations in sub-region\n', totcost0/DNPC,datalabel,numel(iok));
-    fprintf(1,'Total L1 Norm Cost of final model = %12.4f %s for %6d observations in sub-region\n', totcost1/DNPC,datalabel,numel(iok));
+    fprintf(1,'Total Cost (by %s) of null  model = %12.4f %s for %6d observations in sub-region\n',objfun,totcost00,objlabel,numel(iok));
+    fprintf(1,'Total Cost (by %s) of initl model = %12.4f %s for %6d observations in sub-region\n',objfun,totcost0, objlabel,numel(iok));
+    fprintf(1,'Total Cost (by %s) of final model = %12.4f %s for %6d observations in sub-region\n',objfun,totcost1, objlabel,numel(iok));
     
     % Added 2008-JUL-17 Kurt
     xax2 = [xmin, xmax];
@@ -557,18 +570,34 @@ for i = 1:np
     umd0 = mdl0 + res0;
     umd1 = mdl1 + res1;
     
-    % unwrapped quantities in meters
-    if abs(mean(DST2.mpercy) - DST2.mpercy(1)) < 1.0e-6
-        uns = DST2.mpercy(1)*reshape(     umd1/DNPC,nlmesh3,ncmesh3);  % unwrapped "observed" values
-        mds = DST2.mpercy(1)*reshape(     mdl1/DNPC,nlmesh3,ncmesh3);  % unwrapped model
-        urs = DST2.mpercy(1)*reshape(     res1/DNPC,nlmesh3,ncmesh3);  % unwrapped residuals
-        ucs = DST2.mpercy(1)*reshape(devs_all1/DNPC,nlmesh3,ncmesh3);  % unwrapped costs (deviations)
-    else
-        error(sprintf('Inconsistent values of fringe spacing %20.8g %20.8g %20.8g\n'...
-            ,mean(DST2.mpercy),DST2.mpercy(1),mean(DST2.mpercy)-DST2.mpercy(1)));
-        %         uns = 28.4*reshape(double(umd1)/DNPC,nlmesh3,ncmesh3);%uns=uns-mean(mean(uns));
-        %         mds = 28.4*reshape(double(mdl1)/DNPC,nlmesh3,ncmesh3);%mds=mds-mean(mean(mds));
+    %% calculate unwrapped quantities in meters
+    switch idatatype1
+        case 0 %% observable is phase in radians
+            if abs(mean(DST2.mpercy) - DST2.mpercy(1)) < 1.0e-6
+                uns = DST2.mpercy(1)*reshape(     umd1/DNPC,nlmesh3,ncmesh3);  % unwrapped "observed" values
+                mds = DST2.mpercy(1)*reshape(     mdl1/DNPC,nlmesh3,ncmesh3);  % unwrapped model
+                urs = DST2.mpercy(1)*reshape(     res1/DNPC,nlmesh3,ncmesh3);  % unwrapped residuals
+                ucs = DST2.mpercy(1)*reshape(devs_all1/DNPC,nlmesh3,ncmesh3);  % unwrapped costs (deviations)
+            else
+                error(sprintf('Inconsistent values of fringe spacing %20.8g %20.8g %20.8g\n'...
+                    ,mean(DST2.mpercy),DST2.mpercy(1),mean(DST2.mpercy)-DST2.mpercy(1)));
+                %         uns = 28.4*reshape(double(umd1)/DNPC,nlmesh3,ncmesh3);%uns=uns-mean(mean(uns));
+                %         mds = 28.4*reshape(double(mdl1)/DNPC,nlmesh3,ncmesh3);%mds=mds-mean(mean(mds));
+            end
+        case -1 %% observable is dimensionless strain
+            uns = reshape(     umd1,nlmesh3,ncmesh3);  % unwrapped "observed" values
+            mds = reshape(     mdl1,nlmesh3,ncmesh3);  % unwrapped model
+            urs = reshape(     res1,nlmesh3,ncmesh3);  % unwrapped residuals
+            ucs = reshape(devs_all1,nlmesh3,ncmesh3);  % unwrapped costs (deviations)
+        case 2 %% observable is range change in meters
+            uns = reshape(     umd1,nlmesh3,ncmesh3);  % unwrapped "observed" values
+            mds = reshape(     mdl1,nlmesh3,ncmesh3);  % unwrapped model
+            urs = reshape(     res1,nlmesh3,ncmesh3);  % unwrapped residuals
+            ucs = reshape(devs_all1,nlmesh3,ncmesh3);  % unwrapped costs (deviations)
+        otherwise
+            error(sprintf('Unknown datatype %d\n',idatatype1));
     end
+    
     
     if bitget(figopt,3) == 1 && bitget(figopt,2) == 1
         %unwrapped components of displacement vectors in meters
@@ -631,14 +660,15 @@ for i = 1:np
         omz = NaN;
     end
     
-    
-    titlestr = sprintf('Pair %3d orbs %5d %5d years %s to %s Dt = %.4f yr Cost0 = %6.4f Cost1=%6.4f %s '...
+    %% title string for all plots
+    titlestr = sprintf('Pair %3d epochs %3d %3d %s to %s Dt = %.1f yr '...
         ,i,iuniqorbs(kmast),iuniqorbs(kslav)...
-        ,tepochs(kmast),tepochs(kslav),years(tepochs(kslav)-tepochs(kmast))...
-        ,nanmean(colvec(devs_all0))/DNPC,nanmean(colvec(devs_all1))/DNPC...
-        ,strrep(runname,'_','\_'));
+        ,char(tepochs(kmast)),char(tepochs(kslav)),double(years(tepochs(kslav)-tepochs(kmast))));
+      %  ,strrep(runname,'_','\_'));  
+   %        ,nanmean(colvec(devs_all0))/DNPC,nanmean(colvec(devs_all1))/DNPC...
+ 
     
-    % phase values in cycles
+    %% build images
     imA = reshape(     double(phao)/DNPC ,nlmesh3,ncmesh3);tlA = 'Initial';
     imB = reshape(     double(wrm0)/DNPC ,nlmesh3,ncmesh3);tlB = 'Mod0';
     imC = reshape(     double(res0)/DNPC ,nlmesh3,ncmesh3);tlC = 'Res0';
@@ -740,7 +770,7 @@ for i = 1:np
         , demx,demy);
     
     % set color table
-    switch idatatype
+    switch idatatype1 %%TODO handle a different data type for each pair
         case 0
             climit=[-0.5, +0.5];
         otherwise
@@ -784,19 +814,22 @@ for i = 1:np
         marksizes(ii) = marksize;
     end
     
-    
+    %% make 8-panel plot in portrait
     nf=nf+1; h(nf)=utmimage8(imA,imB,imC,imD,imE,imF,imG,imH...
         ,tlA,tlB,tlC,tlD,tlE,tlF,tlG,tlH...
         ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes,idatatype1,datalabel);
     %     ,wesn,titlestr,climit,[Xcorners11 NaN Xcorners21]/1000,[Ycorners11 NaN Ycorners21]/1000,ctab,1,mysyms,marksizes);
     feval(printfun,sprintf('%s_%03d_8PAN',runname,i));
-%     nf=nf+1; h(nf)=utmimage8landscape(imA,imB,imC,imD,imE,imF,imG,imH...
-%         ,tlA,tlB,tlC,tlD,tlE,tlF,tlG,tlH...
-%         ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes,idatatype);
-%     %     ,wesn,titlestr,climit,[Xcorners11 NaN Xcorners21]/1000,[Ycorners11 NaN Ycorners21]/1000,ctab,1,mysyms,marksizes);
-%     %printjpg(sprintf('%s_%03d_8PANLS.jpg',runname,i));
-%     feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
-    % make 4-panel plot of wrapped phase
+    
+    %% make 8-panel plot in landscape
+    nf=nf+1; h(nf)=utmimage8landscape(imA,imB,imC,imD,imE,imF,imG,imH...
+        ,tlA,tlB,tlC,tlD,tlE,tlF,tlG,tlH...
+        ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes,idatatype1,datalabel);
+    %     ,wesn,titlestr,climit,[Xcorners11 NaN Xcorners21]/1000,[Ycorners11 NaN Ycorners21]/1000,ctab,1,mysyms,marksizes);
+     feval(printfun,sprintf('%s_%03d_8PANLS.pdf',runname,i),'landscape');
+ 
+     feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
+    %% make 4-panel plot of wrapped phase
     tlA = ''; tlF = '';
     datelabel = '';
     nf=nf+1; h(nf)=utmimage4(imA,imF,imG,imH ...
@@ -834,7 +867,7 @@ for i = 1:np
     %     y2lab='mm/yr';
     tlab = strcat(sprintf('Northing = %.3f km ',ymesh3(iprof,jprof)/1000),' :',titlestr);
     nf=nf+1;h(nf) = draw_profile(xt,yt1,yt2,xlab,y1lab,y2lab,tlab);
-    feval(printfun,sprintf('%s_profR_ew_P%03d',runname,i));
+    feval(printfun,sprintf('%s_profR_ew_P%03d',runname,i),'landscape');
     
     fprintf(1,'Making N-S profile in range rate for Pair %03d\n',i);
     xt = ymesh3(:,jprof)/1000;
@@ -846,7 +879,7 @@ for i = 1:np
     
     tlab = strcat(sprintf('Easting = %.3f km ',xmesh3(iprof,jprof)/1000),' :',titlestr);
     nf=nf+1;h(nf) = draw_profile(xt,yt1,yt2,xlab,y1lab,y2lab,tlab);
-    feval(printfun,sprintf('%s_profR_ns_P%03d',runname,i));
+    feval(printfun,sprintf('%s_profR_ns_P%03d',runname,i),'landscape');
     
     if bitget(figopt,3) == 1
         fprintf(1,'Making E-W profiles for Pair %03d\n',i);
@@ -864,7 +897,7 @@ for i = 1:np
         
         %         y2lab='mm/yr';
         nf=nf+1;h(nf) = draw_profile(xt,yt1,yt2,xlab,y1lab,y2lab,tlab);
-        feval(printfun,sprintf('%s_profE_ew_P%03d',runname,i));
+        feval(printfun,sprintf('%s_profE_ew_P%03d',runname,i),'landscape');
         
         fprintf(1,'Making E-W profile in north for Pair %03d\n',i);
         yt1=omy(iprof,:)*1000/time_span;
@@ -874,7 +907,7 @@ for i = 1:np
         
         %         y2lab='mm/yr';
         nf=nf+1;h(nf) = draw_profile(xt,yt1,yt2,xlab,y1lab,y2lab,tlab);
-        feval(printfun,sprintf('%s_profN_ew_P%03d',runname,i));
+        feval(printfun,sprintf('%s_profN_ew_P%03d',runname,i),'landscape');
         
         fprintf(1,'Making E-W profile in vertical rate for Pair %03d\n',i);
         yt1=omz(iprof,:)*1000/time_span;
@@ -884,7 +917,7 @@ for i = 1:np
         
         %         y2lab='mm/yr';
         nf=nf+1;h(nf) = draw_profile(xt,yt1,yt2,xlab,y1lab,y2lab,tlab);
-        feval(printfun,sprintf('%s_profU_ew_P%03d',runname,i));
+        feval(printfun,sprintf('%s_profU_ew_P%03d',runname,i),'landscape');
         
         %   2012-10-04 values in meters
         iq = iq+1;

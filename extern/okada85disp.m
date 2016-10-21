@@ -151,6 +151,9 @@ function [ue,un,uz] = okada85disp(easting,northing,depth,striked,dipd,length,wid
 % plotflag = 0;	% no plot
 % nu = 0.25;	% isotropic Poisson's ratio
 
+% fprintf(1,'entering %s at %s\n',mfilename,datestr(now));
+% whos
+
 % % Assigns input arguments
 % e = varargin{1};
 e = easting;

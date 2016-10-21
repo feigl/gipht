@@ -103,8 +103,8 @@ else
           %fprintf (fid,'%5d %c %7d %s %3d %10.4f %10.4f\n',i,char(i+64),iuniqorbs(i),uniqdates{i},j,tepochs(i),bpest(i));
 %            fprintf (1,  '%5d %7d %s %c %10.4f %10.4f\n',i,iuniqorbs(i),uniqdates{i},char(j+64),tepochs(i),bpest(i));
 %            fprintf (fid,'%5d %7d %s %c %10.4f %10.4f\n',i,iuniqorbs(i),uniqdates{i},char(j+64),tepochs(i),bpest(i));
-           fprintf (1,  '%5d %7d %s %c %12s %10.4f\n',i,iuniqorbs(i),uniqdates{i},char(j+64),tepochs(i),bpest(i));
-           fprintf (fid,'%5d %7d %s %c %12s %10.4f\n',i,iuniqorbs(i),uniqdates{i},char(j+64),tepochs(i),bpest(i));
+           fprintf (1,  '%5d %7d %s %c %12s %10.4f\n',i,iuniqorbs(i),uniqdates{i},char(j+64),char(tepochs(i)),bpest(i));
+           fprintf (fid,'%5d %7d %s %c %12s %10.4f\n',i,iuniqorbs(i),uniqdates{i},char(j+64),char(tepochs(i)),bpest(i));
 	end
 end
 fclose(fid);

@@ -101,7 +101,8 @@ switch idatatype
     case 2
        imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr);
     case 0
-        image([xutmmin xutmmax],[yutmmax yutmmin],floor(33+64*pixarr)); % values are costs [0, 127]
+        %image([xutmmin xutmmax],[yutmmax yutmmin],floor(33+64*pixarr)); % values are costs [0, 127]
+       image([xutmmin xutmmax],[yutmmax yutmmin],pixarr); %
     case -1
          imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr);
     otherwise

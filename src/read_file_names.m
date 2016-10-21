@@ -56,15 +56,15 @@ switch file_type
         %  ../intf/1992220_1993169/unwrap_mask_ll.grd   % unwrapped phase in radians
         
         % Read the arguments into a Cell Array
-        CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','%');
+        CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','%')
         fclose(fid);
-        [nrows,ncols] = size(CDAT);
+        [nrows,ncols] = size(CDAT)
         if ncols == 5 && nrows > 0
             yyyymmdd1    = CDAT{1};  % Master Date
             yyyymmdd2    = CDAT{2};  % Slave Date
             idatatypes   = CDAT{3};  % data type
             mpercys      = CDAT{4};  % fringe spacing meters per cycle
-            names        = CDAT{5};  % third column of dat file is the grid file name
+            names        = CDAT{5};  % fifth column of dat file is the grid file name
             
             np = nrows;
             for i=1:np

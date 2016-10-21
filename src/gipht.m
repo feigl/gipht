@@ -96,7 +96,12 @@
 %     , pha2qlsname, phaseprefix, surrogate, verbose)
 
 % initialize variables
-%clear all;
+
+%% before releasing, find dependencies using:
+%fList = matlab.codetools.requiredFilesAndProducts('/Users/feigl/gipht/src/gipht.m')
+
+%% initialize
+clear all;
 
 % deal with slashes on Windows boxes
 if ispc == 1
@@ -248,7 +253,7 @@ end
 gipht_step1; % read in phase files, select pixels
 gipht_step2; % set bounds on parameters, run simulated annealing
 gipht_step3; % determine statistical uncertainties on parameter estimates
-gipht_step4; % make images for quad tree
+%gipht_step4; % make images for quad tree
 gipht_step5; % make images for entire sub-region
 
 save_run;

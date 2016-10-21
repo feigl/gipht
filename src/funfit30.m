@@ -189,7 +189,7 @@ if (nin == 1 || nin == 2) && nout == 2 && isstruct(varargin{1}) == 0
         end
     end
     
-    
+
     % for debugging
     %pscl = ones(size(pscl));
     
@@ -211,7 +211,7 @@ elseif nin == 2 && nout == 2 && isstruct(varargin{1}) == 1 && isstruct(varargin{
     % parameter structure
     PST = varargin{2};
     
-    % number of epochs
+    % number of data
     ndata = numel(DST.phaobs);
     
     % initialize
@@ -394,6 +394,10 @@ elseif nin == 3 ...
     TST = varargin{3};
 
 %     fprintf(1,'Unpacking TST\n');
+
+    %% convert string to function handle
+    timefun = str2func(PST.timefun);
+
 
     % unpack storage structure - must match above
     idatatype1 = TST.idatatype1;
@@ -640,7 +644,7 @@ elseif nin == 3 ...
 %                 fprintf(1,'extrema of tl      %g %g\n',nanmin(nanmin(tl)),nanmax(nanmax(tl)));
 %                 fprintf(1,'extrema of tr      %g %g\n',nanmin(nanmin(tr)),nanmax(nanmax(tr)));
 %                 fprintf(1,'extrema of uokada1 %g %g\n',nanmin(nanmin(uokada1)),nanmax(nanmax(uokada1)));
-%             else
+            else
                 uokada1 = zeros(3,ndata);
             end
             kp = 18;
@@ -889,8 +893,11 @@ elseif nin == 3 ...
  
     %time function in a column vector
     %tdif = DD * colvec(pt);
-    tdif = DD * time_function(pt, tquake);
+    %tdif = DD * time_function(pt, tquake);
     %fprintf(1,'Time difference in years %10.4f\n',tdif);
+    tdif = DD * timefun(pt, tquake);
+    %fprintf(1,'Time difference in years %10.4f\n',tdif);
+
     
     %% combine time and space dependence in a column vector
     rng0 = tdif .* gmod + UCS;  % modeled range change in m
@@ -960,33 +967,5 @@ else
 end
 
 return
-
-function ft = time_function(tepochs, tquake)
-% return value of time function f(t)
-%    inputs:
-%          tepochs - me x 1 vector of epochs in years
-%          tquake  - scalar reference epoch in years
-%    output
-%          ft      - me x 1 vector containing value of time function
-%                    evaluated at each epoch
-
-[me, ncols] = size(tepochs);
-if ncols == 1
-    ft = zeros(me,1);
-    
-    if tquake >= nanmin(tepochs) && tquake <= nanmax(tepochs)
-        %fprintf(1,'Using step function that turns on at epoch %f\n',tquake);
-        itime=find(tepochs >= tquake);
-        ft(itime) = 1.0;
-    else
-        ft = tepochs - tquake;
-        %fprintf(1,'Linear in time (secular deformation) ft = %10.4f\n',ft);
-    end
-else
-    ncols
-    error('Dimension problem');
-end
-return
-
 
 

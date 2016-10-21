@@ -31,6 +31,8 @@ function h = hist2(d,nbin)
 %       linkBehavior = hggetbehavior(histPatch(k),'Linked');
 %  
 
+d = colvec(d);
+
 if nargin <= 2
     nbin = 10;
 end

@@ -40,13 +40,13 @@ else
     axis xy; % make displacement positive upwards
 end
 plot(xt,yt2,'k-','LineWidth',2);
-set(gca,'FontName','Helvetica-Bold','Fontsize',12);
+set(gca,'FontName','Helvetica','FontWeight','Bold','Fontsize',12);
 %legend('Observed','Modeled','Location','NorthEast');
 legend('Observed','Modeled','Location','Best');
-xlabel(xlab,'FontName','Helvetica-Bold','Fontsize',12);
-%ylabel(y1lab,'FontName','Helvetica-Bold','Fontsize',12);
-title(y1lab,'FontName','Helvetica-Bold','Fontsize',12);
-ylabel(y2lab,'FontName','Helvetica-Bold','Fontsize',12);
+xlabel(xlab,'FontName','Helvetica','FontWeight','Bold','Fontsize',12);
+%ylabel(y1lab,'FontName','Helvetica','FontWeight','Bold','Fontsize',12);
+title(y1lab,'FontName','Helvetica','FontWeight','Bold','Fontsize',12);
+ylabel(y2lab,'FontName','Helvetica','FontWeight','Bold','Fontsize',12);
 %    fixlabels('Easting (km)','%4.0f','Range change (mm)','%.0f');
 
 subplot(3,1,3);
@@ -54,11 +54,11 @@ plot(xt,yt3,'b.','LineWidth',2);
 axis([min(xt) max(xt) -Inf +Inf]);hold on;
 
 %axis ij; % make uplift upwards
-set(gca,'FontName','Helvetica-Bold','Fontsize',12,'FontWeight','bold');
-xlabel(xlab,'FontName','Helvetica-Bold','Fontsize',12)
-ylabel(y2lab,'FontName','Helvetica-Bold','Fontsize',12)
+set(gca,'FontName','Helvetica','FontWeight','Bold','Fontsize',12,'FontWeight','bold');
+xlabel(xlab,'FontName','Helvetica','FontWeight','Bold','Fontsize',12)
+ylabel(y2lab,'FontName','Helvetica','FontWeight','Bold','Fontsize',12)
 %fixlabels('Easting (km)','%4.0f','Range change (mm)','');
-%   set(gca,'FontName','Helvetica-Bold','Fontsize',12,'FontWeight','bold');
+%   set(gca,'FontName','Helvetica','FontWeight','Bold','Fontsize',12,'FontWeight','bold');
 %legend('Angular Deviation','Wrapped Residual','Location','NorthEast');
 %legend('Absolute Deviation','Location','NorthEast');
 legend('Absolute Deviation','Location','Best');
