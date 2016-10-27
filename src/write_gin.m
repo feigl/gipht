@@ -25,20 +25,22 @@ if fid <= 0
     error(sprintf('Cannot open data file called %s\n',fnameout));
     ierr = 1;
 else
-    % 1st header line 
+    % 1st header line
     fprintf(fid,'Parameter_Name Initial_Value PlusMinusBound\n');
-
+    
     % write one line per parameter
-    fmt = '%32s %20.10E %20.10E\n';     
+    fmt = '%32s %20.10E %20.10E\n';
     kount = 0;
     for i=1:PST.mparam
         % Do not write NaNs or derived parameters
         %&& (strcmp(char(PST.flag(i),'E#') > 0 || strcmp(char(PST.flag(i)),'F#') > 0)) ...
-        %if numel(PST.names(i)) > 2 ...   
-
-%         if      isfinite(PST.p1(i)) == 1 ...
-%                 && isfinite(PST.sigma(i)) == 1
-        if isfinite(PST.p1(i)) == 1 && abs(PST.ub(i)-PST.lb(i)) > eps
+        %if numel(PST.names(i)) > 2 ...
+        
+        %         if      isfinite(PST.p1(i)) == 1 ...
+        %                 && isfinite(PST.sigma(i)) == 1
+        if isfinite(PST.p1(i)) == 1 ...
+                && abs(PST.ub(i)-PST.lb(i)) > eps ...
+                && isfinite(PST.sigma(i)) == 1
             fprintf(1,fmt,char(PST.names{i}),PST.p1(i),PST.sigma(i));
             fprintf(fid,fmt,char(PST.names{i}),PST.p1(i),PST.sigma(i));
             kount = kount+1;
@@ -52,7 +54,7 @@ else
         ierr = 0;
     else
         ierr = 1;
-         warning(sprintf('mismatch between kount (%d) and PST.mparam (%d)\n',kount,PST.mparam));
+        warning(sprintf('mismatch between kount (%d) and PST.mparam (%d)\n',kount,PST.mparam));
     end
 end
 return

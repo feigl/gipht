@@ -48,6 +48,7 @@ saopt6       = OPT.saopt6;
 datafilename = OPT.datafilename;
 fnparin      = OPT.fnparin;
 fnparout     = OPT.fnparout;
+fntxtout     = OPT.fnsumout;
 demdescfile  = OPT.demdescfile;
 orbfile      = OPT.orbfile;
 nsaruns      = OPT.nsaruns;
@@ -72,7 +73,7 @@ orbsavefile = sprintf('orbits.mat');
 orbits_loaded = 0;
 
 % open some output files
-fidtxtout=fopen(OPT.fnparout,'w');
+fidtxtout=fopen(OPT.fnsumout,'w');
 if fidtxtout <= 0
     error(sprintf('Cannot open output file %s\n',OPT.fnparout));
 end

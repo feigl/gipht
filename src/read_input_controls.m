@@ -158,10 +158,12 @@ OPT.printfun     = getval3(OPT,keys,vals,'printfun','s');
 % phaseprefix  = getval3(OPT,keys,vals,'phaseprefix','s');
 OPT.timefun     = getval3(OPT,keys,vals,'timefun','s');
 
-% read input parameters
+% read input parameters in gin format
 OPT.fnparin      = getval3(OPT,keys,vals,'fnparin','s');
-% name for output parameters
+% name for output parameters in gin format
 OPT.fnparout     = getval3(OPT,keys,vals,'fnparout','s');
+% name for output parameters in summary format
+OPT.fnsumout    = getval3(OPT,keys,vals,'fnsumout','s');
 
 
 
