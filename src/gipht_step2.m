@@ -646,6 +646,8 @@ PST1.p0    = colvec(p0);
 PST1.p1    = colvec(p1);
 PST1.sigma = colvec(msig);
 
+
+
 %% cost of final estimate
 cost1 = feval(objfun,DST,PST1,TST);
 
@@ -668,6 +670,7 @@ for fd=[1 fidtxtout]
       fprintf(fd,'WARNING: Final estimate is WORSE than initial estimate\n')
    end
 end
+
 
 % % make a 3-D plot using final estimate
 % nf=nf+1;

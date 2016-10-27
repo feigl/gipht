@@ -118,30 +118,43 @@ text(0.1,0.5,t3...
 % 2. Query the "ScreenSize" property of the root object inside MATLAB:
 % get(0, 'ScreenSize')
 % When there is no display, this returns [1 1 1 1] instead of an actual screen size. However, this relies on behavior that isn't actually specified (by the doc, for instance) to work in any particular way, so may be subject to change in the future. If you were going to use this many times, it might be wise to wrap it in a function (e.g. create an "isdisplay.m" function file), so you can easily change the implementation in the future, if needed. (This method worked as of MATLAB R2008a.) 
-%ss4 = get(0, 'ScreenSize')
-
-
+% ss4 = get(0, 'ScreenSize');
+% 
+% 
 % if ss4 == [1 1 1 1]
+%    if ismac == 1
+%        figfilename = strrep(pdffilename,'pdf','fig');
+%        saveas(gcf,figfilename,'fig');
+%    else
 %    psfilename = strrep(pdffilename,'pdf','ps');
 %    fprintf(1,'Printing PostScript to file named %s\n',psfilename);
 %    print(psfilename,'-dpsc2','-r1200'); % print PS if no display  
 % else
+%   print(pdffilename,'-dpdf','-r1200')
+% end
+
+
 try
-   fprintf(1,'Printing PDF to file named %s\n',pdffilename); 
-   print(pdffilename,'-dPDF','-r1200'); % otherwise, print PDF
-catch 
-    try
-        psfilename = strrep(pdffilename,'pdf','ps');
-        fprintf(1,'Printing PostScript to file named %s\n',psfilename);
-        print(psfilename,'-dpsc2','-r1200'); % print PS if no display
-    catch
-        warning(sprintf('ERROR in %s\n',mfilename));
-        return
-%         jpgfilename = strrep(psfilename,'ps','jpg');
-%         fprintf(1,'Printing JPEG to file named %s\n',jpgfilename);
-%         print(jpgfilename,'-djpeg','-r1200'); % print JPG    
-    end
+    fprintf(1,'Printing PDF to file named %s\n',pdffilename);   
+    print(gcf,pdffilename,'-dpdf','-r1200'); % print PDF   
+catch
+    warning(sprintf('ERROR in %s. Trying to catch...\n',mfilename));   
+    figfilename = strrep(pdffilename,'pdf','fig');
+    saveas(gcf,figfilename,'fig');
 end
+
+
+%     try
+%         psfilename = strrep(pdffilename,'pdf','ps');
+%         fprintf(1,'Printing PostScript to file named %s\n',psfilename);
+%         print(psfilename,'-dpsc2','-r1200'); % print PS if no display
+%     catch
+%         warning(sprintf('ERROR in %s\n',mfilename));
+%         return
+% %         jpgfilename = strrep(psfilename,'ps','jpg');
+% %         fprintf(1,'Printing JPEG to file named %s\n',jpgfilename);
+% %         print(jpgfilename,'-djpeg','-r1200'); % print JPG    
+%     end
 
    
 % end

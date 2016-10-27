@@ -233,8 +233,11 @@ end
 % count the errors
 nerrors = 0;
 
-%% set name of file for input control keywords
+%% set options
 if exist('OPT','var') == 1
+    %% set name of file for input control keywords
+    fprintf(1,'Using inherited options from OPT structure\n');
+    OPT
     if isfield(OPT,'fning') == 1
         if isempty(OPT.fning) == 1
             OPT.fning='gipht.in';
@@ -242,11 +245,25 @@ if exist('OPT','var') == 1
             fprintf(1,'Using inherited input file named %s\n',char(OPT.fning));
         end
     else
-        OPT=struct('fning','gipht.in');
+        OPT.fning='gipht.in';
     end
-else
+%     %% set name of file for list of input grid file names
+%     if isfield(OPT,'ilist') == 1
+%         if isempty(OPT.ilist) == 1
+%             OPT.ilist='grd_filenames.ilist';
+%         else
+%             fprintf(1,'Using inherited ilist file named %s\n',char(OPT.ilist));
+%         end
+%     else
+%         OPT=struct('ilist','grd_filenames.ilist');
+%     end
+else 
+    %% make a new structure and load with default values
     OPT=struct('fning','gipht.in');
+%     OPT.ilist='grd_filenames.ilist';
 end
+
+
 
 
 % Now run the following steps:

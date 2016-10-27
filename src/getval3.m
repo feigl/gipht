@@ -2,14 +2,18 @@ function val=getval3(OPT,keys,vals,keyin,itype)
 %function val=getval3(val,keys,vals,keyin,itype)
 % given a set of keywords, search for keyin and return in val
 
+%% structure does not yet contain this key field
 if isfield(OPT,keyin) == 0
     %fprintf(1,'Creating field in OPT structure from key %s\n',keyin);
     OPT.(keyin) = [];
 end
 
+
 if isempty(OPT.(keyin)) == 0
+    %% return existing value, without overwriting
     val=OPT.(keyin); 
 else
+    %% write a new value to the key field
     val=[];
     nv = numel(vals);
     for i=1:nv
@@ -27,6 +31,7 @@ else
             else
                 k2 = numel(str);
             end
+            %% decide on the type of input value
             switch itype
                 case 's'
                     val = strtrim(str(1:k2));

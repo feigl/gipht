@@ -33,9 +33,9 @@ Kappa1  = NaN;
 crit69 = NaN;
 cstddev1 = NaN;
 
-% decide how to handle statistics
-switch pselect
-    case {1,2,3,5} % observable is phase
+%% based on type of observable, type decide how to handle statistics
+switch idatatype1
+    case 0 % observable is phase
         if strcmp(objfun,'funcoststdnres') == 1
             % assume (weighte) unwrapped phase residuals are normally distributed
             istatcode = 8;
@@ -44,7 +44,7 @@ switch pselect
             % critical value of cost at 69 percent confidence
             istatcode = 1;
         end
-    case 7 % observable is gradient
+    case -1 % observable is gradient
         if strcmp(objfun,'funcostrarcscaled') == 1
             % Assume residuals of gradient values are distributed as Gamma to calculate
             % critical value of cost at 69 percent confidence
@@ -54,26 +54,57 @@ switch pselect
             % critical value of cost at 69 percent confidence
             istatcode = 2;
         end
+    case 2 % observable is unwrapped range change
+        % assume residuals are normally distributed
+        istatcode = 8;
     otherwise
         % skip statistics
         istatcode = 0;
 end
 
+%% based on pixel selection strategy, decide how to handle statistics --
+% using gmt grid files makes this obsolete - 20161025
+% switch pselect
+%     case {1,2,3,5} % observable is phase
+%         if strcmp(objfun,'funcoststdnres') == 1
+%             % assume (weighte) unwrapped phase residuals are normally distributed
+%             istatcode = 8;
+%         else
+%             % Assume phase residuals are distributed as Von Mises to calculate
+%             % critical value of cost at 69 percent confidence
+%             istatcode = 1;
+%         end
+%     case 7 % observable is gradient
+%         if strcmp(objfun,'funcostrarcscaled') == 1
+%             % Assume residuals of gradient values are distributed as Gamma to calculate
+%             % critical value of cost at 69 percent confidence
+%             istatcode = 6;
+%         else
+%             % Assume deviations of gradient values are distributed as Generalized Pareto to calculate
+%             % critical value of cost at 69 percent confidence
+%             istatcode = 2;
+%         end
+%     otherwise
+%         % skip statistics
+%         istatcode = 0;
+% end
+
+%% based on optimization strategy, decide how to do statistics
 switch ianneal
     case 0
         % no inversion has been performed, so skip statistical analysis
-        istatcode = 0;
-    case {1,2}
-        if saopt6 == 3
-            istatcode = 5; % use Bootstrap instead of critical value
-        end
-        fprintf(1,'IANNEAL = %d so ISTATCODE changed to %d\n',ianneal,istatcode);
-    case 6
-        % use uncertainties from MCMC
-        istatcode = 7;
+        fprintf(1,'IANNEAL = %d so skipping statistics: ISTATCODE is %d\n',ianneal,istatcode);
+        istatcode = 0;       
+%     case {1,2}
+%         if saopt6 == 3
+%             istatcode = 5; % use Bootstrap instead of critical value
+%         end
+%         fprintf(1,'IANNEAL = %d so ISTATCODE changed to %d\n',ianneal,istatcode);
+%     case 6
+%         % use uncertainties from MCMC
+%         istatcode = 7;
     otherwise
-        istatcode = 0;
-        fprintf(1,'IANNEAL = %d so ISTATCODE defaults to %d\n',ianneal,istatcode);
+        fprintf(1,'IANNEAL = %d and ISTATCODE is %d\n',ianneal,istatcode);
 end
 
 
@@ -97,40 +128,10 @@ p00 = zeros(size(p0));
 %[pt, px, py, pz, pb, pd, pg, pnames] = chopparamvector(p1,mparams,me);
 %p4 = [pt; zeros(numel(px),1); zeros(numel(py),1); zeros(numel(pz),1); zeros(numel(pb),1); zeros(numel(pd),1); pg];
 
-%%evaluate fitting function at current value of parameters
-switch ianneal
-    case {0,1,2,3,4,5,6}
-        %% range change in radians
-        % null model
-        %mdl00 = feval(fitfun,DST,PST00,TST); % null
-        mdl00 = feval('funnull',DST,PST00,TST); % null
-        %mdl00 = mdl00 + mean_direction(DST.phaobs);
-        % initial model
-        mdl0  = feval(fitfun,DST,PST0  ,TST); % initl
-        % final model
-        mdl1  = feval(fitfun,DST,PST1 ,TST); % final
-        %     case 3
-        %         fprintf(1,'ianneal is 3, so runnning untested code in %s...\n',mfilename);
-        %         clear options;
-        %         options(1)=2;
-        %         options(2)=0;
-        %         PST00.p0(49)
-        %         PST.p0(49)
-        %         PST1.p0(49)
-        %         [DST,PST,TST]=simann1(objfun,bounds,options,fitfun,DST,PST00,TST);
-        %         mdl00 = DST.phamod;
-        %         disp 'mdl00'; sum(mdl00)
-        %
-        %         [DST,PST,TST]=simann1(objfun,bounds,options,fitfun,DST,PST,TST);
-        %         mdl0 = DST.phamod;
-        %         disp 'mdl0 '; sum(mdl0)
-        %
-        %         [DST,PST,TST]=simann1(objfun,bounds,options,fitfun,DST,PST1,TST);
-        %         mdl1 = DST.phamod;
-        %         disp 'mdl1'; sum(mdl1)
-    otherwise
-        error(sprintf('Unknown value of ianneal %d\n',ianneal));
-end
+%% evaluate three fitting functions for three sets of parameters
+mdl00 = feval('funnull',DST,PST00,TST); % null
+mdl0  = feval(fitfun,DST,PST0  ,TST); % initl
+mdl1  = feval(fitfun,DST,PST1 ,TST); % final
 
 % 2011-NOV-30 take real part
 if isreal(mdl00) ~= 1
@@ -370,7 +371,7 @@ if istatcode ~= 0
             warning(sprintf('Unknown value of ISTATCODE = %d\n',istatcode));
     end
     
-    if ismember(abs(istatcode),[0,1,2,5,6]) == 1
+    if ismember(abs(istatcode),[0,1,2,5,6,8]) == 1
         psig = nan(size(p0));
         if isfinite(crit69) == 0
             warning(sprintf('Critical value is not defined.\nApproximating critical value using non-parametric quantiles.\n'));
