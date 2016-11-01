@@ -786,27 +786,29 @@ for i = 1:np
         ctab = colormap('jet');
     end
         
-    %% get centroid of Okada source
-    xcentroid = p1(get_parameter_index('Okada1_Centroid_Easting_in_m____',qnames));
-    ycentroid = p1(get_parameter_index('Okada1_Centroid_Northing_in_m___',qnames));
-    icentroid = NaN;
-    jcentroid = NaN;
-    if isfinite(xcentroid) == 1
-        icentroid = find(abs(yax(isub)-ycentroid) < abs(dy/2.));
-        if numel(icentroid) >= 1
-            icentroid=icentroid(1);
-        end
-    end
-    if isfinite(ycentroid) == 1
-        jcentroid = find(abs(xax(jsub)-xcentroid) < abs(dx/2.));
-        if numel(jcentroid) >= 1
-            jcentroid=jcentroid(1);
-        end
-    end
+%     %% get centroid of Okada source
+%     xcentroid = p1(get_parameter_index('Okada1_Centroid_Easting_in_m____',qnames));
+%     ycentroid = p1(get_parameter_index('Okada1_Centroid_Northing_in_m___',qnames));
+%     icentroid = NaN;
+%     jcentroid = NaN;
+%     if isfinite(xcentroid) == 1
+%         icentroid = find(abs(yax(isub)-ycentroid) < abs(dy/2.));
+%         if numel(icentroid) >= 1
+%             icentroid=icentroid(1);
+%         end
+%     end
+%     if isfinite(ycentroid) == 1
+%         jcentroid = find(abs(xax(jsub)-xcentroid) < abs(dx/2.));
+%         if numel(jcentroid) >= 1
+%             jcentroid=jcentroid(1);
+%         end
+%     end
     
     % draw symbols at centers of sources, UTM coordinates are in meters
-    dotx = xcentroid;
-    doty = ycentroid;   
+%     dotx = xcentroid;
+%     doty = ycentroid;  
+    dotx = nan;
+    doty = nan;
     mysym='w*';
     marksize = 10;
     for ii=1:8
@@ -1004,34 +1006,34 @@ for i = 1:np
     %     qnames{iq} = sprintf('Pair_%05d_Unwrap_Obs_Mod_mm',i);
     %     mds(iprof,jprof)/1.0e3;
     %   2012-10-04 values in meters
-    iq = iq+1;
-    q0(iq)     = DST.mpercy(1)*nanmin(colvec(double(mdl0)))/DNPC;
-    q1(iq)     = DST.mpercy(1)*nanmin(colvec(double(mdl1)))/DNPC;
-    qsig(iq)   = DST.mpercy(1)*nanstd(colvec(double(mdl1)))/DNPC;
-    qnames{iq} = sprintf('Pair_%05d_MiniRange_m_MOD__',i);
-    iq = iq+1;
-    q0(iq)     = DST.mpercy(1)*nanmax(colvec(double(mdl0)))/DNPC;
-    q1(iq)     = DST.mpercy(1)*nanmax(colvec(double(mdl1)))/DNPC;
-    qsig(iq)   = DST.mpercy(1)*nanstd(colvec(double(mdl1)))/DNPC;
-    qnames{iq} = sprintf('Pair_%05d_MaxiRange_m_MOD__',i);
-    
-    
-    %  PRINT OUT THE DERIVED PARAMETERS
-    qnames = truncate_parameter_names(qnames);
-    iq1 = iq2+1;
-    iq2 = iq;
-    uqb(iq1:iq2)=NaN;
-    lqb(iq1:iq2)=NaN;
-    
-    for j=iq1:iq2
-        qflags{j} = 'D#';
-        adj = q1(j)-q0(j);
-        
-        outfmt = getfmt(q1(j),qnames{j});
-        
-        fprintf(1        ,outfmt,qflags{j},j+mparam,qnames{j} ,q0(j),q1(j),adj,qsig(j),sadj,(uqb(j)-lqb(j))/2.0);
-        fprintf(fidtxtout,outfmt,qflags{j},j+mparam,qnames{j}, q0(j),q1(j),adj,qsig(j),sadj,(uqb(j)-lqb(j))/2.0);
-    end
+%     iq = iq+1;
+%     q0(iq)     = DST.mpercy(1)*nanmin(colvec(double(mdl0)))/DNPC;
+%     q1(iq)     = DST.mpercy(1)*nanmin(colvec(double(mdl1)))/DNPC;
+%     qsig(iq)   = DST.mpercy(1)*nanstd(colvec(double(mdl1)))/DNPC;
+%     qnames{iq} = sprintf('Pair_%05d_MiniRange_m_MOD__',i);
+%     iq = iq+1;
+%     q0(iq)     = DST.mpercy(1)*nanmax(colvec(double(mdl0)))/DNPC;
+%     q1(iq)     = DST.mpercy(1)*nanmax(colvec(double(mdl1)))/DNPC;
+%     qsig(iq)   = DST.mpercy(1)*nanstd(colvec(double(mdl1)))/DNPC;
+%     qnames{iq} = sprintf('Pair_%05d_MaxiRange_m_MOD__',i);
+%     
+%     
+%     %  PRINT OUT THE DERIVED PARAMETERS
+%     qnames = truncate_parameter_names(qnames);
+%     iq1 = iq2+1;
+%     iq2 = iq;
+%     uqb(iq1:iq2)=NaN;
+%     lqb(iq1:iq2)=NaN;
+%     
+%     for j=iq1:iq2
+%         qflags{j} = 'D#';
+%         adj = q1(j)-q0(j);
+%         
+%         outfmt = getfmt(q1(j),qnames{j});
+%         
+%         fprintf(1        ,outfmt,qflags{j},j+mparam,qnames{j} ,q0(j),q1(j),adj,qsig(j),sadj,(uqb(j)-lqb(j))/2.0);
+%         fprintf(fidtxtout,outfmt,qflags{j},j+mparam,qnames{j}, q0(j),q1(j),adj,qsig(j),sadj,(uqb(j)-lqb(j))/2.0);
+%     end
     
 %     % print corners of Okada models
 %     iii=get_parameter_index('Okada1_Length_in_m______________',pnames);
@@ -1128,23 +1130,23 @@ end
 
 fclose(fidtxtout);
 
-% append derived parameters (labeled q) to estimated parameters
-pqnum = mparam + iq;
-pq0 = [colvec(p0); colvec(q0)];
-pq1 = [colvec(p1); colvec(q1)];
-%qsig = nan(iq,1);
-pqsig = [colvec(psig); colvec(qsig)];
-pqnames = [pnames qnames];
-qbounds = nan(iq,2);
-pqbounds = [bounds; qbounds];
-pqflags = [pflags qflags];
-qscl = nan(iq,1);
-pqscl = [colvec(pscl); colvec(qscl)];
+% % append derived parameters (labeled q) to estimated parameters
+% pqnum = mparam + iq;
+% pq0 = [colvec(p0); colvec(q0)];
+% pq1 = [colvec(p1); colvec(q1)];
+% %qsig = nan(iq,1);
+% pqsig = [colvec(psig); colvec(qsig)];
+% pqnames = [pnames qnames];
+% qbounds = nan(iq,2);
+% pqbounds = [bounds; qbounds];
+% pqflags = [pflags qflags];
+% qscl = nan(iq,1);
+% pqscl = [colvec(pscl); colvec(qscl)];
 
 % write the parameter structure to a file
-PSTF = build_pst(fitfun,pqnum,pq0,pq1,pqsig,pqnames,pqbounds,datafilename,pqscl,pqflags,timefun);
-write_pst(PSTF,'PST.OUT');
-ierr = print_parameters_nicely(PSTF,fnparout);
+%PSTF = build_pst(fitfun,pqnum,pq0,pq1,pqsig,pqnames,pqbounds,datafilename,pqscl,pqflags,timefun);
+% write_pst(PSTF,'PST.OUT');
+% ierr = print_parameters_nicely(PSTF,fnparout);
 clear h;
 
 %% This file is too big to save.

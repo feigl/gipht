@@ -631,61 +631,62 @@ for i = 1:mparam
     fprintf(fidtxtout,outfmt,pflag{i},i,pnames{i}, p0(i),p1(i),adj,psig(i),sadj,(ub(i)-lb(i))/2.0);
 end
 
-% calculate some derived parameters
-iq = 0;
-
-% total volume change
-iq = iq+1;
-q0(iq) = (p0(get_parameter_index('Okada1_Length'  ,pnames))  ...
-    *p0(get_parameter_index('Okada1_Width'  , pnames))  ...
-    *p0(get_parameter_index('Okada1_Tensile', pnames))) ...
-    + ( p0(get_parameter_index('Okada2_Length'  ,pnames))  ...
-    *p0(get_parameter_index('Okada2_Width'  , pnames))  ...
-    *p0(get_parameter_index('Okada2_Tensile', pnames))) ...
-    +   p0(get_parameter_index('Mogi1_Volume_'  ,pnames))  ...
-    +   p0(get_parameter_index('Mogi2_Volume_'  ,pnames));
-q1(iq) = ( p1(get_parameter_index('Okada1_Length'  ,pnames))  ...
-    *p1(get_parameter_index('Okada1_Width'  , pnames))  ...
-    *p1(get_parameter_index('Okada1_Tensile', pnames))) ...
-    + ( p1(get_parameter_index('Okada2_Length'  ,pnames))  ...
-    *p1(get_parameter_index('Okada2_Width'  , pnames))  ...
-    *p1(get_parameter_index('Okada2_Tensile', pnames))) ...
-    +   p1(get_parameter_index('Mogi1_Volume_'  ,pnames))  ...
-    +   p1(get_parameter_index('Mogi2_Volume_'  ,pnames));
-
-% linearized propagation of uncertainties http://en.wikipedia.org/wiki/Propagation_of_uncertainty
-% 2012-OCT-04
-%qsig(iq) = 0;
-
-tva = p1(get_parameter_index('Okada1_Length'  ,pnames)) ;
-tvb = p1(get_parameter_index('Okada1_Width'  , pnames)) ;
-tvc = p1(get_parameter_index('Okada1_Tensile', pnames)) ;
-tsa = psig(get_parameter_index('Okada1_Length'  ,pnames)) ;
-tsb = psig(get_parameter_index('Okada1_Width'  , pnames)) ;
-tsc = psig(get_parameter_index('Okada1_Tensile', pnames)) ;
-
-% correct the calculation of error below
-if isfinite(tva*tvb*tvc*tsa*tsb*tsc) == 1
-    qsig(iq) = (tvb*tvc*tsa)^2+(tva*tvc*tsb)^2+(tva*tvb*tsc)^2;
-else
-    % 2012-OCT-04
-    qsig(iq) = NaN;
-end
-
-
-% Kurt 2012 JUL 10
-if  isfinite(psig(get_parameter_index('YangPS_semimajor_axis_a__m______',pnames)))==1 ...
-        && isfinite(psig(get_parameter_index('YangPS_semiminor_axis_b_in_m____',pnames)))==1
-    qsig(iq) = NaN;
-end
-qsig(iq) = sqrt(qsig(iq));
-qnames{iq} = sprintf('Total_Net_Volume_Increase_in_m3');
+%% calculate some derived parameters
+%% TODO move these into the fitting functions as a fourth option
+% iq = 0;
+% 
+% % total volume change
+% iq = iq+1;
+% q0(iq) = (p0(get_parameter_index('Okada1_Length'  ,pnames))  ...
+%     *p0(get_parameter_index('Okada1_Width'  , pnames))  ...
+%     *p0(get_parameter_index('Okada1_Tensile', pnames))) ...
+%     + ( p0(get_parameter_index('Okada2_Length'  ,pnames))  ...
+%     *p0(get_parameter_index('Okada2_Width'  , pnames))  ...
+%     *p0(get_parameter_index('Okada2_Tensile', pnames))) ...
+%     +   p0(get_parameter_index('Mogi1_Volume_'  ,pnames))  ...
+%     +   p0(get_parameter_index('Mogi2_Volume_'  ,pnames));
+% q1(iq) = ( p1(get_parameter_index('Okada1_Length'  ,pnames))  ...
+%     *p1(get_parameter_index('Okada1_Width'  , pnames))  ...
+%     *p1(get_parameter_index('Okada1_Tensile', pnames))) ...
+%     + ( p1(get_parameter_index('Okada2_Length'  ,pnames))  ...
+%     *p1(get_parameter_index('Okada2_Width'  , pnames))  ...
+%     *p1(get_parameter_index('Okada2_Tensile', pnames))) ...
+%     +   p1(get_parameter_index('Mogi1_Volume_'  ,pnames))  ...
+%     +   p1(get_parameter_index('Mogi2_Volume_'  ,pnames));
+% 
+% % linearized propagation of uncertainties http://en.wikipedia.org/wiki/Propagation_of_uncertainty
+% % 2012-OCT-04
+% %qsig(iq) = 0;
+% 
+% tva = p1(get_parameter_index('Okada1_Length'  ,pnames)) ;
+% tvb = p1(get_parameter_index('Okada1_Width'  , pnames)) ;
+% tvc = p1(get_parameter_index('Okada1_Tensile', pnames)) ;
+% tsa = psig(get_parameter_index('Okada1_Length'  ,pnames)) ;
+% tsb = psig(get_parameter_index('Okada1_Width'  , pnames)) ;
+% tsc = psig(get_parameter_index('Okada1_Tensile', pnames)) ;
+% 
+% % correct the calculation of error below
+% if isfinite(tva*tvb*tvc*tsa*tsb*tsc) == 1
+%     qsig(iq) = (tvb*tvc*tsa)^2+(tva*tvc*tsb)^2+(tva*tvb*tsc)^2;
+% else
+%     % 2012-OCT-04
+%     qsig(iq) = NaN;
+% end
+% 
+% 
+% % Kurt 2012 JUL 10
+% if  isfinite(psig(get_parameter_index('YangPS_semimajor_axis_a__m______',pnames)))==1 ...
+%         && isfinite(psig(get_parameter_index('YangPS_semiminor_axis_b_in_m____',pnames)))==1
+%     qsig(iq) = NaN;
+% end
+% qsig(iq) = sqrt(qsig(iq));
+% qnames{iq} = sprintf('Total_Net_Volume_Increase_in_m3');
 
 
 % DERIVED PARAMETERS FOR OKADA1
-iii=get_parameter_index('Okada1_Length_in_m______________',pnames);
+% iii=get_parameter_index('Okada1_Length_in_m______________',pnames);
 %if psig(iii) > 0
-if p0(iii) > 0
+%if p0(iii) > 0
 %     for i=1:10
 %         utmzone10(i,:)=utmzone0;
 %     end
@@ -806,245 +807,245 @@ if p0(iii) > 0
 %         + (psig(get_parameter_index('Okada1_Downdip_Slip'  , pnames)))^2   ...
 %         + (psig(get_parameter_index('Okada1_Tensile', pnames)))^2);
 %     2014-01-13 above gives strange results
-    qsig(iq) = NaN;
+%     qsig(iq) = NaN;
+% 
+% end
 
-end
-
-% moment, assuming shear modulus = 30 GPa
-iq = iq+1;
-if q0(iq-1) > 0; q0(iq) = 3e10*q0(iq-1); else q0(iq) = NaN; end;
-if q1(iq-1) > 0; q1(iq) = 3e10*q1(iq-1); else q1(iq) = NaN; end;
-qnames{iq} = sprintf('Derived_Okada1_moment_in_Nm____');
-qsig(iq) = NaN;
-
-% magnitude
-iq = iq+1;
-if q0(iq-1) > 0; q0(iq) = 2*log10(q0(iq-1))/3 - 6.03; else q0(iq) = NaN; end
-if q1(iq-1) > 0; q1(iq) = 2*log10(q1(iq-1))/3 - 6.03; else q1(iq) = NaN; end
-qnames{iq} = sprintf('Derived_Okada1_Mw______________');
-qsig(iq) = NaN;
-
-%end
-
-% DERIVED PARAMETERS FOR OKADA2
-iii=get_parameter_index('Okada2_Length_in_m______________',pnames);
-%if psig(iii) > 0
-if p0(iii) > 0
-    for i=1:10
-        utmzone10(i,:)=utmzone0;
-    end
-    
-    [Xcorners20,Ycorners20,Hcorners20,Ncorners] = disloc_to_seismo(p0(iii:iii+9));
-    [LatCorners20,LonCorners20]=utm2deg(Xcorners20,Ycorners20,utmzone10);
-    [Xcorners21,Ycorners21,Hcorners21,Ncorners] = disloc_to_seismo(p1(iii:iii+9));
-    [LatCorners21,LonCorners21]=utm2deg(Xcorners21,Ycorners21,utmzone10);
-    clear utmzone10;
+% % moment, assuming shear modulus = 30 GPa
+% iq = iq+1;
+% if q0(iq-1) > 0; q0(iq) = 3e10*q0(iq-1); else q0(iq) = NaN; end;
+% if q1(iq-1) > 0; q1(iq) = 3e10*q1(iq-1); else q1(iq) = NaN; end;
+% qnames{iq} = sprintf('Derived_Okada1_moment_in_Nm____');
+% qsig(iq) = NaN;
+% 
+% % magnitude
+% iq = iq+1;
+% if q0(iq-1) > 0; q0(iq) = 2*log10(q0(iq-1))/3 - 6.03; else q0(iq) = NaN; end
+% if q1(iq-1) > 0; q1(iq) = 2*log10(q1(iq-1))/3 - 6.03; else q1(iq) = NaN; end
+% qnames{iq} = sprintf('Derived_Okada1_Mw______________');
+% qsig(iq) = NaN;
+% 
+% %end
+% 
+% % DERIVED PARAMETERS FOR OKADA2
+% iii=get_parameter_index('Okada2_Length_in_m______________',pnames);
+% %if psig(iii) > 0
+% if p0(iii) > 0
+%     for i=1:10
+%         utmzone10(i,:)=utmzone0;
+%     end
 %     
+%     [Xcorners20,Ycorners20,Hcorners20,Ncorners] = disloc_to_seismo(p0(iii:iii+9));
+%     [LatCorners20,LonCorners20]=utm2deg(Xcorners20,Ycorners20,utmzone10);
+%     [Xcorners21,Ycorners21,Hcorners21,Ncorners] = disloc_to_seismo(p1(iii:iii+9));
+%     [LatCorners21,LonCorners21]=utm2deg(Xcorners21,Ycorners21,utmzone10);
+%     clear utmzone10;
+% %     
+% %     
+% %     iq = iq+1;
+% %     q0(iq) = Xcorners20(10);
+% %     q1(iq) = Xcorners21(10);
+% %     qsig(iq) = NaN;
+% %     qnames{iq} = sprintf('Okada2_Centroid_Easting_in_m____');
+% %     iq = iq+1;
+% %     q0(iq) = Ycorners20(10);
+% %     q1(iq) = Ycorners21(10);
+% %     qsig(iq) = NaN;
+% %     qnames{iq} = sprintf('Okada2_Centroid_Northing_in_m___');
+% %     iq = iq+1;
+% %     q0(iq) = LatCorners20(10);
+% %     q1(iq) = LatCorners21(10);
+% %     qsig(iq) = NaN;
+% %     qnames{iq} = sprintf('Okada2_Centroid_latitude__in_deg');
+% %     iq = iq+1;
+% %     q0(iq) = LonCorners20(10);
+% %     q1(iq) = LonCorners21(10);
+% %     qsig(iq) = NaN;
+% %     qnames{iq} = sprintf('Okada2_Centroid_longitude_in_deg');
+% %     
+% %     % conventional strike
+% %     iq=iq+1;
+% %     str = 180 + p0(get_parameter_index('Okada2_Strike',pnames));
+% %     if str > 360
+% %         str = str - 180;
+% %     end
+% %     q0(iq) = str;
+% %     str = 180 + p1(get_parameter_index('Okada2_Strike',pnames));
+% %     if str > 360
+% %         str = str - 180;
+% %     end
+% %     q1(iq) = str;
+% %     qsig(iq) = psig(get_parameter_index('Okada2_Strike',pnames));
+% %     qnames{iq} = sprintf('Okada2_Convt_strike_in_deg_CW_N');
 %     
-%     iq = iq+1;
-%     q0(iq) = Xcorners20(10);
-%     q1(iq) = Xcorners21(10);
+% %     %rake
+% %     iq = iq+1;
+% %     q0(iq) = 180*(atan2(-1*p0(get_parameter_index('Okada2_RL_Strike_Slip',pnames))...
+% %         ,p0(get_parameter_index('Okada2_Downdip_Slip'  ,pnames))...
+% %         ))/pi;  % change sign of U2 for negative dip bug in disloc
+% %     q1(iq) = 180*(atan2(-1*p1(get_parameter_index('Okada2_RL_Strike_Slip',pnames))...
+% %         ,p1(get_parameter_index('Okada2_Downdip_Slip',  pnames))...
+% %         ))/pi;  % change sign of U2 for negative dip bug in disloc
+% %     qsig(iq) = NaN;
+% %     qnames{iq} = sprintf('Derived_Okada2_rake_in_deg_CCW_');
+% %     
+% %     % geometric potency
+% %     iq = iq+1;
+% %     q0(iq) = p0(get_parameter_index('Okada2_Length',pnames))...
+% %         *p0(get_parameter_index('Okada2_Width', pnames))...
+% %         *norm([p0(get_parameter_index('Okada2_RL_Strike_Slip',pnames))...
+% %         ,         p0(get_parameter_index('Okada2_Downdip_Slip',  pnames))...
+% %         ,         p0(get_parameter_index('Okada2_Tensile',       pnames))]);
+% %     q1(iq) = p1(get_parameter_index('Okada2_Length',pnames))...
+% %         *p1(get_parameter_index('Okada2_Width', pnames))...
+% %         *norm([p1(get_parameter_index('Okada2_RL_Strike_Slip',pnames))...
+% %         ,         p1(get_parameter_index('Okada2_Downdip_Slip'  ,pnames))...
+% %         ,         p1(get_parameter_index('Okada2_Tensile',       pnames))]);
+% %     qnames{iq} = sprintf('Derived_Okada2_potency_in_m3___');
+%     %qsig(iq) = NaN;
+%     %
+%     %     qsig(iq) = qsig(iq) * psig(get_parameter_index('Okada2_Length',pnames)) ...
+%     %                 * psig(get_parameter_index('Okada2_Width',pnames)) ;
+%     % moment, assuming shear modulus = 30 GPa
+% 
+%     % 20130419 Uncertainty is sum of squares
+% %     qsig(iq) = sqrt((psig(get_parameter_index('Okada2_RL_Strike_Slip'  ,pnames)))^2  ...
+% %         + (psig(get_parameter_index('Okada2_Downdip_Slip'  , pnames)))^2   ...
+% %         + (psig(get_parameter_index('Okada2_Tensile', pnames)))^2);
+%     % 2014013 aboves gives strange results
 %     qsig(iq) = NaN;
-%     qnames{iq} = sprintf('Okada2_Centroid_Easting_in_m____');
 %     iq = iq+1;
-%     q0(iq) = Ycorners20(10);
-%     q1(iq) = Ycorners21(10);
+%     if q0(iq-1) > 0; q0(iq) = 3e10*q0(iq-1); else q0(iq) = NaN; end;
+%     if q1(iq-1) > 0; q1(iq) = 3e10*q1(iq-1); else q1(iq) = NaN; end;
+%     qnames{iq} = sprintf('Derived_Okada2_moment_in_Nm____');
 %     qsig(iq) = NaN;
-%     qnames{iq} = sprintf('Okada2_Centroid_Northing_in_m___');
-%     iq = iq+1;
-%     q0(iq) = LatCorners20(10);
-%     q1(iq) = LatCorners21(10);
-%     qsig(iq) = NaN;
-%     qnames{iq} = sprintf('Okada2_Centroid_latitude__in_deg');
-%     iq = iq+1;
-%     q0(iq) = LonCorners20(10);
-%     q1(iq) = LonCorners21(10);
-%     qsig(iq) = NaN;
-%     qnames{iq} = sprintf('Okada2_Centroid_longitude_in_deg');
 %     
-%     % conventional strike
+%     % magnitude
+%     iq = iq+1;
+%     if q0(iq-1) > 0; q0(iq) = 2*log10(q0(iq-1))/3 - 6.03; else q0(iq) = NaN; end
+%     if q1(iq-1) > 0; q1(iq) = 2*log10(q1(iq-1))/3 - 6.03; else q1(iq) = NaN; end
+%     qnames{iq} = sprintf('Derived_Okada2_Mw______________');
+%     qsig(iq) = NaN;
+% end
+% 
+% % geographic coordinates of Mogi source
+% if abs(psig(get_parameter_index('Mogi1_Volume_Increase_in_m3_____',pnames))) > 0
+%     [LatMogi10,LonMogi10]=utm2deg(...
+%         p0(get_parameter_index('Mogi1_Easting_in_m______________',pnames))...
+%         ,p0(get_parameter_index('Mogi1_Northing_in_m_____________',pnames))...
+%         ,utmzone0);
+%     [LatMogi11,LonMogi11]=utm2deg(...
+%         p1(get_parameter_index('Mogi1_Easting_in_m______________',pnames))...
+%         ,p1(get_parameter_index('Mogi1_Northing_in_m_____________',pnames))...
+%         ,utmzone0);
+%     iq = iq+1;
+%     q0(iq) = LatMogi10;
+%     q1(iq) = LatMogi11;
+%     qsig(iq) = NaN;
+%     qnames{iq} = sprintf('Mogi1_Centroid_latitude__in_deg_');
+%     iq = iq+1;
+%     q0(iq) = LonMogi10;
+%     q1(iq) = LonMogi11;
+%     qsig(iq) = NaN;
+%     qnames{iq} = sprintf('Mogi1_Centroid_longitude_in_deg_');
+% end
+% if abs(psig(get_parameter_index('Mogi2_Volume_Increase_in_m3_____',pnames))) > 0
+%     [LatMogi20,LonMogi20]=utm2deg(...
+%         p0(get_parameter_index('Mogi2_Easting_in_m______________',pnames))...
+%         ,p0(get_parameter_index('Mogi2_Northing_in_m_____________',pnames))...
+%         ,utmzone0);
+%     [LatMogi21,LonMogi21]=utm2deg(...
+%         p1(get_parameter_index('Mogi2_Easting_in_m______________',pnames))...
+%         ,p1(get_parameter_index('Mogi2_Northing_in_m_____________',pnames))...
+%         ,utmzone0);
+%     iq = iq+1;
+%     q0(iq) = LatMogi20;
+%     q1(iq) = LatMogi21;
+%     qsig(iq) = NaN;
+%     qnames{iq} = sprintf('Mogi2_Centroid_latitude__in_deg_');
+%     iq = iq+1;
+%     q0(iq) = LonMogi20;
+%     q1(iq) = LonMogi21;
+%     qsig(iq) = NaN;
+%     qnames{iq} = sprintf('Mogi2_Centroid_longitude_in_deg_');
+% end
+% 
+% % Ellipsoid
+% if isfinite(psig(get_parameter_index('YangPS_semimajor_axis_a__m______',pnames)))==1 ...
+%         && isfinite(psig(get_parameter_index('YangPS_semiminor_axis_b_in_m____',pnames)))==1
+%     
+%     Yang.a  = p0(get_parameter_index('YangPS_semimajor_axis_a__m______',pnames));
+%     Yang.b  = p0(get_parameter_index('YangPS_semiminor_axis_b_in_m____',pnames));
+%     Yang.V0 = 4.0 * pi * (Yang.a)^2 * Yang.b;
+%     
+%     Yang.a = p1(get_parameter_index('YangPS_semimajor_axis_a__m______',pnames));
+%     Yang.b = p1(get_parameter_index('YangPS_semiminor_axis_b_in_m____',pnames));
+%     Yang.x = p1(get_parameter_index('YangPS_Easting_in_m_____________',pnames));
+%     Yang.y = p1(get_parameter_index('YangPS_Northing_in_m____________',pnames));
+%     Yang.z = p1(get_parameter_index('YangPS_Depth_in_m_______________',pnames));
+%     Yang.p = p1(get_parameter_index('YangPS_Excess_Pressure_in_Pa____',pnames));
+%     Yang.c = p1(get_parameter_index('YangPS_Azimuth_deg_CCW_from_N___',pnames));
+%     Yang.d = p1(get_parameter_index('YangPS_Plunge_in_degrees________',pnames));
+%     Yang.V1 = 4.0 * pi * (Yang.a)^2 * Yang.b;
+%     
+%     % get UTM coordinates of center
+%     if isgeo  == 1
+%         [Yang.latc,Yang.lonc] = utm2deg(Yang.x,Yang.y,utmzone0);
+%     else
+%         Yang.latc = NaN;
+%         Yang.lonc = NaN;
+%     end
+%     
+%     % make prolate spheroid by repeating b axis
+%     % make depth negative up by negating z
+%     [Yang.xs,Yang.ys,Yang.zs] = get_ellipsoid(Yang.x,Yang.y,-1.0*Yang.z,Yang.a,Yang.b,Yang.b,Yang.c,Yang.d);
+%     
 %     iq=iq+1;
-%     str = 180 + p0(get_parameter_index('Okada2_Strike',pnames));
-%     if str > 360
-%         str = str - 180;
-%     end
-%     q0(iq) = str;
-%     str = 180 + p1(get_parameter_index('Okada2_Strike',pnames));
-%     if str > 360
-%         str = str - 180;
-%     end
-%     q1(iq) = str;
-%     qsig(iq) = psig(get_parameter_index('Okada2_Strike',pnames));
-%     qnames{iq} = sprintf('Okada2_Convt_strike_in_deg_CW_N');
-    
-%     %rake
-%     iq = iq+1;
-%     q0(iq) = 180*(atan2(-1*p0(get_parameter_index('Okada2_RL_Strike_Slip',pnames))...
-%         ,p0(get_parameter_index('Okada2_Downdip_Slip'  ,pnames))...
-%         ))/pi;  % change sign of U2 for negative dip bug in disloc
-%     q1(iq) = 180*(atan2(-1*p1(get_parameter_index('Okada2_RL_Strike_Slip',pnames))...
-%         ,p1(get_parameter_index('Okada2_Downdip_Slip',  pnames))...
-%         ))/pi;  % change sign of U2 for negative dip bug in disloc
+%     q0(iq) = Yang.V0;
+%     q1(iq) = Yang.V1;
 %     qsig(iq) = NaN;
-%     qnames{iq} = sprintf('Derived_Okada2_rake_in_deg_CCW_');
+%     qnames{iq} = sprintf('YangPS_Volume_in_cubic_meters___');
+%     iq=iq+1;
+%     q0(iq) = NaN;
+%     q1(iq) = abs(max(max(Yang.zs)));
+%     qsig(iq) = NaN;
+%     qnames{iq} = sprintf('YangPS_depth_to_top_in_meters___');
+%     iq=iq+1;
+%     q0(iq) = NaN;
+%     q1(iq) = abs(min(min(Yang.zs)));
+%     qsig(iq) = NaN;
+%     qnames{iq} = sprintf('YangPS_depth_to_bottom_in_meters');
+%     iq=iq+1;
+%     q0(iq) = NaN;
+%     q1(iq) = Yang.lonc;
+%     qsig(iq) = NaN;
+%     qnames{iq} = sprintf('YangPS_longitude_in_degrees_____');
+%     iq=iq+1;
+%     q0(iq) = NaN;
+%     q1(iq) = Yang.latc;
+%     qsig(iq) = NaN;
+%     qnames{iq} = sprintf('YangPS_latitude_in_degrees______');
+% end
+% 
+% %  PRINT OUT THE DERIVED PARAMETERS
+% qnames = truncate_parameter_names(qnames);
+% iq1 = 1;
+% iq2 = iq;
+% uqb(iq1:iq2)=NaN;
+% lqb(iq1:iq2)=NaN;
+% % 2012 JUL 10
+% %qsig(iq1:iq2)=NaN;
+% for i=iq1:iq2
+%     qflags{i} = 'D#';
+%     adj = q1(i)-q0(i);
+%     %    sadj = NaN;
+%     sadj = abs(adj/qsig(i));
+%     outfmt = getfmt(q1(i),qnames{i});
 %     
-%     % geometric potency
-%     iq = iq+1;
-%     q0(iq) = p0(get_parameter_index('Okada2_Length',pnames))...
-%         *p0(get_parameter_index('Okada2_Width', pnames))...
-%         *norm([p0(get_parameter_index('Okada2_RL_Strike_Slip',pnames))...
-%         ,         p0(get_parameter_index('Okada2_Downdip_Slip',  pnames))...
-%         ,         p0(get_parameter_index('Okada2_Tensile',       pnames))]);
-%     q1(iq) = p1(get_parameter_index('Okada2_Length',pnames))...
-%         *p1(get_parameter_index('Okada2_Width', pnames))...
-%         *norm([p1(get_parameter_index('Okada2_RL_Strike_Slip',pnames))...
-%         ,         p1(get_parameter_index('Okada2_Downdip_Slip'  ,pnames))...
-%         ,         p1(get_parameter_index('Okada2_Tensile',       pnames))]);
-%     qnames{iq} = sprintf('Derived_Okada2_potency_in_m3___');
-    %qsig(iq) = NaN;
-    %
-    %     qsig(iq) = qsig(iq) * psig(get_parameter_index('Okada2_Length',pnames)) ...
-    %                 * psig(get_parameter_index('Okada2_Width',pnames)) ;
-    % moment, assuming shear modulus = 30 GPa
-
-    % 20130419 Uncertainty is sum of squares
-%     qsig(iq) = sqrt((psig(get_parameter_index('Okada2_RL_Strike_Slip'  ,pnames)))^2  ...
-%         + (psig(get_parameter_index('Okada2_Downdip_Slip'  , pnames)))^2   ...
-%         + (psig(get_parameter_index('Okada2_Tensile', pnames)))^2);
-    % 2014013 aboves gives strange results
-    qsig(iq) = NaN;
-    iq = iq+1;
-    if q0(iq-1) > 0; q0(iq) = 3e10*q0(iq-1); else q0(iq) = NaN; end;
-    if q1(iq-1) > 0; q1(iq) = 3e10*q1(iq-1); else q1(iq) = NaN; end;
-    qnames{iq} = sprintf('Derived_Okada2_moment_in_Nm____');
-    qsig(iq) = NaN;
-    
-    % magnitude
-    iq = iq+1;
-    if q0(iq-1) > 0; q0(iq) = 2*log10(q0(iq-1))/3 - 6.03; else q0(iq) = NaN; end
-    if q1(iq-1) > 0; q1(iq) = 2*log10(q1(iq-1))/3 - 6.03; else q1(iq) = NaN; end
-    qnames{iq} = sprintf('Derived_Okada2_Mw______________');
-    qsig(iq) = NaN;
-end
-
-% geographic coordinates of Mogi source
-if abs(psig(get_parameter_index('Mogi1_Volume_Increase_in_m3_____',pnames))) > 0
-    [LatMogi10,LonMogi10]=utm2deg(...
-        p0(get_parameter_index('Mogi1_Easting_in_m______________',pnames))...
-        ,p0(get_parameter_index('Mogi1_Northing_in_m_____________',pnames))...
-        ,utmzone0);
-    [LatMogi11,LonMogi11]=utm2deg(...
-        p1(get_parameter_index('Mogi1_Easting_in_m______________',pnames))...
-        ,p1(get_parameter_index('Mogi1_Northing_in_m_____________',pnames))...
-        ,utmzone0);
-    iq = iq+1;
-    q0(iq) = LatMogi10;
-    q1(iq) = LatMogi11;
-    qsig(iq) = NaN;
-    qnames{iq} = sprintf('Mogi1_Centroid_latitude__in_deg_');
-    iq = iq+1;
-    q0(iq) = LonMogi10;
-    q1(iq) = LonMogi11;
-    qsig(iq) = NaN;
-    qnames{iq} = sprintf('Mogi1_Centroid_longitude_in_deg_');
-end
-if abs(psig(get_parameter_index('Mogi2_Volume_Increase_in_m3_____',pnames))) > 0
-    [LatMogi20,LonMogi20]=utm2deg(...
-        p0(get_parameter_index('Mogi2_Easting_in_m______________',pnames))...
-        ,p0(get_parameter_index('Mogi2_Northing_in_m_____________',pnames))...
-        ,utmzone0);
-    [LatMogi21,LonMogi21]=utm2deg(...
-        p1(get_parameter_index('Mogi2_Easting_in_m______________',pnames))...
-        ,p1(get_parameter_index('Mogi2_Northing_in_m_____________',pnames))...
-        ,utmzone0);
-    iq = iq+1;
-    q0(iq) = LatMogi20;
-    q1(iq) = LatMogi21;
-    qsig(iq) = NaN;
-    qnames{iq} = sprintf('Mogi2_Centroid_latitude__in_deg_');
-    iq = iq+1;
-    q0(iq) = LonMogi20;
-    q1(iq) = LonMogi21;
-    qsig(iq) = NaN;
-    qnames{iq} = sprintf('Mogi2_Centroid_longitude_in_deg_');
-end
-
-% Ellipsoid
-if isfinite(psig(get_parameter_index('YangPS_semimajor_axis_a__m______',pnames)))==1 ...
-        && isfinite(psig(get_parameter_index('YangPS_semiminor_axis_b_in_m____',pnames)))==1
-    
-    Yang.a  = p0(get_parameter_index('YangPS_semimajor_axis_a__m______',pnames));
-    Yang.b  = p0(get_parameter_index('YangPS_semiminor_axis_b_in_m____',pnames));
-    Yang.V0 = 4.0 * pi * (Yang.a)^2 * Yang.b;
-    
-    Yang.a = p1(get_parameter_index('YangPS_semimajor_axis_a__m______',pnames));
-    Yang.b = p1(get_parameter_index('YangPS_semiminor_axis_b_in_m____',pnames));
-    Yang.x = p1(get_parameter_index('YangPS_Easting_in_m_____________',pnames));
-    Yang.y = p1(get_parameter_index('YangPS_Northing_in_m____________',pnames));
-    Yang.z = p1(get_parameter_index('YangPS_Depth_in_m_______________',pnames));
-    Yang.p = p1(get_parameter_index('YangPS_Excess_Pressure_in_Pa____',pnames));
-    Yang.c = p1(get_parameter_index('YangPS_Azimuth_deg_CCW_from_N___',pnames));
-    Yang.d = p1(get_parameter_index('YangPS_Plunge_in_degrees________',pnames));
-    Yang.V1 = 4.0 * pi * (Yang.a)^2 * Yang.b;
-    
-    % get UTM coordinates of center
-    if isgeo  == 1
-        [Yang.latc,Yang.lonc] = utm2deg(Yang.x,Yang.y,utmzone0);
-    else
-        Yang.latc = NaN;
-        Yang.lonc = NaN;
-    end
-    
-    % make prolate spheroid by repeating b axis
-    % make depth negative up by negating z
-    [Yang.xs,Yang.ys,Yang.zs] = get_ellipsoid(Yang.x,Yang.y,-1.0*Yang.z,Yang.a,Yang.b,Yang.b,Yang.c,Yang.d);
-    
-    iq=iq+1;
-    q0(iq) = Yang.V0;
-    q1(iq) = Yang.V1;
-    qsig(iq) = NaN;
-    qnames{iq} = sprintf('YangPS_Volume_in_cubic_meters___');
-    iq=iq+1;
-    q0(iq) = NaN;
-    q1(iq) = abs(max(max(Yang.zs)));
-    qsig(iq) = NaN;
-    qnames{iq} = sprintf('YangPS_depth_to_top_in_meters___');
-    iq=iq+1;
-    q0(iq) = NaN;
-    q1(iq) = abs(min(min(Yang.zs)));
-    qsig(iq) = NaN;
-    qnames{iq} = sprintf('YangPS_depth_to_bottom_in_meters');
-    iq=iq+1;
-    q0(iq) = NaN;
-    q1(iq) = Yang.lonc;
-    qsig(iq) = NaN;
-    qnames{iq} = sprintf('YangPS_longitude_in_degrees_____');
-    iq=iq+1;
-    q0(iq) = NaN;
-    q1(iq) = Yang.latc;
-    qsig(iq) = NaN;
-    qnames{iq} = sprintf('YangPS_latitude_in_degrees______');
-end
-
-%  PRINT OUT THE DERIVED PARAMETERS
-qnames = truncate_parameter_names(qnames);
-iq1 = 1;
-iq2 = iq;
-uqb(iq1:iq2)=NaN;
-lqb(iq1:iq2)=NaN;
-% 2012 JUL 10
-%qsig(iq1:iq2)=NaN;
-for i=iq1:iq2
-    qflags{i} = 'D#';
-    adj = q1(i)-q0(i);
-    %    sadj = NaN;
-    sadj = abs(adj/qsig(i));
-    outfmt = getfmt(q1(i),qnames{i});
-    
-    fprintf(1        ,outfmt,qflags{i},i+mparam,qnames{i} ,q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
-    fprintf(fidtxtout,outfmt,qflags{i},i+mparam,qnames{i}, q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
-end
-fclose(fidtxtout);
+%     fprintf(1        ,outfmt,qflags{i},i+mparam,qnames{i} ,q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
+%     fprintf(fidtxtout,outfmt,qflags{i},i+mparam,qnames{i}, q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
+% end
+% fclose(fidtxtout);
 
 %% update parameter list
 PST1.sigma = colvec(psig);
