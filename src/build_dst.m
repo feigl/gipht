@@ -34,9 +34,11 @@ if exist('alat','var') ~= 1
     alat = nan(ndata,1);
 end
 
-% remove means
+%% remove means
 for i=1:3
-    xyzm0(i,:) = xyzm(i,:)-mean(xyzm(i,:));
+%    xyzm0(i,:) = xyzm(i,:)-mean(xyzm(i,:));
+%% 20161112 Must account for NaNs in DEMs
+    xyzm0(i,:) = xyzm(i,:)-nanmean(xyzm(i,:));
 end
 
 % kmasts = zeros(ndata,1);
@@ -94,7 +96,9 @@ DST.z0           = colvec(xyzm0(3,:));         % de-meaned coordinates
 %These MUST BE CONSTANT. Their values come from the DEM descriptor
 DST.dx           = colvec(dx*ones(ndata,1));   % easting  pixel dimension in meters
 DST.dy           = colvec(dy*ones(ndata,1));   % northing pixel dimesnion in meters
-DST.dz           = colvec(dz);                 % change of topography in eastward direction in meters
+% 20161112 Kurt should be same dimensions
+%DST.dz           = colvec(dz);                 % change of topography in eastward direction in meters
+DST.dz           = colvec(dz*ones(ndata,1));   % change of topography in eastward direction in meters
 % New items 2011-JUN-26
 % DST.bradi        = colvec(orbvm(1,:)); % component of Baseline vector parallel to radius through satellite
 % DST.bhori        = colvec(orbvm(2,:)); % component of Baseline vector parallel to satellite velocity vector

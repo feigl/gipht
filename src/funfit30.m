@@ -1,5 +1,5 @@
-function varargout = funfit28(varargin)
-%function varargout = funfit28(varargin)
+function varargout = funfit30(varargin)
+%function varargout = funfit30(varargin)
 %
 %% separable model for range change
 %   p       == parameter vector (1 column)
@@ -483,7 +483,7 @@ elseif nin == 3 ...
         error('Dimension error.');
     end
     
-    % nuisance parameters first
+    %% nuisance parameters first
     if idatatype1 == -1
         % east component of gradient only
         nui = (DD * px) .* DST.dx;
@@ -495,10 +495,7 @@ elseif nin == 3 ...
             + (DD * pd) .* DST.mpercy; % additive constant
     end
     
-    % baseline term for orbits
-    %bas = zeros(ndata,1);
-%      poh
-%      DDM(1,:) * poh + DDS(1,:) * poh
+    %% baseline term for orbits
     bas = (DDM * poh) .* DST.orbm1 ...
         + (DDM * poa) .* DST.orbm2 ...
         + (DDM * pov) .* DST.orbm3 ...
@@ -514,7 +511,7 @@ elseif nin == 3 ...
     
     
     
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     % calculate Mogi displacments
     % Mogi    [u,e,t]=Mogi(volgeom, xloc, nu)
     %
@@ -582,7 +579,7 @@ elseif nin == 3 ...
             umogi2 = zeros(3,ndata);
     end
     
-    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    %% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     % CALCULATE OKADA DISLOCATIONS
     % OKADA MODEL PARAMETERS
     %
@@ -675,7 +672,7 @@ elseif nin == 3 ...
     end
     
     % 20101215 AEMasters
-    % Yang model for prolate spheroid
+    %% Yang model for prolate spheroid
     %         xs    = as(1);     % center x
     %         ys    = as(2);     % center y
     %         z0    = as(3);     % center depth (positive)
@@ -718,7 +715,7 @@ elseif nin == 3 ...
         uYangPS = zeros(3,ndata);
     end
     
-    % calculate displacements [east, north, up] at [xobs, yobs] due to a of height HI on grid XI, YI
+    %% calculate displacements [east, north, up] at [xobs, yobs] due to a of height HI on grid XI, YI
     % Pinel et al. (2008) Geophys. J. Int. v. 169, pp 325-338
     % assume value of density (rho) is same everywhere
     % Kurt Feigl 2010-OCT-05
@@ -743,7 +740,7 @@ elseif nin == 3 ...
         upinel = zeros(3,ndata);
     end
     
-    %SUN69   Deformation from penny-shaped crack in elastic half-space.
+    %% SUN69   Deformation from penny-shaped crack in elastic half-space.
     %
     %  Author: Franois Beauducel <beauducel@ipgp.fr>
     %    Institut de Physique du Globe de Paris, 2009.
@@ -818,7 +815,7 @@ elseif nin == 3 ...
         uSunDisk2 = zeros(3,ndata);
     end
     
-    % radially dependent velocities
+    %% radially dependent velocities
     %krv = kAQ+4;
     kp = kRad_Vel - koffset;
     if abs(pg(kp)) > 0. 
@@ -852,7 +849,7 @@ elseif nin == 3 ...
     end
     
 %     fprintf(1,'Done with analytic solutions.\n');
-    % COMSOL selection
+    %% COMSOL selection
     if numel(strfind(lower(char(PST.datafilename)),'.mph')) > 0
         % data file exists
         if fexist(char(PST.datafilename)) == 1
@@ -879,7 +876,7 @@ elseif nin == 3 ...
     
 %     fprintf(1,'Summing vectors\n');
 
-    % ************************************
+    %% ************************************
     % DONE WITH INDIVIDUAL PARTS OF DISPLACEMENT FIELD
     % ************************************
     % sum all RATES for separable part
@@ -918,7 +915,8 @@ elseif nin == 3 ...
             warning(sprintf('Unknown value of idatatype1 = %d\n',idatatype1));
             rng = zeros(ndata,1);
     end
-    
+ 
+    %% print statements for debugging
 %     % replace NaN with zeros?
 %     inan = find(isfinite(rng0) == 0);
 %     rng0(inan) = 0;
@@ -928,8 +926,8 @@ elseif nin == 3 ...
     
 %     fprintf(1,'Minimal values in meters for xyzm %10.1f %10.1f %10.1f \n',min(DST.x),min(DST.y),min(DST.z));
 %     fprintf(1,'Maximal values in meters for xyzm %10.1f %10.1f %10.1f \n',max(DST.x),max(DST.y),max(DST.z));
-% %     fprintf(1,'Minimal value  in meters for rRad_Vel %10.4f\n',min(rRad_Vel));
-% %     fprintf(1,'Maximal value  in meters for rRad_Vel %10.4f\n',max(rRad_Vel));
+% % %     fprintf(1,'Minimal value  in meters for rRad_Vel %10.4f\n',min(rRad_Vel));
+% % %     fprintf(1,'Maximal value  in meters for rRad_Vel %10.4f\n',max(rRad_Vel));
 %     fprintf(1,'Minimal value  in meters for rng  %10.4f\n',min(rng));
 %     fprintf(1,'Maximal value  in meters for rng  %10.4f\n',max(rng));
 %     fprintf(1,'Minimal value  in meters for bas  %10.4f\n',min(bas));
@@ -941,7 +939,8 @@ elseif nin == 3 ...
     
 
 %     fprintf(1,'Done calculating. Returning...\n');
-    % return the modeled values
+
+    %% return the modeled values
     switch nout
         case 1
             varargout(1) = {rng};
