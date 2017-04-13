@@ -35,7 +35,7 @@ end
 
 i_rep = sort(i_rep); 
 i_tot(i_rep) = []; % remove repeated indices from index list
-i_msf = i_tot; % store indices of MST of all components for minimum spannig forest (MSF)
+i_msf = i_tot; % store indices of MST of all components for minimum spanning forest (MSF)
 
 return
 

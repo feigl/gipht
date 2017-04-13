@@ -136,9 +136,8 @@ end
 
 netcdf.close(ncid)
 
-return
-end
 
+return
 
 function val = getatt_clean(ncid,attname)
 %
@@ -146,3 +145,4 @@ function val = getatt_clean(ncid,attname)
 % Trap error and return empty vector in that case.
 %
 eval(['val = netcdf.getAtt(ncid,netcdf.getConstant(''NC_GLOBAL''),''' attname ''');'],'val=[];');
+return

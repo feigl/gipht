@@ -1,4 +1,4 @@
-function [ minWd, h] = plot_var_epochs(Wd, tu)
+function [ minWd, h] = plot_var_epochs(Wd, tu, ylabeltxt, titlestr)
 % function [ minWd, hbar] = var_epochs(Q, V, tu)
 % Plots the relative variance for each epoch as a bar graph with epochs labeled with
 % corresponding calendar dates
@@ -7,6 +7,8 @@ function [ minWd, h] = plot_var_epochs(Wd, tu)
 %   Wd - vector of variances for epoch-wise measurements (to plot st. dev.,
 %        enter sqrt(Wd))
 %   tu - vector of epochs
+%   ylabeltxt - string containing label for y axis
+%   titlestr - string containing title
 %
 % OUTPUTS:
 %   minWd - minimum uncertainty of epoch-wise measurements (used for
@@ -27,13 +29,20 @@ index = 1:numel(tu); % assign epoch index numbers
 % Display 
 figure;
 h = bar(index, Wd_norm);
-title('Variance in Epoch-wise Measurements by Epoch Index')
-xlabel('epoch index')
-h = ylabel('uncertainty in \DeltaV');
-set(h, 'Interpreter', 'tex');
+%set(h, 'Interpreter', 'tex');
+%ht = title('Standard Deviation in Epoch-wise Measurements by Epoch Index')
+ht = title(titlestr);
+hx = xlabel('epoch index');
+%hy = ylabel(sprintf('uncertainty in %s', yunit));
+hy = ylabel(ylabeltxt);
+set(hy, 'Interpreter', 'tex');
+set(ht,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','color','k');
+set(hy,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','color','k');
+set(hx,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','color','k');
 
-% Find calendar dates from decimal years
-[ cal_string ] = print_caldate( tu );
+% Find calendar dates from decimal years 
+
+    [ cal_string ] = print_caldate( tu );
 
 % Print calendar dates to figure above each bar
 for i = 1:numel(tu)

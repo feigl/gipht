@@ -29,7 +29,8 @@ slip    =    0; % amount of in-plane slip in meters
 % F
 
 %% change in volume [m^3]
-F.volchange = F.volstrain .* (F.dx .* F.dy .* F.dz);
+% F.volchange = F.volstrain .* (F.dx .* F.dy .* F.dz);
+F.volchange = F.volstrain;
 
 %% loop over fault centroids
 onev = ones(size(F.xcentroid));
