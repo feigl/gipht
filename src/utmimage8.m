@@ -77,21 +77,21 @@ switch idatatype
         labu = 'strain';
         zmin = nanmin(climit);
         zmax = nanmax(climit);
-        labt = sprintf('%+5.1E',zmin);
-        labb = sprintf('%+5.1E',zmax);
+        labt = sprintf('%+5.1E',zmax);
+        labb = sprintf('%+5.1E',zmin);
     case 2
         labu = 'mm';
         zmin = nanmin(climit);
         zmax = nanmax(climit);
         if abs(zmin) < 1000 && abs(zmin) < 1000 && abs(zmin) > 1 && abs(zmin) > 1
-            labt = sprintf('%+5.0f',zmin);
-            labb = sprintf('%+5.0f',zmax);
+            labt = sprintf('%+5.0f',zmax);
+            labb = sprintf('%+5.0f',zmin);
          elseif abs(zmin) < 1 && abs(zmin) < 1 && abs(zmin) > 0.1 && abs(zmin) > 0.1
-            labt = sprintf('%+5.1f',zmin);
-            labb = sprintf('%+5.1f',zmax);
+            labt = sprintf('%+5.1f',zmax);
+            labb = sprintf('%+5.1f',zmin);
         else
-            labt = sprintf('%+5.1E',zmin);
-            labb = sprintf('%+5.1E',zmax);
+            labt = sprintf('%+5.1E',zmax);
+            labb = sprintf('%+5.1E',zmin);
         end      
     otherwise
         error(sprintf('unknown idatatype %d\n',idatatype));

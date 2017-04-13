@@ -100,13 +100,17 @@ end
 % fprintf(1,'In %s extrema are %g %g +/- %g \n,',mfilename,nanmin(nanmin(pixarr)),nanmax(nanmax(pixarr)),std(colvec(pixarr)));
 
 switch idatatype
-    case 2
-       imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr);
-    case 0
-       %image([xutmmin xutmmax],[yutmmax yutmmin],floor(33+64*pixarr)); % values are costs [0, 127]
-       imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr); %
-    case -1
-         imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr);
+    case 2 %% values are (unwrapped) range change in meters          
+       %imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr); % use automatic scaling
+       imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr,climit); % use automatic scaling within limits
+    case 0 %% values are wrapped phase in cycles on [-0.5 to +0.5]
+           % scale to indices into a color table with 64 labels 
+           % add 33 to center in middle of color bar. 
+           % image (sans "s") does not use automatic scaling
+       image([xutmmin xutmmax],[yutmmax yutmmin],floor(33+64*pixarr)); %
+    case -1 %% values are gradients
+       %imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr); % use automatic scaling
+       imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr,climit); % use automatic scaling within limits
     otherwise
         error(sprintf('unknown idatatype %d\n',idatatype));
  end
@@ -168,7 +172,6 @@ ha=text(0.95,0.98,datelabel...
 ,'Units','normalized','Clipping','off','FontName','Helvetica','margin',1,'FontWeight','bold'...
 ,'HorizontalAlignment','Right','VerticalAlignment','Top'...
 ,'BackgroundColor',[1 1 1 ]); % white box underneath
-
 
 hold on;
 axis xy; 

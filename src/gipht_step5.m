@@ -361,13 +361,20 @@ for i = 1:np
         
         storage=[];
         clear DST2;
+%         function DST = build_dst(fitfun,xyzm,tepochs,bpest,dops,DD,unitv...
+%     ,xd,yd,ippix1,mpercys,idatatype...
+%     ,dx,dy,dz,orbvm,orbvs,alon,alat...
+%     ,qii1,qii2,qjj1,qjj2...
+%     ,phasig,kindex,kmasts,kslavs)
+
         DST2 = build_dst(fitfun,xyzm1,tepochs,bpest,dops,DD1,unitv1...
             ,zeros(ndata,1),zeros(ndata,1),ippix1,mpercys(i),idatatype...
             ,dx1,dy1,dz1,orbvm1,orbvs1,clond1,clatd1...
             ,qii1,qii2,qjj1,qjj2...
             ,phasig,kindex,kmasts,kslavs);
         
-        
+        fprintf(1,'Number of finite values in DST2.z0 = %d\n',numel(find(isfinite(DST2.z0)==1)));
+    
         %             % call fitting function first time to initialize
         %             % calculate modeled values for phase, NOT gradient
         for ii=1:numel(DST2.idatatype)
@@ -674,7 +681,8 @@ for i = 1:np
     imC = reshape(     double(res0)/DNPC ,nlmesh3,ncmesh3);tlC = 'Res0';
     imD = reshape(double(devs_all0)/DNPC ,nlmesh3,ncmesh3);tlD = 'Dev0';
     %if pselect == 3 || pselect == 5 || pselect == 7
-    if ismember(pselect,[3,5,7])
+    %if ismember(pselect,[3,5,7])
+    if idatatype1 == -1
         %% TODO 20160814need to find quad-tree
         %imE = reshape(     double(qhao)/DNPC ,nlmesh3,ncmesh3);tlE = 'Final';
         imE = reshape(     double(phao)/DNPC ,nlmesh3,ncmesh3);tlE = 'Final';
@@ -693,10 +701,11 @@ for i = 1:np
         inull = [];
     end
     
-    inull=union(inull,find(abs(imE) < 1/256.0));
-    inull=union(inull,find(isfinite(imE)==0)); %
-    inull=union(inull,find(abs(imA) < 1/256.0));
-    inull=union(inull,find(isfinite(imA)==0));
+%     
+%     inull=union(inull,find(abs(imE) < 1/256.0));
+%     inull=union(inull,find(isfinite(imE)==0)); %
+%     inull=union(inull,find(abs(imA) < 1/256.0));
+%     inull=union(inull,find(isfinite(imA)==0));
     
     % How handle values for multi-panel plots
     %figopt % xx1 propagate nulls from quadtree, paint missing data black

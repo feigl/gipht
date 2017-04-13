@@ -23,7 +23,7 @@ else
 end
 
 % draw the image
-imagesc(xp,xp,IMAGE);
+imagesc(xp,yp,IMAGE);
 colormap(cmap);
 axis xy;
 xlabel(xlab);

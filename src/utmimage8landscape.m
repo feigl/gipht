@@ -86,14 +86,14 @@ switch idatatype
         zmin = nanmin(climit);
         zmax = nanmax(climit);
         if abs(zmin) < 1000 && abs(zmin) < 1000 && abs(zmin) > 1 && abs(zmin) > 1
-            labt = sprintf('%+5.0f',zmin);
-            labb = sprintf('%+5.0f',zmax);
+            labt = sprintf('%+5.0f',zmax);
+            labb = sprintf('%+5.0f',zmin);
          elseif abs(zmin) < 1 && abs(zmin) < 1 && abs(zmin) > 0.1 && abs(zmin) > 0.1
-            labt = sprintf('%+5.1f',zmin);
-            labb = sprintf('%+5.1f',zmax);
+            labt = sprintf('%+5.1f',zmax);
+            labb = sprintf('%+5.1f',zmin);
         else
-            labt = sprintf('%+5.1E',zmin);
-            labb = sprintf('%+5.1E',zmax);
+            labt = sprintf('%+5.1E',zmax);
+            labb = sprintf('%+5.1E',zmin);
         end      
     otherwise
         error(sprintf('unknown idatatype %d\n',idatatype));
@@ -110,9 +110,9 @@ colormap(ctab);
 subplot('position',[0.825  0.325*rat   0.225 0.225*rat]*rs);
 utmimage(im4,xutmmin,xutmmax,yutmmin,yutmmax,tl4,'d',climit,dotxutm, dotyutm,ctab,mysyms{4},marksizes(4),0,0,'',idatatype,datalabel);
 if cbar == 1  
-   ha=text(1.45 ,-0.850,labb            ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Right'  ,'VerticalAlignment','Bottom','rotation', 0);
-   ha=text(1.45 , 0.000,labu            ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',90);    
-   ha=text(1.45 , 0.850,labt            ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Right ' ,'VerticalAlignment','Top','rotation', 0); 
+   ha=text(1.25 ,-0.850,labb            ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Right'  ,'VerticalAlignment','Bottom','rotation', 0);
+   ha=text(1.25 , 0.000,labu            ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',90);    
+   ha=text(1.25 , 0.850,labt            ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Right ' ,'VerticalAlignment','Top','rotation', 0); 
    ha=text(0.50 , 1.0      ,'Deviation' ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',0);    
 end
 
@@ -132,7 +132,7 @@ subplot('position',[0.150    0.325*rat   0.225 0.225*rat]*rs);
 utmimage(im1,xutmmin,xutmmax,yutmmin,yutmmax,tl1,'a',climit, dotxutm,dotyutm,ctab,mysyms{1},marksizes(1),0,0,'',idatatype,datalabel);
 if cbar == 1  
    ha=text(0.50  ,  1.0      ,'Observed','Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',0);    
-   ha=text(-0.25,+0.1, 'Northing (km)','Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','rotation',90,'HorizontalAlignment','Left','VerticalAlignment','Top');
+   ha=text(-0.15,+0.1, 'Northing (km)','Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','rotation',90,'HorizontalAlignment','Left','VerticalAlignment','Top');
 end
 
 if cbar == 1

@@ -36,8 +36,10 @@ for j=1
     Eobspts_wrt_fault =     xobs - F.x(j);               % relative position of obs point wrt to fault centroid
     Nobspts_wrt_fault =     yobs - F.y(j);               % relative position of obs point wrt to fault centroid
     
-    %% depth of fault centroid in meters
-    depth     =    -1*F.z(j) ;                   % vertical coordinate of fault centroid   
+    %% depth (below surface) of fault centroid in meters
+    %depth     =    F.z(j) ;                  
+    % 20170207 corrected so that F.z is elevation above ground surface
+    depth     =    -1*F.z(j) ;                  
     
     %% calculate opening from volume strain
     %volume = F.dx(j) .* F.dy(j) .* F.dz(j);          % cubic meters
