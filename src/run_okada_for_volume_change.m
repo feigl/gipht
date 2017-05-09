@@ -15,7 +15,7 @@ nf = 0;
 %SSS.G_shear = 3.e10 % in Pa
 
 %% calculate Bulk Modulus 
-K_bulk_mod = 2*SSS.G_shear*(1+SSS.nu)/(3*(1-SSS.nu; % 3.3333e+10 Pa 
+K_bulk_mod = 2*SSS.G_shear*(1+SSS.nu)/(3*(1-SSS.nu)); % 3.3333e+10 Pa 
 % Nur and Byerlee [1971] give K = 36.E5 bar = 3.6E10 Pa for quartz, citing Birch [1966] 
 
 %% check grid dimensions

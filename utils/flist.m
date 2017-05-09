@@ -18,6 +18,8 @@ while kount > 0
         fnames{k}=char(A);
     end
 end
+% make into a column
+fnames = transpose(fnames);
 fclose(fid);
 fdelete('fnames.tmp');
 return

@@ -50,7 +50,8 @@ iTmaxstd=find(abs(std(PTFIELD.T')-max(std(PTFIELD.T'))) <= eps);iTmaxstd=iTmaxst
 
 iPmaxstd=find(abs(std(PTFIELD.P')-max(std(PTFIELD.P'))) <= eps);iPmaxstd=iPmaxstd(1);
 
-
+tzero = datetime(0,1,1);
+tzero.TimeZone = 'UTC';
 
 
 
@@ -69,10 +70,10 @@ vcen=GRID.Elevation(iTmax)
 %
 %% plot time series of Temperature for various voxels
 nf=nf+1;h(nf)=figure;hold on;
-plot(years(PTFIELD.t-datetime(0,1,1)),PTFIELD.T(iTmin,1:end),'b-');
-plot(years(PTFIELD.t-datetime(0,1,1)),PTFIELD.T(iTmax,1:end),'r-');
-plot(years(PTFIELD.t-datetime(0,1,1)),PTFIELD.T(iTmed,1:end),'k-');
-plot(years(PTFIELD.t-datetime(0,1,1)),PTFIELD.T(iTmaxstd,1:end),'g-');
+plot(years(PTFIELD.t-tzero),PTFIELD.T(iTmin,1:end),'b-');
+plot(years(PTFIELD.t-tzero),PTFIELD.T(iTmax,1:end),'r-');
+plot(years(PTFIELD.t-tzero),PTFIELD.T(iTmed,1:end),'k-');
+plot(years(PTFIELD.t-tzero),PTFIELD.T(iTmaxstd,1:end),'g-');
 legend('min','max','median','max std dev');
 xlabel('time step [year]');
 ylabel('Temperature [deg C]');
@@ -82,10 +83,10 @@ printpdf(sprintf('%s_%02d.pdf',mfilename,nf));
 
 %% plot time series of Pressure for various voxels
 nf=nf+1;h(nf)=figure;hold on;
-plot(years(PTFIELD.t-datetime(0,1,1)),PTFIELD.P(iPmin,1:end),'b-');
-plot(years(PTFIELD.t-datetime(0,1,1)),PTFIELD.P(iPmax,1:end),'r-');
-plot(years(PTFIELD.t-datetime(0,1,1)),PTFIELD.P(iPmed,1:end),'k-');
-plot(years(PTFIELD.t-datetime(0,1,1)),PTFIELD.P(iPmaxstd,1:end),'g-');
+plot(years(PTFIELD.t-tzero),PTFIELD.P(iPmin,1:end),'b-');
+plot(years(PTFIELD.t-tzero),PTFIELD.P(iPmax,1:end),'r-');
+plot(years(PTFIELD.t-tzero),PTFIELD.P(iPmed,1:end),'k-');
+plot(years(PTFIELD.t-tzero),PTFIELD.P(iPmaxstd,1:end),'g-');
 %xlabel(sprintf('time step [days after %s]',strt0));
 legend('min','max','median','max std dev');
 xlabel('time step [year]');

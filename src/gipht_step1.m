@@ -54,6 +54,7 @@ orbfile      = OPT.orbfile;
 nsaruns      = OPT.nsaruns;
 verbose      = OPT.verbose;
 nprocessors  = OPT.nprocessors;
+surrogate    = OPT.surrogate;
 
 
 % how to handle statistics
