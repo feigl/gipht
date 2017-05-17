@@ -13,14 +13,19 @@ LL=zeros(nxy,nxy);
 kount = 0;
 for irow = 1:nxy
     [j,i] = ind2sub([ny,nx],irow);
-    if i>1 && i<nx && j>1 && j<ny 
+    if i>1 && i<nx && j>1 && j<ny
         kount = kount+1;
-        fprintf(1,'%3dth nonzero row at (j,i) %3d %3d\n',kount,j,i);
+        fprintf(1,'%3dth nonzero row at interior (j,i) %3d %3d\n',kount,j,i);
+        
         icol = sub2ind([ny,nx],j  , i  ); LL(irow,icol) = -1;   % central voxel
         icol = sub2ind([ny,nx],j  , i+1); LL(irow,icol) =  1/4; % right neighbor in X
         icol = sub2ind([ny,nx],j  , i-1); LL(irow,icol) =  1/4; % left  neighbor in X
         icol = sub2ind([ny,nx],j+1, i  ); LL(irow,icol) =  1/4; % right neighbor in Y
         icol = sub2ind([ny,nx],j-1, i  ); LL(irow,icol) =  1/4; % left  neighbor in Y
+    elseif i == 1 || i == nx || j == 1 || j == ny
+        kount = kount+1;
+        fprintf(1,'%3dth nonzero row at edge     (j,i) %3d %3d\n',kount,j,i);        
+        icol = sub2ind([ny,nx],j  , i  ); LL(irow,icol) = 1;   % central voxel
     end
 end
 

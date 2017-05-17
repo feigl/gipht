@@ -50,7 +50,7 @@ ub=zeros(mparam,1);
 fidparin = fopen(fnparin,'r');
 if fidparin > 0
    fprintf(1,'Opened file named %s to read initial estimates of parameters.\n',fnparin);
-   for i = 1:mparam;
+   for i = 1:mparam
        parse_err=0;
        k=0;
        frewind(fidparin);
@@ -367,6 +367,7 @@ ierr = check_struct(PST0);
 ierr = check_struct(DST);
 clear rng
 clear TST
+objfun
 fprintf(1,'Calling fitting function for first time to initialize.\n');
 [rng,TST] = feval(fitfun,DST,PST0);
 % 20150519 Try to avoid using feval
@@ -435,10 +436,23 @@ switch ianneal
        %cost00  = feval(objfun,p00,fitfun,DST,PST,TST); % cost of null model
         fprintf(1,'Starting to calculate cost of null    estimate\n');
         PST00.fitfun = 'funnull';
-        cost00  = feval(objfun,DST,PST00,TST); % cost of null model
+        objfun
+        %cost00  = feval(objfun,DST,PST00,TST); % cost of null model
+        cost00  = feval(str2func(objfun),DST,PST00,TST); % cost of null model
         fprintf(1,'Starting to calculate cost of initial estimate\n');
         PST0.fitfun = fitfun;
-        cost0   = feval(objfun,DST,PST0,TST); % cost of initial model
+        %cost0   = feval(objfun,DST,PST0,TST); % cost of initial model
+        cost0   = feval(str2func(objfun),DST,PST0,TST); % cost of initial model
+        msig = nan(size(PST0.p0)); % uncertainty of model parameters
+        istatcode = 0;
+        
+    case 7
+        fprintf(1,'Starting to calculate cost of null    estimate\n');
+        PST00.fitfun = 'funnull';
+        cost00  = feval(str2func(objfun),PST00.p1,DST,PST00,TST); % cost of null model
+        fprintf(1,'Starting to calculate cost of initial estimate\n');
+        PST0.fitfun = fitfun;
+        cost0   = feval(str2func(objfun),PST0.p1,DST,PST0,TST); % cost of initial model
         msig = nan(size(PST0.p0)); % uncertainty of model parameters
         istatcode = 0;
 %     case 3
@@ -549,6 +563,9 @@ switch ianneal
         niter = 1e6; % quick test
         nburnin = 1000;
         mstepscale = 0.1;
+    case 7 
+        % constrained optimization
+        clear options;
     otherwise
         error(sprintf('Unknown value of ianneal = %d\n',ianneal));
 end
@@ -567,9 +584,7 @@ switch ianneal
         %function [mhat,fval,model,energy,count]=constrainedopt1(FUN,bounds,OPTIONS,varargin)
         [p1,f,model,energy,count] = constrainedopt1(objfun,bounds,options,fitfun,DST,PST0,TST);
         fprintf (1,'\nAnnealing ended after %15.0f seconds\n',toc(tanneal));
-        msig = nan(size(p0));
-        
-        
+        msig = nan(size(p0));      
     case 2
         %start annealing
         if idatatype1 == -1
@@ -620,7 +635,6 @@ switch ianneal
         acosts1= trials(:,1);        % cost values are in first column
         temps  = trials(:,2);        % temperatures are in second column
         trials = trials(:,3:end);% trial parameter values are in remaining columns
-
     case 5
         fprintf (1,'\nStarting optimization using gridsearch...\n');
         acosts1(1)=NaN;
@@ -636,6 +650,31 @@ switch ianneal
         p1 = PST1.p1;
         msig = PST1.sigma;
         acosts1(1)=NaN;
+    case 7 
+        % Constrained optimization
+        %% Set constraints define matrix for negative values
+%         Alessthan = eye(numel(p0));
+%         blessthan = zeros(numel(p1),1);
+        % Alessthan = [0, 0, -1, 0];
+        % blessthan = 0;
+        Alessthan = [];
+        blessthan = [];
+            
+        
+        %% Run constrained inversion
+        %    X = fmincon(FUN,X0,A,B,Aeq,Beq,LB,UB,NONLCON,OPTIONS) minimizes with
+        %     the default optimization parameters replaced by values in OPTIONS, an
+        %     argument created with the OPTIMOPTIONS function. See OPTIMOPTIONS for
+        %     details. For a list of options accepted by fmincon refer to the
+        %     documentation.
+        % options for algorithm
+        options = optimoptions('fmincon','Display','Iter'); % run interior-point algorithm
+        %funobj = 'funcoststdnres4'; % name of objective function
+        objfun
+        fh = str2func(objfun); % function handle
+        p1 = fmincon(@(p1,pst,dst,tst) (fh(p1,DST,PST0,TST)),p0,Alessthan,blessthan,[],[],lb,ub,[],options);
+        msig = PST0.sigma;
+        acosts1(1)=NaN;
     otherwise
         error(sprintf('Unknown value of ianneal = %d\n',ianneal));
 end; % switch on ianneal
@@ -649,7 +688,11 @@ PST1.sigma = colvec(msig);
 
 
 %% cost of final estimate
-cost1 = feval(objfun,DST,PST1,TST);
+if ianneal == 7
+    cost1 = feval(objfun,PST1.p1,DST,PST1,TST);
+else
+    cost1 = feval(objfun,DST,PST1,TST);
+end
 
 %% print results
 fprintf(1        ,'\n\nI          Parameter_Name               P0(initial)     P1(final)     Adj   PlusMinusBnd\n');

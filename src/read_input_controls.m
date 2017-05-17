@@ -380,7 +380,7 @@ if  ismember(OPT.pselect,[0,1,2,3,5,7,9]) == 0
     error(sprintf ('ERROR: PSELECT invalid value in %s\n',OPT.fning));
 end
 
-if  ismember(OPT.ianneal,[0:6]) == 0
+if  ismember(OPT.ianneal,[0:7]) == 0
     error(sprintf ('ERROR: ANNEAL invalid value in %s\n',OPT.fning));
 end
 
