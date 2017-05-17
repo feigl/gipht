@@ -30,7 +30,7 @@ end
 %% unpack options
 OPT = read_input_controls(OPT);
 % functions
-%objfun       = OPT.objfun;
+objfun       = OPT.objfun;
 fitfun       = OPT.fitfun;
 fitfun_exact = OPT.fitfun;
 printfun     = OPT.printfun;
@@ -140,21 +140,25 @@ switch ndatatypes
         FACTIN = 1; % .grd file contains radians
         DNPC = 2 * pi;     
         datalabel = '[cycles]';
-        objfun = 'funcostrarc';        % Objective Function mininum angle,  assumes zero mean, using arc function in radians
+        %objfun = 'funcostrarc';        % Objective Function mininum angle,  assumes zero mean, using arc function in radians
         objlabel = '[cycles]';
     case -1; % east component of gradient
         idatatype1 = -1;
         FACTIN = 1; % grd file contains dimensionless strain
         DNPC = 1;
         datalabel = '[dimless]';
-        objfun = 'funcoststdnres';      % Objective function is sample standard deviation of normalized residual (should equal sqrt(chi2))
+        %objfun = 'funcoststdnres';      % Objective function is sample standard deviation of normalized residual (should equal sqrt(chi2))
         objlabel = '[dimless]';
     case 2   % range change in meters after unwrapping
         idatatype1 = 2;
         FACTIN = 1.; % grd file contains meters
         DNPC = 1.0e-3;     
         datalabel = '[mm]';
-        objfun = 'funcoststdnres';      % Objective function is sample standard deviation of normalized residual (should equal sqrt(chi2))
+%         if ianneal == 7
+%            objfun = 'funcoststdnres4';      % 4-argument Objective function is sample standard deviation of normalized residual (should equal sqrt(chi2))
+%         else
+%            objfun = 'funcoststdnres';      % Objective function is sample standard deviation of normalized residual (should equal sqrt(chi2))
+%         end
         objlabel = '[dimless]';
     otherwise
         error(sprintf('unknown ndatatypes %d\n',ndatatypes));

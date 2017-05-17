@@ -95,6 +95,10 @@ switch ianneal
         % no inversion has been performed, so skip statistical analysis
         fprintf(1,'IANNEAL = %d so skipping statistics: ISTATCODE is %d\n',ianneal,istatcode);
         istatcode = 0;       
+    case 7
+        % no inversion has been performed, so skip statistical analysis
+        fprintf(1,'IANNEAL = %d so skipping statistics: ISTATCODE is %d\n',ianneal,istatcode);
+        istatcode = 0;       
 %     case {1,2}
 %         if saopt6 == 3
 %             istatcode = 5; % use Bootstrap instead of critical value
@@ -191,18 +195,23 @@ elseif strcmp(objfun,'funcostrms') == 1
     costs00 = abs(DST.phaobs-wrm00);
     costs0  = abs(DST.phaobs-wrm0);
     costs1  = abs(DST.phaobs-wrm1);
-elseif strcmp(objfun,'funcoststdnres') == 1
+else
+    warning(sprintf('Unknown value of objfun %s\n',objfun));
     costs00 = DST.phaobs;
     costs0  = DST.phaobs-mdl0;
     costs1  = DST.phaobs-mdl1;
-else
-    error(sprintf('Unknown value of objfun %s\n',objfun));
 end
 % values of total costs in cycles
-cost00 = feval(objfun,DST,PST00,TST);
-cost0  = feval(objfun,DST,PST0, TST);
-cost1  = feval(objfun,DST,PST1, TST);
-
+if ianneal == 7
+    cost00 = feval(objfun,PST00.p1,DST,PST00,TST);
+    cost0  = feval(objfun,PST00.p1,DST,PST0, TST);
+    cost1  = feval(objfun,PST00.p1,DST,PST1, TST);
+    
+else
+    cost00 = feval(objfun,DST,PST00,TST);
+    cost0  = feval(objfun,DST,PST0, TST);
+    cost1  = feval(objfun,DST,PST1, TST);
+end
 % mean resultant lengths of resdiduals
 Rbar00 = rbarrad(res00);
 Rbar0  = rbarrad(res0);
