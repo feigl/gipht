@@ -26,10 +26,12 @@ end
 imagesc(xp,yp,IMAGE);
 colormap(cmap);
 axis xy;
+axis equal;
+axis tight;
 xlabel(xlab);
 ylabel(ylab);
-tstr = sprintf('%s [%s]',INFO.title,strrep(grdfilename,'_','\_'));
-title(tstr);
+tstr = sprintf('%s\n[%s]',INFO.title,grdfilename);
+title(tstr,'Interpreter','None');
 c = colorbar;
 c.Label.String = INFO.zname;
 h = gcf;

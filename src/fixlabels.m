@@ -60,7 +60,7 @@ if numel(yfmt) > 0
         else
             yticklabels2{k} = sprintf('    ');
         end
-        fprintf(1,'%d %s %f %s\n',k,char(yticklabels{k}),ytickvals(k),char(yticklabels2{k}));
+%         fprintf(1,'%d %s %f %s\n',k,char(yticklabels{k}),ytickvals(k),char(yticklabels2{k}));
     end
     %set(gca,'YTickLabelMode','manual');
     yticklabels2 = char(yticklabels2);
