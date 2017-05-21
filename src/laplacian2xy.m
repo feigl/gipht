@@ -7,12 +7,15 @@ function LL = laplacian2xy(x,y)
 nx = numel(x);
 ny = numel(y);
 if nx == ny   
-    ncells = nx;
+    ncells = nx
 else
     error
 end
 % number of nonzero entries in sparse matrix
-LL=zeros(ncells,ncells);
+nxy = nx*ny
+% number of nonzero entries in sparse matrix
+nzmax = 5*(nx-2)*(ny-2)
+
 
 %% make convex hull in 2 dimensions
 DelTriang = delaunayTriangulation(x,y);
@@ -21,25 +24,52 @@ hullx = x(khull);
 hully = y(khull);
 
 %% find the points on the edge
-[iin,ion] = find(inpolygon(x,y,hullx,hully));
+[iin,ion] = inpolygon(x,y,hullx,hully)
+
+non = numel(find(ion==1))
+
+% number of nonzero rows
+nzrows = ncells - non
+% note order!
+LL=zeros(nzrows,nxy);
+size(LL)
+
+
+figure;hold on;
+plot(x,y,'ro');
+plot(hullx,hully,'b-');
+plot(x(ion),y(ion),'k*');
 
 kount = 0;
-for irow = 1:ncells
-    [j,i] = ind2sub([ny,nx],irow);
-    if ismember(irow,ion) == 0
-        kount = kount+1;
-        fprintf(1,'%3dth nonzero row at interior (j,i) %3d %3d\n',kount,j,i);
-        
-        icol = sub2ind([ny,nx],j  , i  ); LL(irow,icol) = -1;   % central voxel
-        icol = sub2ind([ny,nx],j  , i+1); LL(irow,icol) =  1/4; % right neighbor in X
-        icol = sub2ind([ny,nx],j  , i-1); LL(irow,icol) =  1/4; % left  neighbor in X
-        icol = sub2ind([ny,nx],j+1, i  ); LL(irow,icol) =  1/4; % right neighbor in Y
-        icol = sub2ind([ny,nx],j-1, i  ); LL(irow,icol) =  1/4; % left  neighbor in Y
-    elseif i == 1 || i == nx || j == 1 || j == ny
-        kount = kount+1;
-        fprintf(1,'%3dth nonzero row at edge     (j,i) %3d %3d\n',kount,j,i);        
-        icol = sub2ind([ny,nx],j  , i  ); LL(irow,icol) = 1;   % central voxel
+k=0;
+% for irow = 1:nxy
+%     [j,i] = ind2sub([ncells,ncells],irow);
+for ii=1:ncells
+    for jj=1:ncells
+        k = k+1;
+        [j,i] = ind2sub([ncells,ncells],k);
+        if i>1 && i<ncells && j>1 && j<ncells
+            if ion(j-1)==0 && ion(j)==0 && ion(j+1) && ion(i-1)==0 && ion(i)==0 && ion(i+1)==0
+                kount = kount+1;
+                %         fprintf(1,'%3dth nonzero row at interior (j,i) %3d %3d\n',kount,j,i);
+                icol = sub2ind([ncells,ncells],j  , i  );
+                LL(kount,icol) = -1;   % central voxel
+                icol = sub2ind([ncells,ncells],j  , i+1); LL(kount,icol) =  1/4; % right neighbor in X
+                icol = sub2ind([ncells,ncells],j  , i-1); LL(kount,icol) =  1/4; % left  neighbor in X
+                icol = sub2ind([ncells,ncells],j+1, i  ); LL(kount,icol) =  1/4; % right neighbor in Y
+                icol = sub2ind([ncells,ncells],j-1, i  ); LL(kount,icol) =  1/4; % left  neighbor in Y
+            end
+        end
     end
+end
+figure;
+spy(LL)
+
+if kount ~= nzrows
+    kount
+    nzrows
+    nzmax
+    error('miscount');
 end
 
 return
