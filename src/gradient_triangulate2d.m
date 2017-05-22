@@ -79,6 +79,7 @@ for jj=1:nedges
         DEL(jj,i1) = 1;
     end
 end
+DEL=sparse(DEL);
 figure;
 spy(DEL)
 

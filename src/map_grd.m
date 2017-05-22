@@ -22,8 +22,12 @@ else
     yp = ye;
 end
 
+% set up a symmetric colortable
+cmaxabs = max(abs(colvec(IMAGE)));
+clim = [-cmaxabs,+cmaxabs];
+
 % draw the image
-imagesc(xp,yp,IMAGE);
+imagesc(xp,yp,IMAGE,clim);
 colormap(cmap);
 axis xy;
 axis equal;
