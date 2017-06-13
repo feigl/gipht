@@ -26,7 +26,7 @@ if numel(Ch) == 1
 end
 
 
-print (gcf,pngfilename,'-dpng','-r1200');
+print (gcf,pngfilename,'-dpng','-r600');
 
 return
 
