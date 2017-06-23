@@ -83,6 +83,7 @@ else
     xname = 'x';
     yname = 'y';
     zname = 'z';
+    desc = 'description left blank';
 end
 vers='4.x';                             % is "x" OK?
 
