@@ -108,7 +108,7 @@ end
 netcdf.close(ncid);
 
 switch nargout
-    case 1,double
+    case 1
         varargout{1}=z;
     case {3,4}
         varargout{1}=x;

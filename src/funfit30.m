@@ -34,6 +34,7 @@ function varargout = funfit30(varargin)
 % 2012-NOV-26 call comsol
 % 2014-MAY-14 abandon Abaqus, use general 3-D Comsol
 % 2015-APR-19 replace Cervelli disloc routine with Beauducel okada85
+% 2017-JUL-24 fix bug found by Helene - Kurt
 
 % fprintf(1,'Entering fitting function fitfun = %s\n',mfilename);
 
@@ -424,18 +425,18 @@ elseif nin == 3 ...
 
     % get values of parameters
     p = colvec(PST.p1);
-    pt =p( 0*me+1: 0*me+me); % epoch
-    px =p( 1*me+1: 1*me+me);
-    py =p( 2*me+1: 2*me+me);
-    pz =p( 3*me+1: 3*me+me);
-    poh=p( 4*me+1: 4*me+me); % parameters describing orbit position - horizontal  component
-    poa=p( 5*me+1: 5*me+me); % parameters describing orbit position - along-track component
-    pov=p( 6*me+1: 6*me+me); % parameters describing orbit position - vertical    component
-    pvh=p( 7*me+1: 7*me+me); % parameters describing orbit velocity - horizontal  component
-    pva=p( 8*me+1: 8*me+me); % parameters describing orbit velocity - along-track component
-    pvv=p( 9*me+1: 9*me+me); % parameters describing orbit velocity - vertical    component
-    pd =p(10*me+1:10*me+me); % additive offset
-    pg =p(11*me+1:  mparam); % geophysical parameters
+    pt =colvec(p( 0*me+1: 0*me+me)); % epoch
+    px =colvec(p( 1*me+1: 1*me+me));
+    py =colvec(p( 2*me+1: 2*me+me));
+    pz =colvec(p( 3*me+1: 3*me+me));
+    poh=colvec(p( 4*me+1: 4*me+me)); % parameters describing orbit position - horizontal  component
+    poa=colvec(p( 5*me+1: 5*me+me)); % parameters describing orbit position - along-track component
+    pov=colvec(p( 6*me+1: 6*me+me)); % parameters describing orbit position - vertical    component
+    pvh=colvec(p( 7*me+1: 7*me+me)); % parameters describing orbit velocity - horizontal  component
+    pva=colvec(p( 8*me+1: 8*me+me)); % parameters describing orbit velocity - along-track component
+    pvv=colvec(p( 9*me+1: 9*me+me)); % parameters describing orbit velocity - vertical    component
+    pd =colvec(p(10*me+1:10*me+me)); % additive offset
+    pg =colvec(p(11*me+1:  mparam)); % geophysical parameters
  
     %     for ikp = 1:numel(pg)
     %         fprintf(1,'%d %s %12.4e\n',ikp,PST.names{ikp+koffset},pg(ikp));
@@ -469,9 +470,10 @@ elseif nin == 3 ...
     nu2 = pg(kp);
     
     % check dimensions
-    [ndum,mdum] = size(DD);
-    if  ndum ~= ndata || mdum ~= me ...
-            || numel(px) ~= me || numel(py) ~= me || numel(pz) ~= me || numel(pd) ~= me
+    [nrDD,ncDD] = size(DD);
+    if  nrDD ~= ndata || ncDD ~= me ...
+            || numel(px) ~= me || numel(py) ~= me || numel(pz) ~= me || numel(pd) ~= me  ...
+         
         me
         ndata
         disp DD; size(DD)

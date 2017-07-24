@@ -38,7 +38,7 @@ if numel(xfmt) > 0
     set(gca,'XTickLabel',xticklabels2);
     set(gca,'FontName','Helvetica','Fontsize',10,'FontWeight','bold');
 else
-    xlabel(xlab,'FontName','Helvetica','Fontsize',10,'FontWeight','bold');
+    xlabel(xlab,'FontName','Helvetica','Fontsize',10,'FontWeight','bold','Interpreter','none');
 end
 
 %if exist('yfmt','var')
@@ -66,11 +66,12 @@ if numel(yfmt) > 0
     yticklabels2 = char(yticklabels2);
     set(gca,'YTickLabel',yticklabels2);
     set(gca,'FontName','Helvetica','Fontsize',10,'FontWeight','bold');
+
     %h = gca;
 % else
 %     set(gca,'YTickLabelMode','auto');
 else
-    ylabel(ylab,'FontName','Helvetica','Fontsize',10,'FontWeight','bold');
+    ylabel(ylab,'FontName','Helvetica','Fontsize',10,'FontWeight','bold','Interpreter','none');
 end
 
 %h = gca;

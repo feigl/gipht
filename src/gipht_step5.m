@@ -15,6 +15,9 @@ if fexist('gipht.mat') == 1
     load('gipht.mat');
 end
 
+% initialize
+kq = 0; % pointer to derived parameters
+
 %load;
 %load('qsave.mat');
 fidtxtout = fopen(fnparout,'a');
@@ -171,6 +174,12 @@ for i = 1:np
     
     %% read observed phase values at all pixels for this pair
     fn0 = pfnames{i};
+    % Kurt 20170724 dimensions of subregion must be dimensions of input
+    % grid file. In other words, cut the grid files down to size before
+    % running GIPhT.
+    INFO = grdinfo3(fn0);
+    nrsub = INFO.ny
+    ncsub = INFO.nx
     %[tmpx,tmpy,tmpz] = grdread3(fn0); % GMT grid file 
     [grdx,grdy,tmpz] = grdread3(fn0); % GMT grid file 
     phao = double(tmpz)*FACTIN;
@@ -421,7 +430,8 @@ for i = 1:np
         % get vector values
         if bitget(figopt,3) == 1
             fprintf(1,'Evaluating fitting function %s for final   estimate at %d locations....\n',fitfun,numel(DST2.x));
-            [rng0,DST2] = feval(fitfun,DST2,PST1,TST); % final
+           %KF20170724[rng0,DST2] = feval(fitfun,DST2,PST1,TST); % final
+            [rng0,DST2] = feval(fitfun,DST2,PST1,TST1); % final
             %profile off
             if isreal(rng0) ~= 1
                 warning(sprintf('Found complex values in rng0. Max abs(imaginary) is %g\n',max(imag(rng0))));
@@ -931,16 +941,16 @@ for i = 1:np
         feval(printfun,sprintf('%s_profU_ew_P%03d',runname,i),'landscape');
         
         %   2012-10-04 values in meters
-        iq = iq+1;
-        q0(iq)     = NaN;
-        q1(iq)     = nanmin(colvec(umz));
-        qsig(iq)   = nanstd(colvec(umz));
-        qnames{iq} = sprintf('Pair_%05d_MiniVerti_m_MOD__',i);
-        iq = iq+1;
-        q0(iq)     = NaN;
-        q1(iq)     = nanmax(colvec(umz));
-        qsig(iq)   = nanstd(colvec(umz));
-        qnames{iq} = sprintf('Pair_%05d_MaxiVerti_m_MOD__',i);
+        kq = kq+1;
+        q0(kq)     = NaN;
+        q1(kq)     = nanmin(colvec(umz));
+        qsig(kq)   = nanstd(colvec(umz));
+        qnames{kq} = sprintf('Pair_%05d_MiniVerti_m_MOD__',i);
+        kq = kq+1;
+        q0(kq)     = NaN;
+        q1(kq)     = nanmax(colvec(umz));
+        qsig(kq)   = nanstd(colvec(umz));
+        qnames{kq} = sprintf('Pair_%05d_MaxiVerti_m_MOD__',i);
         
         %         %   2012-10-22 values in meters
         %         iq = iq+1;
@@ -960,25 +970,25 @@ for i = 1:np
         %         qnames{iq} = sprintf('Pair_%05d_DisZatCen_m_MOD__',i);
         
         %   2012-10-25 values in meters
-        if numel(icentroid) == 1 && numel(jcentroid) == 1
-            if isfinite(icentroid) == 1 && isfinite(jcentroid) == 1
-                iq = iq+1;
-                q0(iq)     = NaN;
-                q1(iq)     = umx(icentroid,jcentroid);
-                qsig(iq)   = NaN;
-                qnames{iq} = sprintf('Pair_%05d_ModDisXCentroid_m',i);
-                iq = iq+1;
-                q0(iq)     = NaN;
-                q1(iq)     = umy(icentroid,jcentroid);
-                qsig(iq)   = NaN;
-                qnames{iq} = sprintf('Pair_%05d_ModDisYCentroid_m',i);
-                iq = iq+1;
-                q0(iq)     = NaN;
-                q1(iq)     = umz(icentroid,jcentroid);
-                qsig(iq)   = NaN;
-                qnames{iq} = sprintf('Pair_%05d_ModDisZCentroid_m',i);
-            end
-        end
+%         if numel(icentroid) == 1 && numel(jcentroid) == 1
+%             if isfinite(icentroid) == 1 && isfinite(jcentroid) == 1
+%                 kq = kq+1;
+%                 q0(kq)     = NaN;
+%                 q1(kq)     = umx(icentroid,jcentroid);
+%                 qsig(kq)   = NaN;
+%                 qnames{kq} = sprintf('Pair_%05d_ModDisXCentroid_m',i);
+%                 kq = kq+1;
+%                 q0(kq)     = NaN;
+%                 q1(kq)     = umy(icentroid,jcentroid);
+%                 qsig(kq)   = NaN;
+%                 qnames{kq} = sprintf('Pair_%05d_ModDisYCentroid_m',i);
+%                 kq = kq+1;
+%                 q0(kq)     = NaN;
+%                 q1(kq)     = umz(icentroid,jcentroid);
+%                 qsig(kq)   = NaN;
+%                 qnames{kq} = sprintf('Pair_%05d_ModDisZCentroid_m',i);
+%             end
+%         end
     end
     
     % calculate some derived parameters
