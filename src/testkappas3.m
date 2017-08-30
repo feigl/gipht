@@ -57,7 +57,23 @@ if Rbar2 > 1.0 ||  Rbar2 < 0.0
     warning(sprintf('Undefined Rbar2 %12.4e\n',Rbar2));
     return
 end
-
+% if Rbar1 > 1.0
+%     warning(sprintf('Undefined Rbar1 %12.4e set to 1.0\n',Rbar1));
+%     Rbar1 = 1.0;
+% end
+% if Rbar2 > 1.0
+%     warning(sprintf('Undefined Rbar2 %12.4e set to 1.0\n',Rbar2));
+%     Rbar2 = 1.0;
+% end
+% if Rbar1 < 0.0
+%     warning(sprintf('Undefined Rbar1 %12.4e set to 0.0\n',Rbar1));
+%     Rbar1 = 0.0;
+% end
+% if Rbar2 < 0.0
+%     warning(sprintf('Undefined Rbar2 %12.4e set to 0.0\n',Rbar2));
+%     Rbar2 = 0.0;
+% end
+% 
 
 
 % Case III

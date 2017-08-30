@@ -270,7 +270,7 @@ end
 gipht_step1; % read in phase files, select pixels
 gipht_step2; % set bounds on parameters, run simulated annealing
 gipht_step3; % determine statistical uncertainties on parameter estimates
-%gipht_step4; % make images for quad tree
+% gipht_step4; % make images for quad tree
 gipht_step5; % make images for entire sub-region
 
 save_run;

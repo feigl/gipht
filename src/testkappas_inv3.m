@@ -68,12 +68,24 @@ end
 %guess = 0.42;
 %Rbar1 = fzero(@(x)testkappas1(x, n1, Rbar2, n2)-eta,guess);
 
-% 2012-JAN-03
+% % 2012-JAN-03
 if Rbar2 > 0 && Rbar2 < 1.00
     guess = Rbar2;
 else
     guess = 0.5;
 end
 Rbar1 = fzero(@(x)testkappas3(x, n1, Rbar2, n2)-P,guess);
+% % % 20170822 Guess can contain bounds
+% % guess2 = [0.5*guess, 1.0-eps];
+% % Iterate to get valid value
+% Rbar1 = 0.5;
+% icount = 0;
+% while Rbar1 <= 1 && Rbar1 >= 0 && icount < 10
+%     icount = icount+1;
+%     Rbar1 = fzero(@(x)testkappas3(x, n1, Rbar2, n2)-P,guess);
+%     if Rbar1 > 1 || Rbar1 < 0
+%         warning(sprintf('Invalid Rbar1 %f\n',Rbar1));
+%     end
+% end
 return
 

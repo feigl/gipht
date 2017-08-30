@@ -140,18 +140,27 @@ else
 end % reading parameters from file
 
 % % Additive constant depends on observable
-if ismember(pselect,[7,9]) == 1  % observable is gradient
-    p0(get_parameter_index('Offset',pnames)) =  0.0; % cycles
-    lb(get_parameter_index('Offset',pnames)) =  0.0; % cycles
-    ub(get_parameter_index('Offset',pnames)) =  0.0; % cycles
-    ifast = 100;
-else
-    p0(get_parameter_index('Offset',pnames)) =  0.0; % cycles
-    lb(get_parameter_index('Offset',pnames)) = -0.5; % cycles
-    ub(get_parameter_index('Offset',pnames)) = +0.5; % cycles
-    ifast = 0;
+%20170802 if ismember(pselect,[7,9]) == 1  % observable is gradient
+switch idatatype1
+    case 0  % observable is phase
+        p0(get_parameter_index('Offset',pnames)) =  0.0; % cycles
+        lb(get_parameter_index('Offset',pnames)) = -0.5; % cycles
+        ub(get_parameter_index('Offset',pnames)) = +0.5; % cycles
+        ifast = 0;
+    case 2 % observable is range - bounds to be defined later
+%         p0(get_parameter_index('Offset',pnames)) =  nan;
+%         lb(get_parameter_index('Offset',pnames)) =  nan;
+%         ub(get_parameter_index('Offset',pnames)) =  nan;
+        ifast = 0;
+    case -1 % observable is gradient
+        p0(get_parameter_index('Offset',pnames)) =  0.0; % cycles
+        lb(get_parameter_index('Offset',pnames)) =  0.0; % cycles
+        ub(get_parameter_index('Offset',pnames)) =  0.0; % cycles
+        ifast = 100;
+    otherwise
+        error(sprintf('Unknown idatatype1 %d\n',idatatype1));
 end
-% 
+%
 
 % set initial values of epoch-wise parameters
 for k=1:me  %    % loop over epochs
@@ -193,7 +202,7 @@ for k=1:me  %    % loop over epochs
     pindex=union(pindex,get_parameter_index(sprintf('OrbitVelV__@_epoch_%03d_m_per_s__',k),pnames));
     
     for ii=1:numel(pindex)
-        if jm == 1   % epoch is first in trees
+        if jm == 1   % epoch is first in its tree
             %if abs(p0(pindex(ii))) >= 0.0 && isfinite(p0(pindex(ii))) == 1 % initial value is already set
             if isfinite(p0(pindex(ii))) == 1 % initial value is already set
                 lb(pindex(ii)) = p0(pindex(ii));                % update lower bound
@@ -207,11 +216,19 @@ for k=1:me  %    % loop over epochs
                 fprintf(1,'Zeroing  initial value and bounds on %s %16.7g %16.7g %16.7g\n'...
                     ,pnames{pindex(ii)},p0(pindex(ii)),lb(pindex(ii)),ub(pindex(ii)));
             end
-        else % epoch is NOT first in trees
-            lb(pindex(ii)) = p0(pindex(ii)) + lb(pindex(ii));                % update lower bound
-            ub(pindex(ii)) = p0(pindex(ii)) + ub(pindex(ii));                % update upper bound
-            fprintf(1,'Updating                       bounds on %s %16.7g %16.7g %16.7g\n'...
-                ,pnames{pindex(ii)},p0(pindex(ii)),lb(pindex(ii)),ub(pindex(ii)));
+        else % epoch is NOT first in its tree
+% %             % 20170802 add this case
+%             if isfinite(p0(pindex(ii))) == 1 % initial value is already set
+%                 lb(pindex(ii)) = p0(pindex(ii));                % update lower bound
+%                 ub(pindex(ii)) = p0(pindex(ii));                % update upper bound
+%                 fprintf(1,'Fixing bounds to initial estimate on %s %16.7g %16.7g %16.7g\n'...
+%                     ,pnames{pindex(ii)},p0(pindex(ii)),lb(pindex(ii)),ub(pindex(ii)));
+%             else               
+                lb(pindex(ii)) = p0(pindex(ii)) + lb(pindex(ii));                % update lower bound
+                ub(pindex(ii)) = p0(pindex(ii)) + ub(pindex(ii));                % update upper bound
+                fprintf(1,'Updating                       bounds on %s %16.7g %16.7g %16.7g\n'...
+                    ,pnames{pindex(ii)},p0(pindex(ii)),lb(pindex(ii)),ub(pindex(ii)));
+ %           end
         end
     end
     
@@ -445,7 +462,6 @@ switch ianneal
         cost0   = feval(str2func(objfun),DST,PST0,TST); % cost of initial model
         msig = nan(size(PST0.p0)); % uncertainty of model parameters
         istatcode = 0;
-        
     case 7
         fprintf(1,'Starting to calculate cost of null    estimate\n');
         PST00.fitfun = 'funnull';

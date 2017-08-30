@@ -36,7 +36,7 @@ cstddev1 = NaN;
 %% based on type of observable, type decide how to handle statistics
 switch idatatype1
     case 0 % observable is phase
-        if strcmp(objfun,'funcoststdnres') == 1
+        if contains(objfun,'funcoststdnres') == 1
             % assume (weighte) unwrapped phase residuals are normally distributed
             istatcode = 8;
         else
@@ -45,7 +45,7 @@ switch idatatype1
             istatcode = 1;
         end
     case -1 % observable is gradient
-        if strcmp(objfun,'funcostrarcscaled') == 1
+        if contains(objfun,'funcostrarcscaled') == 1
             % Assume residuals of gradient values are distributed as Gamma to calculate
             % critical value of cost at 69 percent confidence
             istatcode = 6;
@@ -66,7 +66,7 @@ end
 % using gmt grid files makes this obsolete - 20161025
 % switch pselect
 %     case {1,2,3,5} % observable is phase
-%         if strcmp(objfun,'funcoststdnres') == 1
+%         if contains(objfun,'funcoststdnres') == 1
 %             % assume (weighte) unwrapped phase residuals are normally distributed
 %             istatcode = 8;
 %         else
@@ -75,7 +75,7 @@ end
 %             istatcode = 1;
 %         end
 %     case 7 % observable is gradient
-%         if strcmp(objfun,'funcostrarcscaled') == 1
+%         if contains(objfun,'funcostrarcscaled') == 1
 %             % Assume residuals of gradient values are distributed as Gamma to calculate
 %             % critical value of cost at 69 percent confidence
 %             istatcode = 6;
@@ -94,19 +94,19 @@ switch ianneal
     case 0
         % no inversion has been performed, so skip statistical analysis
         fprintf(1,'IANNEAL = %d so skipping statistics: ISTATCODE is %d\n',ianneal,istatcode);
-        istatcode = 0;       
+        istatcode = 0;
     case 7
         % no inversion has been performed, so skip statistical analysis
         fprintf(1,'IANNEAL = %d so skipping statistics: ISTATCODE is %d\n',ianneal,istatcode);
-        istatcode = 0;       
-%     case {1,2}
-%         if saopt6 == 3
-%             istatcode = 5; % use Bootstrap instead of critical value
-%         end
-%         fprintf(1,'IANNEAL = %d so ISTATCODE changed to %d\n',ianneal,istatcode);
-%     case 6
-%         % use uncertainties from MCMC
-%         istatcode = 7;
+        istatcode = 0;
+        %     case {1,2}
+        %         if saopt6 == 3
+        %             istatcode = 5; % use Bootstrap instead of critical value
+        %         end
+        %         fprintf(1,'IANNEAL = %d so ISTATCODE changed to %d\n',ianneal,istatcode);
+        %     case 6
+        %         % use uncertainties from MCMC
+        %         istatcode = 7;
     otherwise
         fprintf(1,'IANNEAL = %d and ISTATCODE is %d\n',ianneal,istatcode);
 end
@@ -183,15 +183,15 @@ mnd1 = mean_direction( res1*DNPC)/2.0/pi;  % in cycles
 umd0 = mdl0 + double(res0);
 umd1 = mdl1 + double(res1);
 
-if strcmp(objfun,'funcostrarc') == 1
+if contains(objfun,'funcostrarc') == 1
     costs00 = rarcm(DST.phaobs,wrm00);
     costs0  = rarcm(DST.phaobs,wrm0);
     costs1  = rarcm(DST.phaobs,wrm1);
-elseif strcmp(objfun,'funcostrarcscaled') == 1
+elseif contains(objfun,'funcostrarcscaled') == 1
     costs00 = rarcm(DST.phaobs,wrm00) ./ DST.phasig;
     costs0  = rarcm(DST.phaobs,wrm0)  ./ DST.phasig;
     costs1  = rarcm(DST.phaobs,wrm1)  ./ DST.phasig;
-elseif strcmp(objfun,'funcostrms') == 1
+elseif contains(objfun,'funcostrms') == 1
     costs00 = abs(DST.phaobs-wrm00);
     costs0  = abs(DST.phaobs-wrm0);
     costs1  = abs(DST.phaobs-wrm1);
@@ -226,31 +226,32 @@ if isfinite(cost0) ~= 1 || isfinite(cost1) ~= 1
     istatcode = 0;
 end
 
+    
+%% make raw histogram of residuals
+nbins = floor(ndata/100);
+nbins = nbins - mod(nbins,2); % want an even number of bins
+if nbins < 10
+    nbins = 10;
+end
+if nbins > 50
+    nbins = 50;
+end
+nf=nf+1;h(nf)=figure;
+subplot(2,1,1);
+histogram(colvec(res0)/DNPC,nbins);
+title('histogram of initial residuals');xlabel('residual (cycle)');ylabel('N occurrences');
+subplot(2,1,2);
+histogram(colvec(res1)/DNPC,nbins);
+title('histogram of final residuals');xlabel('residual (cycle)');ylabel('N occurrences');
+feval(printfun,sprintf('%s_HIST2',runname));
+
+%% Analyze statistics
 if istatcode ~= 0
     printstats= 1;
     %Circular standard deviation of final residuals
     %cstddev1  = circular_stddev(2*pi*reshape(res1,numel(res1),1))/2/pi;
     cstddev1  = circular_stddev(2*pi*reshape(double(res1)/DNPC,numel(res1),1))/2/pi;
-    
-    %     % make raw histogram of residuals
-    %     nbins = floor(ndata/100);
-    %     nbins = nbins - mod(nbins,2); % want an even number of bins
-    %     if nbins < 10
-    %         nbins = 10;
-    %     end
-    %     if nbins > 50
-    %         nbins = 50;
-    %     end
-    %     nf=nf+1;h(nf)=figure;
-    %     subplot(2,1,1);
-    %     hist(colvec(res0)/DNPC,nbins);
-    %     title('histogram of initial residuals');xlabel('residual (cycle)');ylabel('N occurrences');
-    %     subplot(2,1,2);
-    %     hist(colvec(res1)/DNPC,nbins);
-    %     title('histogram of final residuals');xlabel('residual (cycle)');ylabel('N occurrences');
-    %     feval(printfun,sprintf('%s_HIST2',runname));
-    
-    
+   
     switch istatcode
         case 1  % Assume Von Mises distribution
             fprintf(1,'Evaluating Von Mises distribution for residual phase values.\n')
@@ -304,9 +305,9 @@ if istatcode ~= 0
                 fprintf(1,'Calling testkappas_inv3 with Rbar1 = %.6f ndata = %d\n',Rbar1,ndata)
                 Rbar69 = testkappas_inv3(0.31,ndata,Rbar1,ndata) % Z = -0.48  is P = 31% one sided
                 
-                %     if Rbar69 > Rbar1
-                %         warning(sprintf('Rbar69 (%.4f) is greater than Rbar1 (%.4f)\n',Rbar69,Rbar1));
-                %     end
+                if Rbar69 > Rbar1
+                    warning(sprintf('Rbar69 (%.4f) is greater than Rbar1 (%.4f)\n',Rbar69,Rbar1));
+                end
                 %     %     if Rbar95 > Rbar1
                 %     %         warning(sprintf('Rbar95 (%.4f) is greater than Rbar1 (%.4f)\n',Rbar95,Rbar1));
                 %     %     end
@@ -380,7 +381,7 @@ if istatcode ~= 0
             warning(sprintf('Unknown value of ISTATCODE = %d\n',istatcode));
     end
     
-    if ismember(abs(istatcode),[0,1,2,5,6,8]) == 1
+    if ismember(abs(istatcode),[1,2,5,6,8]) == 1
         psig = nan(size(p0));
         if isfinite(crit69) == 0
             warning(sprintf('Critical value is not defined.\nApproximating critical value using non-parametric quantiles.\n'));
@@ -406,7 +407,7 @@ if istatcode ~= 0
             fprintf(1,'Approximating critical value using empirical values. ISTATCODE = %d\n',istatcode);
         end
         
-        if istatcode ~= 0 && isfinite(crit69) == 1
+        if isfinite(crit69) == 1
             % evaluate cost for each parameter
             nslices = 100;
             %p1vals = zeros(numel(acosts1),mparam); % initialize  this matrix
@@ -574,9 +575,9 @@ for fd=[1 fidtxtout]
     fprintf(fd,'Cost  of initl model   = %.7f %s for %6d observations in inverted data set %s\n',cost0,   datalabel, ndata, runname);
     fprintf(fd,'Cost  of final model   = %.7f %s for %6d observations in inverted data set %s\n',cost1,   datalabel, ndata, runname);
     fprintf(fd,'Cost  improvement      = %.7f %s for %6d observations in inverted data set %s\n',cost0-cost1,   datalabel, ndata, runname);
-if isfinite(crit69)==1
-    fprintf(fd,'Critical value of cost = %.7f %sfor %6d observations in inverted data set %s\n',crit69,  datalabel, ndata, runname);
-end
+    if isfinite(crit69)==1
+        fprintf(fd,'Critical value of cost = %.7f %sfor %6d observations in inverted data set %s\n',crit69,  datalabel, ndata, runname);
+    end
     if istatcode == 1
         
         fprintf(fd,'Mean direction of residuals from null     model              = %.4f cycles\n',mnd00);
@@ -643,7 +644,7 @@ end
 %% calculate some derived parameters
 %% TODO move these into the fitting functions as a fourth option
 % iq = 0;
-% 
+%
 % % total volume change
 % iq = iq+1;
 % q0(iq) = (p0(get_parameter_index('Okada1_Length'  ,pnames))  ...
@@ -662,18 +663,18 @@ end
 %     *p1(get_parameter_index('Okada2_Tensile', pnames))) ...
 %     +   p1(get_parameter_index('Mogi1_Volume_'  ,pnames))  ...
 %     +   p1(get_parameter_index('Mogi2_Volume_'  ,pnames));
-% 
+%
 % % linearized propagation of uncertainties http://en.wikipedia.org/wiki/Propagation_of_uncertainty
 % % 2012-OCT-04
 % %qsig(iq) = 0;
-% 
+%
 % tva = p1(get_parameter_index('Okada1_Length'  ,pnames)) ;
 % tvb = p1(get_parameter_index('Okada1_Width'  , pnames)) ;
 % tvc = p1(get_parameter_index('Okada1_Tensile', pnames)) ;
 % tsa = psig(get_parameter_index('Okada1_Length'  ,pnames)) ;
 % tsb = psig(get_parameter_index('Okada1_Width'  , pnames)) ;
 % tsc = psig(get_parameter_index('Okada1_Tensile', pnames)) ;
-% 
+%
 % % correct the calculation of error below
 % if isfinite(tva*tvb*tvc*tsa*tsb*tsc) == 1
 %     qsig(iq) = (tvb*tvc*tsa)^2+(tva*tvc*tsb)^2+(tva*tvb*tsc)^2;
@@ -681,8 +682,8 @@ end
 %     % 2012-OCT-04
 %     qsig(iq) = NaN;
 % end
-% 
-% 
+%
+%
 % % Kurt 2012 JUL 10
 % if  isfinite(psig(get_parameter_index('YangPS_semimajor_axis_a__m______',pnames)))==1 ...
 %         && isfinite(psig(get_parameter_index('YangPS_semiminor_axis_b_in_m____',pnames)))==1
@@ -705,7 +706,7 @@ end
 %     [Xcorners11,Ycorners11,Hcorners11,Ncorners] = disloc_to_seismo(p1(iii:iii+9));
 %     [LatCorners11,LonCorners11]=utm2deg(Xcorners11,Ycorners11,utmzone10);
 %     clear utmzone10;
-%     
+%
 %     iq = iq+1;
 %     q0(iq) = Xcorners10(10);
 %     q1(iq) = Xcorners11(10);
@@ -726,7 +727,7 @@ end
 %     q1(iq) = LonCorners11(10);
 %     qsig(iq) = NaN;
 %     qnames{iq} = sprintf('Okada1_Centroid_longitude_in_deg');
-%     
+%
 %     %   fprintf(fd,'Initial UTM coordinates of 4 corners, upper center, and Centroid of Okada\n');
 %     %   for i=[1 2 3 4 7 10]
 %     %      fprintf(fd,'%s %12.4f %12.4f %12.4f\n',Ncorners{i},Xcorners0(i),Ycorners0(i),Hcorners0(i));
@@ -744,8 +745,8 @@ end
 %     %%   for i=[1 2 3 4 7 10]
 %     %      fprintf(fd,'%s %12.4f %12.4f %12.4f\n',Ncorners{i},LonCorners1(i),LatCorners1(i),Hcorners1(i));
 %     %   end
-%     
-%     
+%
+%
 %     % conventional strike
 %     iq=iq+1;
 %     str = 180 + p0(get_parameter_index('Okada1_Strike',pnames));
@@ -760,7 +761,7 @@ end
 %     q1(iq) = str;
 %     qsig(iq) = psig(get_parameter_index('Okada1_Strike',pnames));
 %     qnames{iq} = sprintf('Okada1_Convt_strike_in_deg_CW_N');
-%     
+%
 %     % Okada U1
 %     % q0(9) = qg0(12);
 %     % q1(9) = qg1(12);
@@ -779,7 +780,7 @@ end
 %     %q0(11) = p0(get_parameter_index('Okada1_Tensile_Opening',pnames));
 %     %q1(11) = p1(get_parameter_index('Okada1_Tensile_Opening',pnames));
 %     %qnames{11} =sprintf('Okada_slip_U3_in_meters________');
-    
+
 %     %rake
 %     iq = iq+1;
 %     q0(iq) = 180*(atan2(-1*p0(get_parameter_index('Okada1_RL_Strike_Slip',pnames))...
@@ -790,7 +791,7 @@ end
 %         ))/pi;  % change sign of U2 for negative dip bug in disloc
 %     qsig(iq) = NaN;
 %     qnames{iq} = sprintf('Derived_Okada1_rake_in_deg_CCW_');
-%     
+%
 %     % geometric potency
 %     iq = iq+1;
 %     q0(iq) = p0(get_parameter_index('Okada1_Length',pnames))...
@@ -804,20 +805,20 @@ end
 %         ,         p1(get_parameter_index('Okada1_Downdip_Slip'  ,pnames))...
 %         ,         p1(get_parameter_index('Okada1_Tensile',       pnames))]);
 %     qnames{iq} = sprintf('Derived_Okada1_potency_in_m3___');
-    % qsig(iq) = NaN;
-    %     qsig(iq) = 0;
-    %     if isfinite(psig(get_parameter_index('Okada1_Tensile',pnames))) == 1
-    %         qsig(iq) = qsig(iq) ...
-    %             +((psig(get_parameter_index('Okada1_Length'  ,pnames))  ...
-    %             * psig(get_parameter_index('Okada1_Width'  , pnames))   ...
-    %             * psig(get_parameter_index('Okada1_Tensile', pnames))))^2;
-    %   20130419 uncertainty is sqrt of sum of squares
+% qsig(iq) = NaN;
+%     qsig(iq) = 0;
+%     if isfinite(psig(get_parameter_index('Okada1_Tensile',pnames))) == 1
+%         qsig(iq) = qsig(iq) ...
+%             +((psig(get_parameter_index('Okada1_Length'  ,pnames))  ...
+%             * psig(get_parameter_index('Okada1_Width'  , pnames))   ...
+%             * psig(get_parameter_index('Okada1_Tensile', pnames))))^2;
+%   20130419 uncertainty is sqrt of sum of squares
 %     qsig(iq) = sqrt((psig(get_parameter_index('Okada1_RL_Strike_Slip'  ,pnames)))^2  ...
 %         + (psig(get_parameter_index('Okada1_Downdip_Slip'  , pnames)))^2   ...
 %         + (psig(get_parameter_index('Okada1_Tensile', pnames)))^2);
 %     2014-01-13 above gives strange results
 %     qsig(iq) = NaN;
-% 
+%
 % end
 
 % % moment, assuming shear modulus = 30 GPa
@@ -826,16 +827,16 @@ end
 % if q1(iq-1) > 0; q1(iq) = 3e10*q1(iq-1); else q1(iq) = NaN; end;
 % qnames{iq} = sprintf('Derived_Okada1_moment_in_Nm____');
 % qsig(iq) = NaN;
-% 
+%
 % % magnitude
 % iq = iq+1;
 % if q0(iq-1) > 0; q0(iq) = 2*log10(q0(iq-1))/3 - 6.03; else q0(iq) = NaN; end
 % if q1(iq-1) > 0; q1(iq) = 2*log10(q1(iq-1))/3 - 6.03; else q1(iq) = NaN; end
 % qnames{iq} = sprintf('Derived_Okada1_Mw______________');
 % qsig(iq) = NaN;
-% 
+%
 % %end
-% 
+%
 % % DERIVED PARAMETERS FOR OKADA2
 % iii=get_parameter_index('Okada2_Length_in_m______________',pnames);
 % %if psig(iii) > 0
@@ -843,14 +844,14 @@ end
 %     for i=1:10
 %         utmzone10(i,:)=utmzone0;
 %     end
-%     
+%
 %     [Xcorners20,Ycorners20,Hcorners20,Ncorners] = disloc_to_seismo(p0(iii:iii+9));
 %     [LatCorners20,LonCorners20]=utm2deg(Xcorners20,Ycorners20,utmzone10);
 %     [Xcorners21,Ycorners21,Hcorners21,Ncorners] = disloc_to_seismo(p1(iii:iii+9));
 %     [LatCorners21,LonCorners21]=utm2deg(Xcorners21,Ycorners21,utmzone10);
 %     clear utmzone10;
-% %     
-% %     
+% %
+% %
 % %     iq = iq+1;
 % %     q0(iq) = Xcorners20(10);
 % %     q1(iq) = Xcorners21(10);
@@ -871,7 +872,7 @@ end
 % %     q1(iq) = LonCorners21(10);
 % %     qsig(iq) = NaN;
 % %     qnames{iq} = sprintf('Okada2_Centroid_longitude_in_deg');
-% %     
+% %
 % %     % conventional strike
 % %     iq=iq+1;
 % %     str = 180 + p0(get_parameter_index('Okada2_Strike',pnames));
@@ -886,7 +887,7 @@ end
 % %     q1(iq) = str;
 % %     qsig(iq) = psig(get_parameter_index('Okada2_Strike',pnames));
 % %     qnames{iq} = sprintf('Okada2_Convt_strike_in_deg_CW_N');
-%     
+%
 % %     %rake
 % %     iq = iq+1;
 % %     q0(iq) = 180*(atan2(-1*p0(get_parameter_index('Okada2_RL_Strike_Slip',pnames))...
@@ -897,7 +898,7 @@ end
 % %         ))/pi;  % change sign of U2 for negative dip bug in disloc
 % %     qsig(iq) = NaN;
 % %     qnames{iq} = sprintf('Derived_Okada2_rake_in_deg_CCW_');
-% %     
+% %
 % %     % geometric potency
 % %     iq = iq+1;
 % %     q0(iq) = p0(get_parameter_index('Okada2_Length',pnames))...
@@ -916,7 +917,7 @@ end
 %     %     qsig(iq) = qsig(iq) * psig(get_parameter_index('Okada2_Length',pnames)) ...
 %     %                 * psig(get_parameter_index('Okada2_Width',pnames)) ;
 %     % moment, assuming shear modulus = 30 GPa
-% 
+%
 %     % 20130419 Uncertainty is sum of squares
 % %     qsig(iq) = sqrt((psig(get_parameter_index('Okada2_RL_Strike_Slip'  ,pnames)))^2  ...
 % %         + (psig(get_parameter_index('Okada2_Downdip_Slip'  , pnames)))^2   ...
@@ -928,7 +929,7 @@ end
 %     if q1(iq-1) > 0; q1(iq) = 3e10*q1(iq-1); else q1(iq) = NaN; end;
 %     qnames{iq} = sprintf('Derived_Okada2_moment_in_Nm____');
 %     qsig(iq) = NaN;
-%     
+%
 %     % magnitude
 %     iq = iq+1;
 %     if q0(iq-1) > 0; q0(iq) = 2*log10(q0(iq-1))/3 - 6.03; else q0(iq) = NaN; end
@@ -936,7 +937,7 @@ end
 %     qnames{iq} = sprintf('Derived_Okada2_Mw______________');
 %     qsig(iq) = NaN;
 % end
-% 
+%
 % % geographic coordinates of Mogi source
 % if abs(psig(get_parameter_index('Mogi1_Volume_Increase_in_m3_____',pnames))) > 0
 %     [LatMogi10,LonMogi10]=utm2deg(...
@@ -978,15 +979,15 @@ end
 %     qsig(iq) = NaN;
 %     qnames{iq} = sprintf('Mogi2_Centroid_longitude_in_deg_');
 % end
-% 
+%
 % % Ellipsoid
 % if isfinite(psig(get_parameter_index('YangPS_semimajor_axis_a__m______',pnames)))==1 ...
 %         && isfinite(psig(get_parameter_index('YangPS_semiminor_axis_b_in_m____',pnames)))==1
-%     
+%
 %     Yang.a  = p0(get_parameter_index('YangPS_semimajor_axis_a__m______',pnames));
 %     Yang.b  = p0(get_parameter_index('YangPS_semiminor_axis_b_in_m____',pnames));
 %     Yang.V0 = 4.0 * pi * (Yang.a)^2 * Yang.b;
-%     
+%
 %     Yang.a = p1(get_parameter_index('YangPS_semimajor_axis_a__m______',pnames));
 %     Yang.b = p1(get_parameter_index('YangPS_semiminor_axis_b_in_m____',pnames));
 %     Yang.x = p1(get_parameter_index('YangPS_Easting_in_m_____________',pnames));
@@ -996,7 +997,7 @@ end
 %     Yang.c = p1(get_parameter_index('YangPS_Azimuth_deg_CCW_from_N___',pnames));
 %     Yang.d = p1(get_parameter_index('YangPS_Plunge_in_degrees________',pnames));
 %     Yang.V1 = 4.0 * pi * (Yang.a)^2 * Yang.b;
-%     
+%
 %     % get UTM coordinates of center
 %     if isgeo  == 1
 %         [Yang.latc,Yang.lonc] = utm2deg(Yang.x,Yang.y,utmzone0);
@@ -1004,11 +1005,11 @@ end
 %         Yang.latc = NaN;
 %         Yang.lonc = NaN;
 %     end
-%     
+%
 %     % make prolate spheroid by repeating b axis
 %     % make depth negative up by negating z
 %     [Yang.xs,Yang.ys,Yang.zs] = get_ellipsoid(Yang.x,Yang.y,-1.0*Yang.z,Yang.a,Yang.b,Yang.b,Yang.c,Yang.d);
-%     
+%
 %     iq=iq+1;
 %     q0(iq) = Yang.V0;
 %     q1(iq) = Yang.V1;
@@ -1035,7 +1036,7 @@ end
 %     qsig(iq) = NaN;
 %     qnames{iq} = sprintf('YangPS_latitude_in_degrees______');
 % end
-% 
+%
 % %  PRINT OUT THE DERIVED PARAMETERS
 % qnames = truncate_parameter_names(qnames);
 % iq1 = 1;
@@ -1050,7 +1051,7 @@ end
 %     %    sadj = NaN;
 %     sadj = abs(adj/qsig(i));
 %     outfmt = getfmt(q1(i),qnames{i});
-%     
+%
 %     fprintf(1        ,outfmt,qflags{i},i+mparam,qnames{i} ,q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
 %     fprintf(fidtxtout,outfmt,qflags{i},i+mparam,qnames{i}, q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
 % end
