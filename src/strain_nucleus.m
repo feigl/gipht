@@ -45,7 +45,7 @@ for i=1:nobs
                     Xy = yobs(i) - Iy(iy);  % relative position of observation point wrt to integration point in strain nucleus
                     zp =      0. - Iz(iz);  % relative position of observation point wrt to integration point in strain nucleus
                     % dUHS = dUHS + wang539(dvolume_strain,nu,zp,Xx,Xy);
-                    dUHS = dUHS + wang539(F.volume_increase(j)/(nsteps^3),nu,zp,Xx,Xy);
+                    dUHS = dUHS + wang539(F.dV(j)/(nsteps^3),nu,zp,Xx,Xy);
                 end
             end
         end

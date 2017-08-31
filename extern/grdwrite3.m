@@ -1,4 +1,4 @@
-function grdwrite2(x,y,z,file)
+function grdwrite3(x,y,z,file,INFO)
 %GRDWRITE2  Write a GMT grid file
 %
 % Uses built-in NetCDF capability (MATLAB R2008b or later) to
@@ -34,41 +34,68 @@ function grdwrite2(x,y,z,file)
 % <http://www.mathworks.com/matlabcentral/fileexchange/26290-grdwrite2>
 
 % 20160814 - modified to suit GMT5 Kurt Feigl
+% 20170518 - Add desc to list of arguments Kurt Feigl
 
-if nargin < 4,
+if nargin < 4
     help(mfilename);
-    return,
+    return
 end
 
 % check for appropriate Matlab version (>=7.7)
 V=regexp(version,'[ \.]','split');
-if (str2num(V{1})<7) || (str2num(V{1})==7 && str2num(V{2})<7),
+if (str2num(V{1})<7) || (str2num(V{1})==7 && str2num(V{2})<7)
     ver
     error('grdread2: Requires Matlab R2008b or later!');
 end
 
 ncid = netcdf.create(file, 'NC_SHARE');
-if isempty(ncid),
-    return,
+if isempty(ncid)
+    return
 end
 
 % set descriptive variables
 conv='COARDS/CF-1.0';
 title=file;
-history='File written by MATLAB function grdwrite2.m';
-desc=['Created ' datestr(now)];
+if nargin == 5
+    history=['File written by MATLAB function grdwrite3.m ' datestr(now)];   
+    if isfield(INFO,'description') == 1
+        desc = INFO.description;
+    else
+        desc=['Created ' datestr(now)];
+    end
+    if isfield(INFO,'xname') == 1
+        xname = INFO.xname;
+    else
+        xname='x';
+    end
+    if isfield(INFO,'yname') == 1
+        yname = INFO.yname;
+    else
+        yname='y';
+    end
+    if isfield(INFO,'zname') == 1
+        zname = INFO.zname;
+    else
+        zname='z';
+    end
+else
+    history='File written by MATLAB function grdwrite3.m';
+    xname = 'x';
+    yname = 'y';
+    zname = 'z';
+end
 vers='4.x';                             % is "x" OK?
 
 % check X and Y
-if (~isvector(x) || ~isvector(y)),
+if (~isvector(x) || ~isvector(y))
     error('X and Y must be vectors!');
 end
-if (length(x) ~= size(z,2)),    % number of columns don't match size of x
+if (length(x) ~= size(z,2))    % number of columns don't match size of x
     minx=min(x); maxx=max(x);
     dx=(maxx-minx)/(size(z,2)-1);
     x=minx:dx:maxx;                       % write as a vector
 end
-if (length(y) ~= size(z,1)),    % number of rows don't match size of y
+if (length(y) ~= size(z,1))    % number of rows don't match size of y
     miny=min(y); maxy=max(y);
     dy=(maxy-miny)/(size(z,1)-1);
     y=miny:dy:maxy;                       % write as a vector
@@ -107,7 +134,8 @@ netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'GMT_version',vers);
 % X
 dimid = netcdf.defDim(ncid,'x',length(x));
 varid = netcdf.defVar(ncid,'x','double',dimid);
-netcdf.putAtt(ncid,varid,'long_name','x');
+%netcdf.putAtt(ncid,varid,'long_name','x');
+netcdf.putAtt(ncid,varid,'long_name',xname);
 netcdf.putAtt(ncid,varid,'actual_range',[min(x) max(x)]);
 netcdf.endDef(ncid);
 netcdf.putVar(ncid,varid,x);
@@ -115,14 +143,16 @@ netcdf.putVar(ncid,varid,x);
 netcdf.reDef(ncid);
 dimid = netcdf.defDim(ncid,'y',length(y));
 varid = netcdf.defVar(ncid,'y','double',dimid);
-netcdf.putAtt(ncid,varid,'long_name','y');
+%netcdf.putAtt(ncid,varid,'long_name','y');
+netcdf.putAtt(ncid,varid,'long_name',yname);
 netcdf.putAtt(ncid,varid,'actual_range',[min(y) max(y)]);
 netcdf.endDef(ncid);
 netcdf.putVar(ncid,varid,y);
 % Z
 netcdf.reDef(ncid);
 varid = netcdf.defVar(ncid,'z',nctype,[0 1]);
-netcdf.putAtt(ncid,varid,'long_name','z');
+%netcdf.putAtt(ncid,varid,'long_name','z');
+netcdf.putAtt(ncid,varid,'long_name',zname);
 netcdf.putAtt(ncid,varid,'_FillValue',nanfill);
 netcdf.putAtt(ncid,varid,'actual_range',[min(z(:)) max(z(:))]);
 netcdf.endDef(ncid);

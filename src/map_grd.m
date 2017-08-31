@@ -22,14 +22,20 @@ else
     yp = ye;
 end
 
+% set up a symmetric colortable
+cmaxabs = max(abs(colvec(IMAGE)));
+clim = [-cmaxabs,+cmaxabs];
+
 % draw the image
-imagesc(xp,yp,IMAGE);
+imagesc(xp,yp,IMAGE,clim);
 colormap(cmap);
 axis xy;
+axis equal;
+axis tight;
 xlabel(xlab);
 ylabel(ylab);
-tstr = sprintf('%s [%s]',INFO.title,strrep(grdfilename,'_','\_'));
-title(tstr);
+tstr = sprintf('%s\n[%s]',INFO.title,grdfilename);
+title(tstr,'Interpreter','None');
 c = colorbar;
 c.Label.String = INFO.zname;
 h = gcf;

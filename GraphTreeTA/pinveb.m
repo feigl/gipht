@@ -37,7 +37,7 @@ n = 1:numel(s); % store indices of singluar values
 % Assign tolerance and cut-off values 
 if nargin < 2 
     % if tolerance isn't specified, use default
-    tol = max(size(A)) * eps(norm(s,inf)); 
+    tol = max(size(A)) * eps(norm(s,inf))
     sp = s(s > tol);
     p = numel(sp);
 elseif nargin == 2 
