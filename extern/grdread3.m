@@ -80,7 +80,7 @@ switch nvars
         grid_mapping=netcdf.getVar(ncid,3); % 
     case 6                       % old (v3) GMT netCDF grid file
         [dimname, dimlen] = netcdf.inqDim(ncid,1);
-        if (dimname=='xysize'),             % make sure it really is v3 netCDF
+        if (dimname=='xysize')            % make sure it really is v3 netCDF
             xrange=netcdf.getVar(ncid,0)';
             yrange=netcdf.getVar(ncid,1)';
             z=netcdf.getVar(ncid,5);
@@ -108,7 +108,7 @@ end
 netcdf.close(ncid);
 
 switch nargout
-    case 1,double
+    case 1
         varargout{1}=z;
     case {3,4}
         varargout{1}=x;

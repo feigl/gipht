@@ -1,4 +1,4 @@
-function errorcode = geotiff_float_to_16bit(infilename,outfilename)
+function lut = geotiff_float_to_16bit(infilename,outfilename,map)
 %function errcode = geotiff_float_to_16bit(infilename,outfilename)
 %
 % First, read a geotiff file containing an image array of science values (e.g., radians)
@@ -16,6 +16,7 @@ errorcode = 0;
 % extract the data from the file
 info1 =geotiffinfo(infilename);
 [image1,REF1] =geotiffread(infilename);
+REF1
 
 %% make a plot if required
 debug = true;
@@ -31,8 +32,20 @@ end
 %% scale the values from [min,max] to [0,1]
 gray=mat2gray(image1);
 
+%% make a look-up table LUT
+%% TODO add NaN values ...
+cy=linspace(nanmin(colvec(image1)),nanmax(colvec(image1)),2^16);
+ii=1:2^16;
+lut = [cy',ii'];
+
 %% convert to indexed image
-[indexed, map] = gray2ind(gray,2^16);
+[indexed, mapgray] = gray2ind(gray,2^16);
+whos 
+[nrows,ncols] = size(map)
+fprintf(1,'first 10 rows of color map\n');
+map(1:10,1:3)
+fprintf(1,'last 10 rows of color map\n');
+map(nrows-10:nrows,1:3)
 
 %% handle missing data
 inan = find(isnan(image1) == 1);

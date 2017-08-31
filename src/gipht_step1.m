@@ -142,7 +142,7 @@ switch ndatatypes
         datalabel = '[cycles]';
         %objfun = 'funcostrarc';        % Objective Function mininum angle,  assumes zero mean, using arc function in radians
         objlabel = '[cycles]';
-    case -1; % east component of gradient
+    case -1 % east component of gradient
         idatatype1 = -1;
         FACTIN = 1; % grd file contains dimensionless strain
         DNPC = 1;
@@ -320,6 +320,7 @@ xcenter = mean([xsubmin, xsubmax]);
 ycenter = mean([ysubmin, ysubmax]);
 
 
+
 %% Decide how to select pixels
 switch pselect
     case 0
@@ -360,26 +361,39 @@ kmasts = zeros(np,1);
 kslavs = zeros(np,1);
 
 for i = 1:np
+    
+
     %% index master and slave
     kmast = find(DD(i,:) == -1);
     kslav = find(DD(i,:) == +1);
     
-    %%read phase data from interferogram
-    %2009-JUN-18 phaimg = read_pha(fn0,ncols)/256; % in cycles
-    
+    %% read data from interferogram
+    %2009-JUN-18 phaimg = read_pha(fn0,ncols)/256; % in cycle    
     fn0 = pfnames{i};
     nbytes = fsize(fn0);
     if  nbytes > 0
         fprintf(1,'Extracting information from GMT UTM grid file named %s\n',fn0);
         INFO = grdinfo3(fn0)
-        nf=nf+1;h(nf) = map_grd(fn0,cmapblackzero(1));
-        feval(printfun,sprintf('%s_obs_P%02d',runname,i));  
         [grdx,grdy,grdd] = grdread3(fn0);       
      else
         phaimg = [];
         warning(sprintf('Phase file named %s is non-existant or empty\n',fn0));
         nerrors = nerrors + 1;
     end
+    
+    %% make a title for subsequent plots
+    titlestr = sprintf('Phase: Pair %3d %s orbs %5d %5d NROWS = %d by NCOLS= %d'...
+        ,i,strrep(fn0,'_','\_'),iuniqorbs(kmast),iuniqorbs(kslav),nrows,ncols);
+
+    
+    %% make histogram of raw data
+    nf=nf+1;h(nf)=figure;
+    histogram(double(grdd)/DNPC,64);hold on;
+    title('GRDD = Raw data before selecting pixels');
+    axis xy;xlabel(datalabel); ylabel('number of occurences');
+    feval(printfun,sprintf('%s_HistogramR_P%02d',runname,i));
+
+    
     
     %% decide about masking
     switch pselect
@@ -434,24 +448,33 @@ for i = 1:np
     
     fprintf(1,'Minimal values in meters         for xyzm %10.1f %10.1f %10.1f \n',min(xyzm(1,i1:i2)),min(xyzm(2,i1:i2)),min(xyzm(3,i1:i2)));
     fprintf(1,'Maximal values in meters         for xyzm %10.1f %10.1f %10.1f \n',max(xyzm(1,i1:i2)),max(xyzm(2,i1:i2)),max(xyzm(3,i1:i2)));
+    fprintf(1,'Extremal values in raw           for grdd %12.4f %12.4f \n',min(colvec(grdd)),max(colvec(grdd)));
+    fprintf(1,'Extremal values in cycles        for phao %12.4f %12.4f \n',min(phao(i1:i2)/DNPC),max(phao(i1:i2)/DNPC));
     
-    %% make a title for subsequent plots
-    titlestr = sprintf('Phase: Pair %3d %s orbs %5d %5d NROWS = %d by NCOLS= %d'...
-        ,i,strrep(fn0,'_','\_'),iuniqorbs(kmast),iuniqorbs(kslav),nrows,ncols);
+    %% plot data as an image
+    SYMS.x = colvec(xyzm(1,i1:i2));
+    SYMS.y = colvec(xyzm(2,i1:i2));
+    SYMS.sym = cell(i2-i1+1,1);
+    for ii=1:i2-i1+1
+        SYMS.sym{ii} = sprintf('%s','ok');
+    end
+    nf=nf+1;h(nf) = map_grd(fn0,cmapblackzero(1),SYMS);
+    feval(printfun,sprintf('%s_obs_P%02d',runname,i));  
 
-    %% plot wrapped phase in histogram
-    nf=nf+1;h(nf)=figure;title(titlestr);
-    hist2(phao(i1:i2)/DNPC,64);hold on;
+    %% make histogram
+    nf=nf+1;h(nf)=figure;
+    histogram(phao(i1:i2)/DNPC,64);hold on;
+    title('PHAO: finite data after selecting pixels');
     axis xy;xlabel(datalabel); ylabel('number of occurences');
     feval(printfun,sprintf('%s_Histogram_P%02d',runname,i));
     
     %% plot data as a function of topographic elevation
     nf=nf+1;h(nf)=figure;hold on;title(titlestr);
-    subplot(4,1,1);plot(xyzm(1,i1:i2)/1e3, double(phao(i1:i2))/DNPC,'k.');xlabel('Easting (km)');ylabel(datalabel);
-    subplot(4,1,2);plot(xyzm(2,i1:i2)/1e3, double(phao(i1:i2))/DNPC,'k.');xlabel('Northing (km)');ylabel(datalabel);
-    subplot(4,1,3);plot(xyzm(3,i1:i2)/1e3, double(phao(i1:i2))/DNPC,'k.');xlabel('topographic elevation (km)');ylabel(datalabel);
+    subplot(4,1,1);plot(xyzm(1,i1:i2)/1e3, phao(i1:i2)/DNPC,'k.');xlabel('Easting (km)');ylabel(datalabel);
+    subplot(4,1,2);plot(xyzm(2,i1:i2)/1e3, phao(i1:i2)/DNPC,'k.');xlabel('Northing (km)');ylabel(datalabel);
+    subplot(4,1,3);plot(xyzm(3,i1:i2)/1e3, phao(i1:i2)/DNPC,'k.');xlabel('topographic elevation (km)');ylabel(datalabel);
     subplot(4,1,4);rdist = sqrt((xyzm(1,i1:i2)-xcenter).^2 +(xyzm(2,i1:i2)-ycenter).^2);
-    plot(rdist/1e3, double(phao(i1:i2))/DNPC,'k.'); xlabel('Radial distance from center of subregion (km)');ylabel(datalabel);
+    plot(rdist/1e3, phao(i1:i2)/DNPC,'k.'); xlabel('Radial distance from center of subregion (km)');ylabel(datalabel);
     feval(printfun,sprintf('%s_PositionVsPhase_P%02d',runname,i));
    
     %% deal with orbits
@@ -548,7 +571,7 @@ check_struct(DST,1); % print min, max, values
 %
 % save unitv unitv
 
-clear inan imout iok i2dem isort phaimg phao rng xyzm;
+%clear inan imout iok i2dem isort phaimg phao rng xyzm;
 clear qgx qgy qi1 qi2 qim qim2 qj1 qj2 qjm qjm2 qqp qqq qsp qkw qlist;
 clear qi12 qiim qj12 qjjm;
 clear h;

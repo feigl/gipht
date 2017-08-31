@@ -24,7 +24,9 @@ switch pselect
         %     integer values drawn from the discrete uniform distribution on 1:IMAX.
         %     randi(IMAX,M,N) or randi(IMAX,[M,N]) returns an M-by-N matrix.
 
-        kkeep =  randi(npix,[numel(grdd),1]);
+        % 20170830 WRONG: kkeep =  randi(npix,[numel(grdd),1]); 
+        % 20170830 RIGHT: draw npix values from interval [1,nx*ny]
+        kkeep =  randi([1,numel(grdd)],npix,1);
         fprintf(1,'Saving %d pixel indices to kkeep.mat \n',npix);
         save kkeep kkeep;
     case 2      %20130624 - My understanding is that if we do NOT initialize, then the RNG
