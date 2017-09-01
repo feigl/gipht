@@ -32,7 +32,8 @@ end
 INFO = grdinfo3(grdfilename);
 
 %% if coordinates are in UTM meters, then plot in kilometers
-if contains(INFO.xname,'meters') == 1 || contains (INFO.yname,'meters') == 1
+% if contains(INFO.xname,'meters') == 1 || contains (INFO.yname,'meters') == 1
+if isempty(regexpi(INFO.xname,'meters')) ~= 1 || isempty(regexpi(INFO.yname,'meters')) ~= 1
     lengthfact = 1.e3; % plot in km
     xlab = strrep(INFO.xname,'in meters','[km]');
     ylab = strrep(INFO.yname,'in meters','[km]');   
@@ -51,20 +52,24 @@ cmaxabs = max(abs(colvec(IMAGE)));
 clim = [-cmaxabs,+cmaxabs];
 
 % draw the image
-imagesc(xp,yp,IMAGE,clim);
+imagesc(xe/lengthfact,ye/lengthfact,IMAGE,clim);
 colormap(cmap);
 axis xy;
 axis equal;
 axis tight;
+grd_axis = axis;
 
 %% plot symbols if requested
 if plot_symbols == 1
-    for i=1:numel(SYMS.x)
-        plot(SYMS.x(i)/lengthfact,SYMS.y(i)/lengthfact,SYMS.sym{i});
+    for i=1:numel(SYMS.sym)
+        sym_ind = find(SYMS.ind == i);
+        sym_code = char(SYMS.sym{i});
+        sym_color = char(sym_code(1));
+        plot(SYMS.x(sym_ind)/lengthfact,SYMS.y(sym_ind)/lengthfact,SYMS.sym{i}, 'MarkerFaceColor', sym_color);
     end
     else
 end
-
+axis(grd_axis)
 %% add labels and title
 xlabel(xlab);
 ylabel(ylab);
