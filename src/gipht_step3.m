@@ -236,7 +236,7 @@ end
 if nbins > 50
     nbins = 50;
 end
-nf=nf+1;h(nf)=figure;
+nf=nf+1;h(nf)=figure(nf);
 subplot(2,1,1);
 histogram(colvec(res0)/DNPC,nbins);
 title('histogram of initial residuals');xlabel('residual (cycle)');ylabel('N occurrences');
@@ -257,7 +257,7 @@ if istatcode ~= 0
             fprintf(1,'Evaluating Von Mises distribution for residual phase values.\n')
             
             % make QQ plot of residuals
-            nf=nf+1;h(nf)=figure;
+            nf=nf+1;h(nf)=figure(nf);
             qqplotvonmises(reshape(double(res1)/DNPC,numel(res1),1));
             feval(printfun,sprintf('%s_QQPLOT_von_mises',runname));
             
@@ -501,7 +501,7 @@ if istatcode ~= 0
                     fprintf(1,'%32s %20.10e +/- %20.10e\n',char(pnames{i}),p1(i),psig(i));
                     
                     %if db > abs(p1(i)-p0(i)) && numel(strfind(pnames{i},'Offset')) == 0
-                    nf=nf+1;h(nf)=figure;
+                    nf=nf+1;h(nf)=figure(nf);
                     axis([-Inf,+Inf,ymin,ymax]);
                     hold on;
                     
@@ -556,6 +556,55 @@ if istatcode ~= 0
                     feval(printfun,sprintf('%s_param%03d',runname,i));
                 end
             end
+            
+            %% make a plot of correlations
+            %find indices of free parameters
+            jfree = find(abs(p1-p0)>0);
+            varnames = strrep(pnames(jfree),'_',' ');
+            varnames = strrep(varnames,'Okada3','');
+            varnames = strrep(varnames,'Okada','');
+            varnames = strrep(varnames,'Mogi','');
+            CORRS.varnames = varnames;
+            
+            % find indices of good solutions within confidence
+            iwithin = find(acosts1 < crit69);                %  threshold from test
+            %iwithin = find(acosts1 < quantile(acosts1,0.05)); % within 5 percent quantile
+            
+            CORRS.trials = trials(iwithin,jfree);
+            
+            % make the plot                       
+            %set(h(nf),'PaperType','a0');
+            [CORRS.R,CORRS.P] = corrplot(CORRS.trials,'varNames',CORRS.varnames);
+            nf=nf+1;h(nf)=gcf;           
+            %CORRS.h = h(nf);
+            feval(printfun,sprintf('%s_corrplot',runname));
+            
+            % save the results in a .mat file
+            save(sprintf('%s_CORRS.mat',runname),'-struct','CORRS')
+            fprintf(1,'To re-analyze correlations, try: \n   cd %s \n   CORRS=load(\''x_CORRS.mat\'')\n'...
+                ,strrep(runname,'/x',''));
+            
+            % save the figure in a .fig file
+            savefig(h(nf),sprintf('%s_CORRS.fig',runname))
+            fprintf(1,'To re-load figure with correlations, try: \n   cd %s\n   openfig(\''x_CORRS.fig\'')\n'...
+                ,strrep(runname,'/x',''));
+            
+            % re-open the figure to choose paper size
+            h2=openfig(sprintf('%s_CORRS.fig',runname));
+            if numel(CORRS.varnames) > 40
+                papertype = 'A0';
+            elseif numel(CORRS.varnames) > 20
+                papertype = 'A1';
+            elseif numel(CORRS.varnames) > 10
+                papertype = 'A2';
+            elseif numel(CORRS.varnames) > 5
+                papertype = 'A3';
+            else
+                papertype = 'A4';
+            end
+            set(h2,'PaperType',papertype,'PaperOrientation','landscape');
+            print(sprintf('%s_corrplot%2s',runname,papertype),'-dpdf','-r1200','-bestfit');
+
         end
         if cost1 > crit69
             fprintf(1,'WARNING: Final value of cost (%.4f) is higher (WORSE) than 69-percent critical value (%.4f).\n',cost1,crit69);

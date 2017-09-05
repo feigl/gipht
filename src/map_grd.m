@@ -62,7 +62,6 @@ if plot_symbols == 1
     for i=1:numel(SYMS.x)
         plot(SYMS.x(i)/lengthfact,SYMS.y(i)/lengthfact,SYMS.sym{i});
     end
-    else
 end
 
 %% add labels and title
