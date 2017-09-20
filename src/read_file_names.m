@@ -18,9 +18,9 @@ end
 
 %% decide to read GMT grid files or not
 if numel(strfind(file_name,'grd')) > 0
-    file_type = 2;
+    file_type = 2
 else
-    file_type = 1;
+    file_type = 1
 end
 
 %% open file
