@@ -59,7 +59,7 @@ switch file_type
         CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','%')
         fclose(fid);
         [nrows,ncols] = size(CDAT)
-        if ncols == 5 && nrows > 0
+        if ncols >= 5 && nrows > 0
             yyyymmdd1    = CDAT{1};  % Master Date
             yyyymmdd2    = CDAT{2};  % Slave Date
             idatatypes   = CDAT{3};  % data type
