@@ -13,26 +13,26 @@ function grdwrite3(x,y,z,file,INFO)
 % dimensions that match the size of Z or two-component vectors
 % containing the max and min values for each.
 %
-% See also GRDREAD2, GRDINFO2
-
+% See also GRDREAD3, GRDINFO3
+%
 % For more information on GMT grid file formats, see:
 % http://www.soest.hawaii.edu/gmt/gmt/doc/gmt/html/GMT_Docs/node70.html
 % Details on Matlab's native netCDF capabilities are at:
 % http://www.mathworks.com/access/helpdesk/help/techdoc/ref/netcdf.html
-
+%
 % GMT (Generic Mapping Tools, <http://gmt.soest.hawaii.edu>)
 % was developed by Paul Wessel and Walter H. F. Smith
-
+%
 % Kelsey Jordahl
 % Marymount Manhattan College
 % http://marymount.mmm.edu/faculty/kjordahl/software.html
-
+%
 % Time-stamp: <Tue Jul 19 16:28:24 EDT 2011>
-
+%
 % Version 1.1.2, 19-Jul-2011
 % Available at MATLAB Central
 % <http://www.mathworks.com/matlabcentral/fileexchange/26290-grdwrite2>
-
+%
 % 20160814 - modified to suit GMT5 Kurt Feigl
 % 20170518 - Add desc to list of arguments Kurt Feigl
 

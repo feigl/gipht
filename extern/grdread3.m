@@ -18,8 +18,8 @@ function varargout =grdread3(file)
 % pixel registration will be converted to gridline registration
 % for the x- and y-vectors.
 %
-% See also GRDWRITE2, GRDINFO2
-
+% See also GRDWRITE3, GRDINFO3
+%
 % CAUTION: This program currently does little error checking and makes
 % some assumptions about the content and structure of NetCDF files that
 % may not always be valid.  It is tested with COARDS-compliant NetCDF
@@ -32,14 +32,14 @@ function varargout =grdread3(file)
 % http://www.soest.hawaii.edu/gmt/gmt/doc/gmt/html/GMT_Docs/node70.html
 % Details on Matlab's native netCDF capabilities are at:
 % http://www.mathworks.com/access/helpdesk/help/techdoc/ref/netcdf.html
-
+%
 % GMT (Generic Mapping Tools, <http://gmt.soest.hawaii.edu>)
 % was developed by Paul Wessel and Walter H. F. Smith
-
+%
 % Kelsey Jordahl
 % Marymount Manhattan College
 % Time-stamp: <Wed Jan  6 16:37:45 EST 2010>
-
+%
 % Version 1.1.1, 6-Jan-2010
 % released with minor changes in documentation along with grdwrite2 and grdinfo2
 % Version 1.1, 3-Dec-2009
