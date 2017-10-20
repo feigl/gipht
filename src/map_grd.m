@@ -6,16 +6,21 @@ function h = map_grd(varargin)
 % 20170830 add SYM argument for plotting
 
 %% parse input arguments
-if nargin >= 2
+if nargin >= 1
     grdfilename = varargin{1};
-    cmap        = varargin{2};
 else
     warning('missing arguments');
     h = nan;
     return;
 end
 
-if nargin == 3 
+if nargin >= 2
+    cmap        = varargin{2};
+else
+    cmap = jet;
+end
+
+if nargin == 3
     if isstruct(varargin{3}) == 1
         plot_symbols = 1;
         SYMS = varargin{3};
@@ -46,9 +51,12 @@ end
 %% set up figure
 figure; hold on;
 
-%% set up a symmetric colortable
-cmaxabs = max(abs(colvec(IMAGE)));
-clim = [-cmaxabs,+cmaxabs];
+% %% set up a symmetric colortable
+% cmaxabs = nanmax(abs(colvec(IMAGE)));
+% clim = [-cmaxabs,+cmaxabs];
+
+%% set up a colortable
+clim = [nanmin(colvec(IMAGE)),nanmax(colvec(IMAGE))];
 
 %% draw the image
 imagesc(xe/lengthfact,ye/lengthfact,IMAGE,clim);

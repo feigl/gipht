@@ -232,6 +232,7 @@ if numel(tbreaks) > 0
             tswitch1=metaparams(3); % switch time
             tswitch2=metaparams(4); % switch time
             
+<<<<<<< HEAD
             if tswitch1 < tswitch2
                 
                 ft = heaviside1(tepochs - tswitch1) .* (tepochs - tswitch1) ...
@@ -243,6 +244,42 @@ if numel(tbreaks) > 0
             end
 
             ft=timefun_riser(ti,tswitch1,tswitch2);
+=======
+        case {'riser'} % rises linearly between t1 and t2 
+            % added 20170920 by Kurt for Dixie
+            jj=3;
+            mparams = 3;
+            ft = zeros(mparams,1);
+            tswitch1=metaparams(2); % switch time
+            tswitch2=metaparams(3); % switch time
+            if tstart >= tswitch1 || tswitch1 > tswitch2
+                tstart 
+                tswitch1
+                tswitch2
+                error('problem with times');
+            end
+            
+            if ti >= tstart && ti < tswitch1
+                ft(1) = 0.0; 
+                ft(2) = 0.0;
+                ft(3) = 0.0;
+            elseif ti >= tswitch1 && ti < tswitch2             
+                dt = ti - tswitch1;
+                ft(1) = 0.; 
+                ft(2) = dt; % rate
+                ft(3) = 0;
+            elseif ti >= tswitch2
+                dt = tswitch2 - tswitch1;              
+                ft(1) = 0.;
+                ft(2) = dt; % rate
+                ft(3) = 0.
+            else
+                ft(1) = 0;
+                ft(2) = 0;
+                ft(3) = 0;
+            end
+            
+>>>>>>> 33493dba832deba419dc4e033d27a9449fe66dda
         otherwise
             error(sprintf('undefined tfunc %s',tfunc));
     end

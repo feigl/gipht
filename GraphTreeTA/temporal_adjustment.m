@@ -88,6 +88,8 @@ if  min(tbreaks) <  min(tu)
 end
 
 if max(tbreaks) > max(tu)
+    max(tbreaks)
+    max(tu)
     error('max(tbreaks) after last observation');
 end
 

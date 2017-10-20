@@ -14,7 +14,7 @@ function INFO = grdinfo3(file)
 % (xmin, xmax, ymin, ymax, zmin, zmax, format, xinc, yinc). Format is
 % 1 for pixel registration and 0 for grid node registration.
 %
-% See also GRDREAD2, GRDWRITE2
+% See also GRDREAD3, GRDWRITE3
 
 % This program is expected to work on any GMT netCDF format file,
 % but it does not duplicate all the functionality of GMT's I/O
@@ -27,16 +27,16 @@ function INFO = grdinfo3(file)
 % http://www.soest.hawaii.edu/gmt/gmt/doc/gmt/html/GMT_Docs/node70.html
 % Details on Matlab's native netCDF capabilities are at:
 % http://www.mathworks.com/access/helpdesk/help/techdoc/ref/netcdf.html
-
+%
 % GMT (Generic Mapping Tools, <http://gmt.soest.hawaii.edu>)
 % was developed by Paul Wessel and Walter H. F. Smith
-
+%
 % Kelsey Jordahl
 % Marymount Manhattan College
 % http://marymount.mmm.edu/faculty/kjordahl/software.html
-
+%
 % Time-stamp: <Wed Jan  6 16:26:46 EST 2010>
-
+%
 % Version 1.1.1, 6-Jan-2010
 % first released on MATLAB Central
 % revised 20160813 Kurt Feigl
