@@ -18,9 +18,9 @@ end
 
 %% decide to read GMT grid files or not
 if numel(strfind(file_name,'grd')) > 0
-    file_type = 2;
+    file_type = 2
 else
-    file_type = 1;
+    file_type = 1
 end
 
 %% open file
@@ -59,7 +59,7 @@ switch file_type
         CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','%')
         fclose(fid);
         [nrows,ncols] = size(CDAT)
-        if ncols == 5 && nrows > 0
+        if ncols >= 5 && nrows > 0
             yyyymmdd1    = CDAT{1};  % Master Date
             yyyymmdd2    = CDAT{2};  % Slave Date
             idatatypes   = CDAT{3};  % data type

@@ -225,8 +225,24 @@ if numel(tbreaks) > 0
                 ft(2) = 0;
                 ft(3) = 0;
             end
+        case {'riser'} % 0 before tswitch1, rising linear betweeen, 1 after tswitch2
+            jj=3;
+            mparams = 3;
+            ft = zeros(mparams,1);
+            tswitch1=metaparams(3); % switch time
+            tswitch2=metaparams(4); % switch time
             
-            
+            if tswitch1 < tswitch2
+                
+                ft = heaviside1(tepochs - tswitch1) .* (tepochs - tswitch1) ...
+                   - heaviside1(tepochs - tswitch2) .* (tepochs - tswitch2);
+            else
+                tswitch1
+                tswitch2
+                error('Reference times out of order.\n');
+            end
+
+            ft=timefun_riser(ti,tswitch1,tswitch2);
         otherwise
             error(sprintf('undefined tfunc %s',tfunc));
     end

@@ -565,45 +565,47 @@ if istatcode ~= 0
             varnames = strrep(varnames,'Okada','');
             varnames = strrep(varnames,'Mogi','');
             CORRS.varnames = varnames;
-            
+            save('CORRS.mat','-struct','CORRS');
             % find indices of good solutions within confidence
             iwithin = find(acosts1 < crit69);                %  threshold from test
             %iwithin = find(acosts1 < quantile(acosts1,0.05)); % within 5 percent quantile
             
             CORRS.trials = trials(iwithin,jfree);
             
-            % make the plot                       
-            %set(h(nf),'PaperType','a0');
-            [CORRS.R,CORRS.P] = corrplot(CORRS.trials,'varNames',CORRS.varnames);
-            nf=nf+1;h(nf)=gcf;           
-            %CORRS.h = h(nf);
-            feval(printfun,sprintf('%s_corrplot',runname));
-            
-            % save the results in a .mat file
-            save(sprintf('%s_CORRS.mat',runname),'-struct','CORRS')
-            fprintf(1,'To re-analyze correlations, try: \n   cd %s \n   CORRS=load(\''x_CORRS.mat\'')\n'...
-                ,strrep(runname,'/x',''));
-            
-            % save the figure in a .fig file
-            savefig(h(nf),sprintf('%s_CORRS.fig',runname))
-            fprintf(1,'To re-load figure with correlations, try: \n   cd %s\n   openfig(\''x_CORRS.fig\'')\n'...
-                ,strrep(runname,'/x',''));
-            
-            % re-open the figure to choose paper size
-            h2=openfig(sprintf('%s_CORRS.fig',runname));
-            if numel(CORRS.varnames) > 40
-                papertype = 'A0';
-            elseif numel(CORRS.varnames) > 20
-                papertype = 'A1';
-            elseif numel(CORRS.varnames) > 10
-                papertype = 'A2';
-            elseif numel(CORRS.varnames) > 5
-                papertype = 'A3';
-            else
-                papertype = 'A4';
+            if exist('corrplot')
+                % make the plot
+                %set(h(nf),'PaperType','a0');
+                [CORRS.R,CORRS.P] = corrplot(CORRS.trials,'varNames',CORRS.varnames);
+                nf=nf+1;h(nf)=gcf;
+                %CORRS.h = h(nf);
+                feval(printfun,sprintf('%s_corrplot',runname));
+                
+                % save the results in a .mat file
+                save(sprintf('%s_CORRS.mat',runname),'-struct','CORRS')
+                fprintf(1,'To re-analyze correlations, try: \n   cd %s \n   CORRS=load(\''x_CORRS.mat\'')\n'...
+                    ,strrep(runname,'/x',''));
+                
+                % save the figure in a .fig file
+                savefig(h(nf),sprintf('%s_CORRS.fig',runname))
+                fprintf(1,'To re-load figure with correlations, try: \n   cd %s\n   openfig(\''x_CORRS.fig\'')\n'...
+                    ,strrep(runname,'/x',''));
+                
+                % re-open the figure to choose paper size
+                h2=openfig(sprintf('%s_CORRS.fig',runname));
+                if numel(CORRS.varnames) > 40
+                    papertype = 'A0';
+                elseif numel(CORRS.varnames) > 20
+                    papertype = 'A1';
+                elseif numel(CORRS.varnames) > 10
+                    papertype = 'A2';
+                elseif numel(CORRS.varnames) > 5
+                    papertype = 'A3';
+                else
+                    papertype = 'A4';
+                end
+                set(h2,'PaperType',papertype,'PaperOrientation','landscape');
+                print(sprintf('%s_corrplot%2s',runname,papertype),'-dpdf','-r1200','-bestfit');
             end
-            set(h2,'PaperType',papertype,'PaperOrientation','landscape');
-            print(sprintf('%s_corrplot%2s',runname,papertype),'-dpdf','-r1200','-bestfit');
 
         end
         if cost1 > crit69
