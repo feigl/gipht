@@ -33,7 +33,7 @@ INFO = grdinfo3(grdfilename);
 
 %% if coordinates are in UTM meters, then plot in kilometers
 % if contains(INFO.xname,'meters') == 1 || contains (INFO.yname,'meters') == 1
-if isempty(regexpi(INFO.xname,'meters')) ~= 1 || isempty(regexpi(INFO.yname,'meters')) ~= 1
+if isempty(regexpi(INFO.xname,'Meter')) ~= 1 || isempty(regexpi(INFO.yname,'Meter')) ~= 1
     lengthfact = 1.e3; % plot in km
     xlab = strrep(INFO.xname,'in meters','[km]');
     ylab = strrep(INFO.yname,'in meters','[km]');   
