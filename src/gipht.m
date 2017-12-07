@@ -100,6 +100,15 @@
 %% before releasing, find dependencies using:
 %fList = matlab.codetools.requiredFilesAndProducts('/Users/feigl/gipht/src/gipht.m')
 
+% [fList,pList] = matlab.codetools.requiredFilesAndProducts('gipht.m');pList.Name
+% MATLAB
+% Statistics and Machine Learning Toolbox
+% Financial Toolbox
+% Econometrics Toolbox
+% Parallel Computing Toolbox
+% MATLAB Distributed Computing Server
+
+
 %% initialize
 clear all;
 

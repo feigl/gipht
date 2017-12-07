@@ -1,7 +1,13 @@
 function varargout = pinel3d(varargin)
 %function u = pinel3c(xinm,yinm,g,E,nu,rho,loadfile)
-% calculate displacements [east, north, up] at [xobs, yobs] due to a of height HI on grid XI, YI
-% Pinel et al. (2008) Geophys. J. Int. v. 169, pp 325-338
+% calculate displacements [east, north, up] at [xobs, yobs] due to a of
+% height HI on grid XI, YI 
+% Pinel, V., F. Sigmundsson, E. Sturkell, H. Geirsson, 
+% P. Einarsson, M. T. Gudmundsson, and T. Högnadóttir (2007),
+% Discriminating volcano deformation due to magma movements and variable
+% surface loads: application to Katla subglacial volcano, Iceland, Geophys.
+% J. Int., 169, 325-338. 
+
 % assume value of density (rho) is same everywhere
 % Kurt Feigl 2010-OCT-05
 % number of arguments entered as input

@@ -66,7 +66,7 @@ OPEN   =    pg(10);                       % tensile opening in meters
 if abs(OPEN) < 0.01 && abs(SLIP) < 0.01
     OPEN
     SLIP
-    warning('Slip is less than 0.01\n');
+    warning('Slip is less than 0.01 in absolute value\n');
 end
 
 E =     xyobs(1,:) - pg(6);               % relative position of obs point wrt to fault centroid
@@ -74,8 +74,8 @@ N =     xyobs(2,:) - pg(7);               % relative position of obs point wrt t
 
 Emax = max(abs(E));
 Nmax = max(abs(N));
-if Emax > 1.e4 || Nmax > 1.e4 || hypot(Emax,Nmax) > 1.e4
-    warning('Observation point is more than 10 km from fault centroid:');
+if Emax > 100.e3 || Nmax > 100.e3 || hypot(Emax,Nmax) > 100.e3
+    warning('Observation point is more than 100 km from fault centroid:');
     Emax
     Nmax
 end
