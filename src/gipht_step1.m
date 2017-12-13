@@ -361,9 +361,13 @@ kmasts = zeros(np,1);
 kslavs = zeros(np,1);
 
 for i = 1:np
-    
-
     %% index master and slave
+    % TODO: catch this error
+%     Index exceeds matrix dimensions.
+%     Error in gipht_step1 (line 367)
+%     kmast = find(DD(i,:) == -1);
+%     It occurs when when one of the input phase files does not exist....
+
     kmast = find(DD(i,:) == -1);
     kslav = find(DD(i,:) == +1);
     
