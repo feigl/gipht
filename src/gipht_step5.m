@@ -740,6 +740,30 @@ for i = 1:np
         urs(inull) = NaN;
         ucs(inull) = NaN;
         %mds(inull) = NaN;
+    else
+        % interpolate
+        if idatatype1 == 0
+            interpolation_method = 'nearest';extrapolation_method = 'none';
+        else
+            interpolation_method = 'natural';extrapolation_method = 'none';
+        end
+
+        warning(sprintf('Replacing %d pixels with Interpolated values using interpolation_method %s and extrapolation_method %s\n'...
+            ,numel(inull)),interpolation_method,extrapolation_method);
+        imA(inull) = NaN;
+        %imA(inull) = fillingaps(imA,interpolation_method,extrapolation_method);
+        %imB(inull) = NaN; 
+        imC = fillingaps(imC,interpolation_method,extrapolation_method);
+        imD = fillingaps(imD,interpolation_method,extrapolation_method);
+        imE = fillingaps(imE,interpolation_method,extrapolation_method);
+        imF = fillingaps(imF,interpolation_method,extrapolation_method);
+        imG = fillingaps(imG,interpolation_method,extrapolation_method);
+        imH = fillingaps(imH,interpolation_method,extrapolation_method);
+        % do unwrapped quantities too
+        uns = fillingaps(uns,interpolation_method,extrapolation_method);
+        urs = fillingaps(urs,interpolation_method,extrapolation_method);
+        ucs = fillingaps(ucs,interpolation_method,extrapolation_method);
+        %mds(inull) = NaN;
     end
     
     % 20131106
@@ -847,7 +871,7 @@ for i = 1:np
         ,tlA,tlB,tlC,tlD,tlE,tlF,tlG,tlH...
         ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes,idatatype1,datalabel);
     %     ,wesn,titlestr,climit,[Xcorners11 NaN Xcorners21]/1000,[Ycorners11 NaN Ycorners21]/1000,ctab,1,mysyms,marksizes);
-     feval(printfun,sprintf('%s_%03d_8PANLS.pdf',runname,i),'landscape');
+    %feval(printfun,sprintf('%s_%03d_8PANLS.pdf',runname,i),'landscape');
  
      feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
     %% make 4-panel plot of wrapped phase
@@ -888,7 +912,8 @@ for i = 1:np
     %     y2lab='mm/yr';
     tlab = strcat(sprintf('Northing = %.3f km ',ymesh3(iprof,jprof)/1000),' :',titlestr);
     nf=nf+1;h(nf) = draw_profile(xt,yt1,yt2,xlab,y1lab,y2lab,tlab);
-    feval(printfun,sprintf('%s_profR_ew_P%03d',runname,i),'landscape');
+    %feval(printfun,sprintf('%s_profR_ew_P%03d',runname,i),'landscape');
+    feval(printfun,sprintf('%s_profR_ew_P%03d',runname,i));
     
     fprintf(1,'Making N-S profile in range rate for Pair %03d\n',i);
     xt = ymesh3(:,jprof)/1000;
@@ -900,7 +925,8 @@ for i = 1:np
     
     tlab = strcat(sprintf('Easting = %.3f km ',xmesh3(iprof,jprof)/1000),' :',titlestr);
     nf=nf+1;h(nf) = draw_profile(xt,yt1,yt2,xlab,y1lab,y2lab,tlab);
-    feval(printfun,sprintf('%s_profR_ns_P%03d',runname,i),'landscape');
+    %feval(printfun,sprintf('%s_profR_ns_P%03d',runname,i),'landscape');
+    feval(printfun,sprintf('%s_profR_ns_P%03d',runname,i));
     
     if bitget(figopt,3) == 1
         fprintf(1,'Making E-W profiles for Pair %03d\n',i);
@@ -918,7 +944,7 @@ for i = 1:np
         
         %         y2lab='mm/yr';
         nf=nf+1;h(nf) = draw_profile(xt,yt1,yt2,xlab,y1lab,y2lab,tlab);
-        feval(printfun,sprintf('%s_profE_ew_P%03d',runname,i),'landscape');
+        feval(printfun,sprintf('%s_profE_ew_P%03d',runname,i));
         
         fprintf(1,'Making E-W profile in north for Pair %03d\n',i);
         yt1=omy(iprof,:)*1000/time_span;
@@ -928,7 +954,7 @@ for i = 1:np
         
         %         y2lab='mm/yr';
         nf=nf+1;h(nf) = draw_profile(xt,yt1,yt2,xlab,y1lab,y2lab,tlab);
-        feval(printfun,sprintf('%s_profN_ew_P%03d',runname,i),'landscape');
+        feval(printfun,sprintf('%s_profN_ew_P%03d',runname,i));
         
         fprintf(1,'Making E-W profile in vertical rate for Pair %03d\n',i);
         yt1=omz(iprof,:)*1000/time_span;
@@ -938,7 +964,7 @@ for i = 1:np
         
         %         y2lab='mm/yr';
         nf=nf+1;h(nf) = draw_profile(xt,yt1,yt2,xlab,y1lab,y2lab,tlab);
-        feval(printfun,sprintf('%s_profU_ew_P%03d',runname,i),'landscape');
+        feval(printfun,sprintf('%s_profU_ew_P%03d',runname,i)');
         
         %   2012-10-04 values in meters
         kq = kq+1;

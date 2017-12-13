@@ -1,12 +1,12 @@
 function cost1 = funcostrmsnres(DST,PST,TST)
 % return objective function as RMS of weighted residuals
-% 20170416
+% 20171213
 %narginchk(3, 3);
 
-% field of residuals in radians
+% field of residuals in same units as data
 resids = funcostsdiff(DST,PST,TST);
 
-% cost is sample standard deviation of weighted residuals
+% cost is root mean square of weighted residuals
 cost1=rms(resids ./ DST.phasig);
 
 return;
