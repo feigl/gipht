@@ -740,6 +740,30 @@ for i = 1:np
         urs(inull) = NaN;
         ucs(inull) = NaN;
         %mds(inull) = NaN;
+    else
+        % interpolate
+        if idatatype1 == 0
+            interpolation_method = 'nearest';extrapolation_method = 'none';
+        else
+            interpolation_method = 'natural';extrapolation_method = 'none';
+        end
+
+        warning(sprintf('Replacing %d pixels with Interpolated values using interpolation_method %s and extrapolation_method %s\n'...
+            ,numel(inull)),interpolation_method,extrapolation_method);
+        imA(inull) = NaN;
+        %imA(inull) = fillingaps(imA,interpolation_method,extrapolation_method);
+        %imB(inull) = NaN; 
+        imC = fillingaps(imC,interpolation_method,extrapolation_method);
+        imD = fillingaps(imD,interpolation_method,extrapolation_method);
+        imE = fillingaps(imE,interpolation_method,extrapolation_method);
+        imF = fillingaps(imF,interpolation_method,extrapolation_method);
+        imG = fillingaps(imG,interpolation_method,extrapolation_method);
+        imH = fillingaps(imH,interpolation_method,extrapolation_method);
+        % do unwrapped quantities too
+        uns = fillingaps(uns,interpolation_method,extrapolation_method);
+        urs = fillingaps(urs,interpolation_method,extrapolation_method);
+        ucs = fillingaps(ucs,interpolation_method,extrapolation_method);
+        %mds(inull) = NaN;
     end
     
     % 20131106

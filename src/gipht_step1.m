@@ -139,17 +139,13 @@ switch ndatatypes
         idatatype1 = 0;
         FACTIN = 1; % .grd file contains radians
         DNPC = 2 * pi;     
-        datalabel = '[cycles]';
-        %objfun = 'funcostrarc';        % Objective Function mininum angle,  assumes zero mean, using arc function in radians
-        objlabel = '[cycles]';
+        datalabel = '[cycles]';       
     case -1 % east component of gradient
         idatatype1 = -1;
         FACTIN = 1; % grd file contains dimensionless strain
         DNPC = 1;
         datalabel = '[dimless]';
-        %objfun = 'funcoststdnres';      % Objective function is sample standard deviation of normalized residual (should equal sqrt(chi2))
-        objlabel = '[dimless]';
-    case 2   % range change in meters after unwrapping
+     case 2   % range change in meters after unwrapping
         idatatype1 = 2;
         FACTIN = 1.; % grd file contains meters
         DNPC = 1.0e-3;     
@@ -159,9 +155,21 @@ switch ndatatypes
 %         else
 %            objfun = 'funcoststdnres';      % Objective function is sample standard deviation of normalized residual (should equal sqrt(chi2))
 %         end
-        objlabel = '[dimless]';
+        %objlabel = '[dimless]';
     otherwise
         error(sprintf('unknown ndatatypes %d\n',ndatatypes));
+end
+
+%% choose the units for the objective function
+switch objfun
+    case {'funcoststdnres','funcoststdnres4'}
+         objlabel = '[dimless]';
+    case {'funcostrarc'}
+         objlabel = '[cycles]';
+    case {'funcostrms'}
+         objlabel = '[meters]';
+    otherwise
+        error(sprintf('unknown objfun %d\n',objfun));
 end
 
 

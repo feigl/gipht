@@ -1113,7 +1113,8 @@ PST1.sigma = colvec(psig);
 %write_pst(PST1,'PST.OUT');
 write_gin(PST1,fnparout);
 
-clear h;
+% clear figure handles to avoid making enormous mat file
+clear h h2;
 
 %% save variables for next step
 %save('qsave.mat','iq','iq1','iq2','qflags','qnames','q0','q1','qsig');

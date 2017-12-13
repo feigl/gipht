@@ -151,6 +151,10 @@ switch idatatype1
 %         p0(get_parameter_index('Offset',pnames)) =  nan;
 %         lb(get_parameter_index('Offset',pnames)) =  nan;
 %         ub(get_parameter_index('Offset',pnames)) =  nan;
+%       allow for constant value 
+        p0(get_parameter_index('Offset',pnames)) =  0.0; % meters?
+        lb(get_parameter_index('Offset',pnames)) = +nanmean([nanmin(DST.phaobs),nanmax(DST.phaobs)]);
+        ub(get_parameter_index('Offset',pnames)) = -nanmean([nanmin(DST.phaobs),nanmax(DST.phaobs)]);
         ifast = 0;
     case -1 % observable is gradient
         p0(get_parameter_index('Offset',pnames)) =  0.0; % cycles
@@ -190,7 +194,9 @@ for k=1:me  %    % loop over epochs
     pindex = [];%                                     E_grad__@_epoch_001_dimless_____
     % 2012-JAN-10 next line is a bug!!
     %pindex=union(pindex,get_parameter_index(sprintf('Offset__@_epoch_%03d_____________',k),pnames));
-    pindex=union(pindex,get_parameter_index(sprintf('Offset__@_epoch_%03d_in_cycles___',k),pnames));
+    %pindex=union(pindex,get_parameter_index(sprintf('Offset__@_epoch_%03d_in_cycles___',k),pnames));
+    % 20171213 allow offset in other units
+    pindex=union(pindex,get_parameter_index(sprintf('Offset__@_epoch_%03d______________',k),pnames));
     pindex=union(pindex,get_parameter_index(sprintf('E_grad__@_epoch_%03d_dimless_____',k),pnames));
     pindex=union(pindex,get_parameter_index(sprintf('N_grad__@_epoch_%03d_dimless_____',k),pnames));
     pindex=union(pindex,get_parameter_index(sprintf('U_grad__@_epoch_%03d_dimless_____',k),pnames));
