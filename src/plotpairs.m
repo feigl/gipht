@@ -1,6 +1,6 @@
 function h1 = plotpairs(tm,ts,Qdiff,Qdsig,Qdmod ...
 , tfit,Qdfit,Qfsigl,Qfsigu ...
-, xlab,ylab,titlestring,tbreaks, ref_pts)
+, xlab,ylab,titlestring,tbreaks, ref_pts, relative_dates)
 % function h1 = plotpairs5(tm,ts,Qdiff,Qdsig,Qdmod,pairnames ...
 % , tfit,Qdfit,Qfsig ...
 % , xlab,ylab,titlestring,tbreaks)
@@ -29,22 +29,40 @@ function h1 = plotpairs(tm,ts,Qdiff,Qdsig,Qdmod ...
 % Updates:
 %   2014-07-15 add tbreaks
 %   2015-07-27 add options for fit (ref_pts);  Elena C. Baluyut, UW-Madison
+%   2018-01-15 add option for relative_dates
 
 
-% Read arguments
+%% Read arguments
 error(nargchk(12,16,nargin)); % incorrect number of input arguments
 
 if nargin < 14
     ref_pts = 'mid'; % default to plotting along midpoint of pairs
 end
 
+if nargin < 15
+    relative_dates = 0; % default to absolute dates
+end
+
+
 % Initialize
 ndat = numel(Qdiff);
+
+%% plot dates relative to initial epoch in decimal years
+if relative_dates == 1
+    t0 = min([tm; ts])
+    tm = tm - t0;
+    ts = ts - t0;
+    tbreaks = tbreaks - t0;
+    tfit = tfit - t0;
+end
+
+%% calculate other epochs
 tmid = (tm+ts)/2;
 tu = unique([tm ts]);
 
-% Start figure
-h1 = figure('color','w'); hold on; set(h1,'DefaultTextInterpreter','None'); 
+%% Start figure
+h1 = figure('color','w'); hold on; 
+set(h1,'DefaultTextInterpreter','tex'); % or 'none'
 
 if isreal(Qfsigl) == 0 || isreal(Qfsigu) == 0
     Qfsigl 
