@@ -70,7 +70,8 @@ end
 j=0;
 for i=10*me+1:11*me
     j=j+1;
-    pnames{i} = sprintf('Offset  @ epoch %03d in cycles   ',j);
+   %pnames{i} = sprintf('Offset  @ epoch %03d in cycles   ',j);
+    pnames{i} = sprintf('Offset  @ epoch %03d             ',j);
     pscl(i)   = 0.1; % cycles
 end
 %     j=0;

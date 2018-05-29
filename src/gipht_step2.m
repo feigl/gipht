@@ -196,7 +196,7 @@ for k=1:me  %    % loop over epochs
     %pindex=union(pindex,get_parameter_index(sprintf('Offset__@_epoch_%03d_____________',k),pnames));
     %pindex=union(pindex,get_parameter_index(sprintf('Offset__@_epoch_%03d_in_cycles___',k),pnames));
     % 20171213 allow offset in other units
-    pindex=union(pindex,get_parameter_index(sprintf('Offset__@_epoch_%03d______________',k),pnames));
+    pindex=union(pindex,get_parameter_index(sprintf('Offset__@_epoch_%03d_____________',k),pnames));
     pindex=union(pindex,get_parameter_index(sprintf('E_grad__@_epoch_%03d_dimless_____',k),pnames));
     pindex=union(pindex,get_parameter_index(sprintf('N_grad__@_epoch_%03d_dimless_____',k),pnames));
     pindex=union(pindex,get_parameter_index(sprintf('U_grad__@_epoch_%03d_dimless_____',k),pnames));

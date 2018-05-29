@@ -150,12 +150,6 @@ switch ndatatypes
         FACTIN = 1.; % grd file contains meters
         DNPC = 1.0e-3;     
         datalabel = '[mm]';
-%         if ianneal == 7
-%            objfun = 'funcoststdnres4';      % 4-argument Objective function is sample standard deviation of normalized residual (should equal sqrt(chi2))
-%         else
-%            objfun = 'funcoststdnres';      % Objective function is sample standard deviation of normalized residual (should equal sqrt(chi2))
-%         end
-        %objlabel = '[dimless]';
     otherwise
         error(sprintf('unknown ndatatypes %d\n',ndatatypes));
 end
