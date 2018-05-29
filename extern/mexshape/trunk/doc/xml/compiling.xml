@@ -1,0 +1,192 @@
+<chapter>
+<title> Compiling Mexshape</title>
+
+
+<sect1>
+	<title> Why Compile? </title>
+<para>
+I'm not distributing any binaries anymore, you have to compile this
+yourself.  Depending upon what platform you are on, this means you
+may also have to compile shapelib yourself.  But before you shed crocodile
+tears and start tearing out your hair, this isn't all that hard.  If you
+use Linux, there may be pre-compiled packages such as RPMs available;
+you will need to consult your local package management system.  If you
+can forgive a shameless plug, Mandriva Linux makes this a breeze...
+But anyway, if you can't find any RPMs, just grab the source code from
+http://dl.maptools.org/dl/shapelib/
+</para>
+
+</sect1>
+
+
+<sect1>
+
+<title> Case Study:  Mandriva 2006</title>
+
+<para>
+Start by copying the <filename>mexopts.sh</filename> from your 
+<filename class="directory">${MATLAB}/bin</filename> 
+directory into your working directory.  The following RPMs were installed
+via URPMI from the contrib media source (consult
+<ulink url="http://easyurpmi.zarb.org/">Easy URPMI</ulink> 
+for information on how to set up your URPMI media sources).
+
+<simplelist type="vert" columns="1">
+	<member>libshapelib1-1.2.10-1mdk</member>
+	<member>libshapelib1-devel-1.2.10-1mdk</member>
+	<member>shapelib-1.2.10-1mdk</member>
+</simplelist>
+
+Then the bottom of <filename>mexopts.sh</filename> was modified to read
+
+<programlisting>
+	CFLAGS="$CFLAGS -I/usr/local/include/libshp "
+	CLIBS="$CLIBS -lshp"
+</programlisting>
+
+Save these edits and invoke <filename>make</filename> from the unix command line.
+Because the RPMs install in the normal locations, i.e. 
+<filename class="directory">/usr/lib</filename>
+and
+<filename class="directory">/usr/include</filename>,
+the edits to 
+<filename>mexopts.sh</filename>
+are pretty minimal.
+
+</para>
+</sect1>
+
+
+
+
+
+
+
+
+<sect1>
+
+<title> Case Study:  CentOS x86-64</title>
+
+<para>
+This linux distribution doesn't readily have an RPM for shapelib, so
+in this case we compile it from source.  First we retrieve and unpack
+shapelib from
+<ulink url="http://dl.maptools.org/dl/shapelib/">http://dl.maptools.org/dl/shapelib/</ulink>.
+In order to build the library, we must issue the commands
+
+<programlisting>
+
+     # make lib
+     # make lib_install
+
+</programlisting>
+
+Now copy the <filename>$MATLABROOT/bin/mexopts.sh</filename> 
+into your mexshape directory and alter the CFLAGS and CLIBS section down
+at the very bottom to read
+
+<programlisting>
+
+     CFLAGS="-I/usr/local/include/libshp -g $CFLAGS"
+     CLIBS="-lshp $CLIBS"
+
+</programlisting>
+
+From the unix command line, issue the command
+
+<programlisting>
+
+     # make 
+
+</programlisting>
+
+which unfortunately fails, eventually giving you the error
+
+<programlisting>
+
+     /usr/bin/ld: /usr/local/lib/libshp.a(shpopen.o): 
+          relocation R_X86_64_32 against `a local symbol' 
+	  cannot be used when making a shared object; recompile 
+	  with -fPIC
+     /usr/local/lib/libshp.a: could not read symbols: Bad value
+     collect2: ld returned 1 exit status
+
+          mex: link of 'mexshape.mexa64' failed.
+
+     make: *** [all] Error 1
+
+</programlisting>
+
+This is a pretty common error when compiling mex-files on the x86-64
+platform, and it means we have to go back and recompile the source
+library with the -fPIC option.  This is kind of a pain because the
+shapelib makefile has everything hardcoded in for the library, so one
+has to do a fair bit of editing.  But once you have that done and have
+recompiled the library, you can test it from matlab with
+
+
+<programlisting>
+
+     >> d = shape_get ( 'data/US_Gulf_States.shp' )
+
+     d =
+
+             Shape: [119x1 struct]
+         Attribute: [119x1 struct]
+              Type: 'Polygon'
+
+</programlisting>
+
+
+</para>
+
+
+
+</sect1>
+
+
+
+
+
+
+
+<sect1>
+
+<title> Case Study:  Windows XP</title>
+
+<para>
+Start by retrieving the sourcecode for shapelib from <ulink
+url="http://dl.maptools.org/dl/shapelib">http://dl.maptools.org/dl/shapelib</ulink>.
+Copy the following files into the mexshape directory
+
+<simplelist type="vert" columns="1">
+	<member>shpopen.c</member>
+	<member>dbfopen.c</member>
+	<member>shapefil.h</member>
+</simplelist>
+
+Then from within matlab, cd into the mexshape directory and issue the 
+following command
+
+<programlisting>
+	>> mex -output mexshape -v mex_shape.c shpopen.c dbfopen.c
+</programlisting>
+
+If MATLAB presents you with a choice of compilers, you may safely choose <filename>Lcc</filename>. 
+It may give you some warnings, but it should compile just fine.
+</para>
+</sect1>
+
+
+
+
+
+
+
+
+</chapter>
+
+
+
+
+

@@ -1,0 +1,42 @@
+* Tue July 03 2006 John Evans <john.g.evans.ne@gmail.com> 1.1.0
+- Documentation now generated via DocBook.
+- All shapelib code removed.
+
+* Thu May 11 2006 John Evans <john.g.evans.ne@gmail.com> 
+- mex-file now returns a single structure
+- Replaced call to "malloc" with "mxCalloc".
+- Removed all strdup calls.
+
+* Thu May 04 2006 John Evans <john.g.evans.ne@gmail.com> 1.0.4
+- Bugfix for special case where entity has just a single point.  
+
+* Tue Apr 25 2006 John Evans <john.g.evans.ne@gmail.com> 
+- Minor stylistic changes to m-files suggested by mlint.
+
+* Mon Feb 27 2006 John Evans <john.g.evans.ne@gmail.com> 1.0.3
+- Added mexshape.dll.  
+- Added windows build description to README.
+
+* Tue Jan 17 2006 John Evans <john.g.evans.ne@gmail.com> 
+- Added mexshape.mexa64.  Linked libshp statically.
+- Added x86_64 build description to README.
+
+* Sun Jan 15 2006 John Evans <john.g.evans.ne@gmail.com> 1.0.2
+- 1.0.2
+- Added mexshape.mexglx back in, linked it statically.
+- Fixed README
+
+* Sun Jan 15 2006 John Evans <john.g.evans.ne@gmail.com> 1.0.1
+- 1.0.1
+- Added -Wall flag to linux x86 compile options.
+- Wiped out CVS history, starting over.
+
+* Fri Jul 29 2005 John Evans <johnevans@acm.org> 1.0.0
+- 1.0.0
+- nParts fix.
+- Name of mex-file changed to "mexshape" from "mex_shape"
+
+* Thu Dec 23 2004 John Evans <johnevans@acm.org>
+- Added Mac OS X (courtesy of Jouni Lerssi), WinXP, and AXP mex files.
+- Added mexopts flag -DMEXSHAPE_RXX
+
