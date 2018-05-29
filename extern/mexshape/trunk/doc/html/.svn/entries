@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="1"
+   name=""
+   committed-date="2006-06-15T18:00:05.912138Z"
+   url="svn+ssh://ahab/m1/svn-repos/matlab/mexshape/tags/mexshape-1.1.0/trunk/doc/html"
+   last-author="jevans"
+   kind="dir"
+   uuid="abeb2110-4716-0410-915c-f20a0443ce76"
+   revision="74"/>
+</wc-entries>

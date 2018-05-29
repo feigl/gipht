@@ -1,0 +1,38 @@
+<chapter>
+
+<title> Wrapping It All Up... </title>
+
+
+<sect1>
+	<title> In the Interests of Full Disclosure... </title>
+
+
+<para>
+I admit that I did evaluate the mapping toolbox from Mathworks under a
+trial license.  However, other than putting all the outputs into structure
+arrays (an idea I think I would have arrived at on my own anyway), nothing
+changed hands here.  In fact I looked at no code at all (I only evaluated
+the OUTPUT).  If you don't believe me, just look at the C code for the
+mex file.  I defy anyone at Mathworks to write code as sloppy as that.
+</para>
+
+</sect1>
+
+<sect1>
+	<title> Thanks </title>
+
+	<para>
+Many thanks to Sebastian Holz for helping to move this past the 1.0.4 
+release.
+</para>
+
+
+
+</sect1>
+
+</chapter>
+
+
+
+
+

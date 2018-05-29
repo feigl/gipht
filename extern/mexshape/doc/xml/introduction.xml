@@ -1,0 +1,127 @@
+<chapter>
+
+<title> Introduction </title>
+
+
+<sect1>
+	<title> Quick Overview </title>
+
+
+<para>
+This code will provide you with a mexfile that will read (not write)
+certain ESRI shapefiles without having to purchase the Mapping Toolbox
+from MATLAB.  By "certain shapefiles" I mean SHPT_POINT (point), 
+SHPT_MULTIPOINT, SHPT_ARC, (simple polyline), or SHPT_POLYGON (simple
+polygon).  There are a slew of other possibilities, but I have yet to run
+into a shapefile that did not get classified as one of these four (the
+code is written to throw an exception if an unknown type is encountered).
+</para>
+
+<para>
+The mex file itself returns a structure for each shape that is read.
+Because that can be a little annoying when dealing with point shapefiles,
+a wrapper routine (shape_get.m) for the mex file is provided that
+allows the user to optionally collect each of the points into a vector.
+It's probably a good idea to use the wrapper routine exclusively.
+</para>
+
+
+
+</sect1>
+
+
+
+
+
+
+<sect1>
+	<title> Requirements </title>
+	<para>
+		Mexshape requires Matlab version R13 or higher.  
+	</para>
+	<para>
+		Mexshape requires shapelib, or at least
+		parts of it.  Shapelib is distributed
+		under the LGPL and can be found at <ulink
+		url="http://dl.maptools.org/dl/shapelib/">http://dl.maptools.org/dl/shapelib/</ulink>.
+		It's uncertain to me from reading the LGPL if I can just
+		package the few necessary files from shapelib along with
+		mexshape or if I have to package the entire library.
+		Since I definitely don't want to package the entire
+		library, for now at least I will not distribute any
+		part of shapelib.  If someone knows the answer to this,
+		please tell me!
+	</para>
+</sect1>
+
+
+<sect1>
+	<title> Contents of this Package </title>
+	<variablelist>
+		<title></title>
+		<varlistentry>
+			<term>ChangeLog</term>
+			<listitem> 
+				<para> 
+					Developer information, you probably don't need to read this.
+				</para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>README</term>
+			<listitem> <para> Text documentation about mexshape.  Equivalent to what you will find in doc/html  </para></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>data/US_Gulf_States, data/Test_Multipoint</term>
+			<listitem> <para> test shapefiles </para> </listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>doc/html </term>
+			<listitem> <para> HTML documentation about mexshape.  Equivalent to what you will find in the README file. </para> </listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>doc/xml </term>
+			<listitem> <para> DocBook XML documentation about mexshape.  This is actually what generates the README and doc/html documentation.  Not really suitable for human consumption.
+			</para> </listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>makefile</term>
+			<listitem> 
+				<para> 
+					Used to build the mex-file
+				</para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>mex_shape.m</term>
+			<listitem> <para> help information for the mex file itself (don't call this directly)  </para></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>shape_in.m</term>
+			<listitem> <para> Old shapefile reader provided for backwards compatibility only.  Superceded by shape_get.m</para></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>shape_get.m</term>
+			<listitem> <para> 
+					Reads shapefiles by calling mexshape.  Please use this m-file to read shapefiles instead of calling mexshape directly.  </para></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>shape_pt2arr.m</term>
+			<listitem> 
+				<para> converts what's read by from a point shapefile into x and y coordinates </para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>shape_plot.m</term>
+			<listitem> <para> plots the data you imported with shape_in </para> </listitem>
+		</varlistentry>
+	</variablelist>
+		
+</sect1>
+
+</chapter>
+
+
+
+
+

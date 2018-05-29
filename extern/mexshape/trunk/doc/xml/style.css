@@ -1,0 +1,78 @@
+BODY {
+	font-family: ariel, sans-serif,  helvetica; 
+	font-size: 14px;
+}
+
+A:link 	{
+	color           : #46508c; 
+	text-decoration : none; 
+	font-weight     : bold;
+}
+A:visited {
+	color           : #8888ee; 
+	text-decoration : none; 
+	font-weight     : bold;
+}
+A:hover {
+	color           : #ff3333;
+}
+A:active {
+	color           : #000099;
+}
+
+#
+# Define a common footer font size
+A.footer:link {
+	color           : #46508c; 
+	text-decoration : none; 
+	font-weight     : bold; 
+	font-size       : 14pt;
+}
+
+A.footer:visited {
+	color           : #505f9a; 
+	text-decoration : none; 
+	font-weight     : bold; 
+	font-size       : 14pt;
+}
+A.footer:hover {
+	color           : #526ca4;
+}
+A.footer:active {
+	color           : #ff3333;
+}
+
+
+
+BODY {
+	background-color: #ffffff; 
+	margin-top      : 10; 
+	margin-left     : 10;
+}
+
+DIV.indented {
+	padding-left: 20pt;
+	padding-right: 20pt;
+}
+
+
+pre.programlisting            
+{
+  font-family: Courier, serif;
+  color: #000000;
+  font-weight: bold;
+  background-color: #EEEEEE;
+}
+DIV.example pre.programlisting
+{
+  font-family: Courier, serif;
+  font-weight: bold;
+  padding-left:  20pt;
+  background-color: #EEEEEE;
+}
+DIV.variablelist DL DT SPAN.term
+{
+  font-family: Courier, serif;
+  color: #000000;
+  font-weight: bold;
+}
