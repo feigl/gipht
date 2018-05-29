@@ -653,7 +653,9 @@ for i = 1:np
         fprintf(1,'After  range2vector %d %d\n',size(omr));
         omr = reshape(omr,nrsub,ncsub);
         fprintf(1,'After  reshape      %d %d\n',size(omr));
-        figure;plot(colvec(DST2.x0),colvec(omr),'.k');title('omr');
+%         figure;
+%         plot(colvec(DST2.x0),colvec(omr),'.k');
+%         title('omr');
         
         omx = reshape(omv(1,:),nrsub,ncsub); % unwrapped observed vector displacement in m [east   component]
         omy = reshape(omv(2,:),nrsub,ncsub); % unwrapped observed vector displacement in m [north  component]
@@ -872,8 +874,8 @@ for i = 1:np
         ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes,idatatype1,datalabel);
     %     ,wesn,titlestr,climit,[Xcorners11 NaN Xcorners21]/1000,[Ycorners11 NaN Ycorners21]/1000,ctab,1,mysyms,marksizes);
     %feval(printfun,sprintf('%s_%03d_8PANLS.pdf',runname,i),'landscape');
- 
-     feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
+    feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
+    
     %% make 4-panel plot of wrapped phase
     tlA = ''; tlF = '';
     datelabel = '';

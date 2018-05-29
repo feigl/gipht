@@ -97,7 +97,7 @@ colormap(ctab);
 
 %% draw panels in smart order to see tick labels
 
-subplot('position',[0.325  0.775*rat  0.225 0.225*rat]*rs);colormap(ctab);drawnow;
+subplot('position',[0.325  0.775*rat  0.225 0.225*rat]*rs);colormap(ctab);%drawnow;
 utmimage(im2,xutmmin,xutmmax,yutmmin,yutmmax,tl2,'b',climit,dotxutm, ...
     dotyutm,ctab,mysyms{2},marksizes(2),0,0,...
     datelabel,idatatype,datalabel);
@@ -114,7 +114,7 @@ if cbar ==1
 end
 
 
-subplot('position',[0.325  0.550*rat  0.225 0.225*rat]*rs);drawnow;
+subplot('position',[0.325  0.550*rat  0.225 0.225*rat]*rs);%drawnow;
 utmimage(im4,xutmmin,xutmmax,yutmmin,yutmmax,tl4,'d',climit,dotxutm, dotyutm,ctab,mysyms{4},marksizes(4),0,0,...
     datelabel,idatatype,datalabel);
 if cbar ==1
@@ -130,7 +130,7 @@ if cbar ==1
     set(ha,'Color',labelcolor);  % 2011-JUL-04
 end
 
-subplot('position',[0.1  0.775*rat   0.225 0.225*rat]*rs);drawnow;
+subplot('position',[0.1  0.775*rat   0.225 0.225*rat]*rs);%drawnow;
 utmimage(im1,xutmmin,xutmmax,yutmmin,yutmmax,tl1,'a',climit,dotxutm,dotyutm,ctab,mysyms{1},marksizes(1),0,0,...
     datelabel,idatatype,datalabel);
 title(tl1,'FontName','Helvetica','FontWeight','Bold');
@@ -139,12 +139,12 @@ if cbar == 1
     set(ha,'Color',labelcolor);  % 2011-JUL-04
 end
 
-subplot('position',[0.1  0.550*rat   0.225 0.225*rat]*rs);drawnow;
+subplot('position',[0.1  0.550*rat   0.225 0.225*rat]*rs);%drawnow;
 utmimage(im3,xutmmin,xutmmax,yutmmin,yutmmax,tl3,'c',climit,dotxutm,dotyutm,ctab,mysyms{3},marksizes(3),1,1,...
     datelabel,idatatype,datalabel);
 
 %% label with title at top
-subplot('position',[0.1 1.0*rat 0.5 0.05*rat]*rs,'Units','normalized');drawnow;
+subplot('position',[0.1 1.0*rat 0.5 0.05*rat]*rs,'Units','normalized');%drawnow;
 axis off
 % coordinates for text are inside the rectangle defined by subplot above
 text(0.1,0.1,titlestr,...
@@ -153,6 +153,7 @@ text(0.1,0.1,titlestr,...
     'Clipping','off',...
     'Units','Normalized','rotation', 0,...
     'margin',2);
+%drawnow;
 
 % 'BackgroundColor',[1 1 1],
 return;

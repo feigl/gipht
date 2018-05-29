@@ -181,7 +181,12 @@ if marksize > 0 && numel(dotx) > 0 && numel(doty) > 0
   plot(dotx/1000,doty/1000,mysym,'MarkerSize',marksize); hold on;
 end
 
+%% 20180529 add this line to avoid issue on unix systems with missing panel
+drawnow;
+
+%% return with status
 istat = 0;
+
 
 return
  
