@@ -1,89 +1,113 @@
-function printpdf(pdffilename,ghandle)
-% write current graphics window to a PDF file
+% printpdf
 
-if nargin < 1
-    pdffilename = mfilename;
+%SAVE2PDF Saves a figure as a properly cropped pdf
+%
+%   save2pdf(pdfFileName,handle,dpi)
+%
+%   - pdfFileName: Destination to write the pdf to.
+%   - handle:  (optional) Handle of the figure to write to a pdf.  If
+%              omitted, the current figure is used.  Note that handles
+%              are typically the figure number.
+%   - dpi: (optional) Integer value of dots per inch (DPI).  Sets
+%          resolution of output pdf.  Note that 150 dpi is the Matlab
+%          default and this function's default, but 600 dpi is typical for
+%          production-quality.
+%
+%   Saves figure as a pdf with margins cropped to match the figure size.
+
+%   (c) Gabe Hoffmann, gabe.hoffmann@gmail.com
+%   Written 8/30/2007
+%   Revised 9/22/2007
+%   Revised 1/14/2007
+%   Revised 2018/05/27 Kurt Feigl
+
+function printpdf(pdfFileName,handle,dpi)
+
+% Verify correct number of arguments
+%error(nargchk(0,3,nargin));
+narginchk(0,3);
+
+% If no handle is provided, use the current figure as default
+if nargin<1
+    [fileName,pathName] = uiputfile('*.pdf','Save to PDF file:');
+    if fileName == 0; return; end
+    pdfFileName = [pathName,fileName];
+end
+if nargin<2 || ishandle(handle)==0  
+    handle = gcf;
+end
+if nargin<3
+    dpi = 600;
 end
 
-if numel(strfind(pdffilename,'.pdf')) <= 0
-    pdffilename = sprintf('%s.pdf',pdffilename);
-end
+% Backup previous settings
+prePaperType = get(handle,'PaperType');
+prePaperUnits = get(handle,'PaperUnits');
+preUnits = get(handle,'Units');
+prePaperPosition = get(handle,'PaperPosition');
+prePaperSize = get(handle,'PaperSize');
 
-% print current figure to pdf file name with 1200 DPI and TIFF
-t0=pwd;
-%t1=strrep(pdffilename,'_','\_');
-t1=pdffilename;
-%t2=date;
-t2 = datestr(now,31); %31             'yyyy-mm-dd HH:MM:SS'    2000-03-01 15:45:17 
-tu=getenv('USER');
-t3=sprintf('%s %s %s %s',t1,t0,t2,tu);
-t4= strrep(t3,'_','\_');
+% Make changing paper type possible
+set(handle,'PaperType','<custom>');
 
-% label with file name, date and time
-subplot('Position',[0 0 10 0.05],'Units','Centimeters');
+% Set units to all be the same
+set(handle,'PaperUnits','inches');
+set(handle,'Units','inches');
+
+% Set the page size and position to match the figure's dimensions
+PaperPosition = get(handle,'PaperPosition');
+
+% get the size of the white space
+Position = get(handle,'Position')
+OuterPosition = get(handle,'OuterPosition');
+
+hlabel = sprintf('%s %s %s',pdfFileName, datestr(now,31),getenv('USER'));
+hlabel=strrep(hlabel,'\','\\');
+hlabel=strrep(hlabel,'_','\_');
+
+vlabel = sprintf('%s',pwd);
+vlabel=strrep(vlabel,'\','\\');
+vlabel=strrep(vlabel,'_','\_');
+%vlabel = 'Hello string without slashes'
+
+%labelfig(hlabel,vlabel);
+
+%% write string vertically on the left hand side
+subplot('Position',[0., 0., 0.02 Position(4)-1],'Units','Inches','Parent',handle);
+text(0.,1.,vlabel ...
+            ,'Units','inches'...
+            ,'VerticalAlignment','Top'...
+            ,'HorizontalAlignment','Left'...
+            ,'Clipping','off'...
+            ,'FontName','Courier','FontSize',12 ...
+            ,'Rotation',90);
 axis off
-text(0,0,t4...
-    ,'Units','Centimeters'...
-    ,'VerticalAlignment','Bottom'...
-    ,'HorizontalAlignment','Left'...
-    ,'Clipping','off'...
-    ,'FontName','Courier','FontSize',9 ...
-    ,'Rotation',0);
 
-% Label the figure
-% Does not work on Hengill
-% mycomputer = computer;
-% if strcmp(mycomputer, 'GLNXA64')==0
-% http://www.mathworks.com/support/solutions/en/data/1-703XB9/?solution=1-703XB9
-% Subject:
-% 
-% Is it possible to programmatically check whether MATLAB has been started
-% with the "-nodisplay" option? Problem Description:
-% 
-% I have a program that needs to behave differently depending on whether
-% MATLAB has a display or not. However, I cannot determine a way to
-% programmatically check this.
-% 
-% The reason I need to do this is that I sometimes start MATLAB in batch
-% mode from a shell script, for testing my programs.
-% 
-% Solution:
-% 
-% The ability to programmatically check whether MATLAB has a display is not
-% available in MATLAB 7.6 (R2008a).
-% 
-% As a workaround, you can do one of the following:
-% 
-% 1. Manually set or unset an environment variable in your shell script
-% that launches MATLAB, so you can query it from inside MATLAB. For
-% instance, setting the ISDISPLAY environment variable in your shell script
-% before launching MATLAB:
-% 
-% 
-% setenv ISDISPLAY no matlab -r "foo; quit"
-% 
-% (here shown with C Shell syntax), means that the MATLAB command
-% getenv('ISDISPLAY') will return the string 'no' in any MATLAB processes
-% that are spawned from this shell.
-% 
-% 2. Query the "ScreenSize" property of the root object inside MATLAB:
-% get(0, 'ScreenSize')
-% When there is no display, this returns [1 1 1 1] instead of an actual screen size. However, this relies on behavior that isn't actually specified (by the doc, for instance) to work in any particular way, so may be subject to change in the future. If you were going to use this many times, it might be wise to wrap it in a function (e.g. create an "isdisplay.m" function file), so you can easily change the implementation in the future, if needed. (This method worked as of MATLAB R2008a.) 
-% ss4 = get(0, 'ScreenSize');
+%% write text string horizontally at lower left
+subplot('Position',[0.04, 0.0, Position(3)-1 0.02],'Units','Inches','Parent',handle);
+text(1.,0.,hlabel ...
+            ,'Units','inches'...
+            ,'VerticalAlignment','Bottom'...
+            ,'HorizontalAlignment','Left'...
+            ,'Clipping','off'...
+            ,'FontName','Courier','FontSize',12 ...
+            ,'Rotation',0);
+axis off
 
 
-% if ss4 == [1 1 1 1 ]
-%    print(gcf,strrep(pdffilename,'pdf','ps'),'-dpsc2','-r1200'); % print PS if no display  
-% else
-%    print(gcf,pdffilename,'-dpdf','-r1200'); % otherwise, print PDF
-% end
 
-if exist('ghandle','var') == 1
-    print(ghandle,pdffilename,'-dpdf','-r1200'); % otherwise, print PDF
-else
-    print(gcf,pdffilename,'-dpdf','-r1200'); % otherwise, print PDF
-end
+set(handle,'PaperPosition',[0,0,Position(3:4)]);
+set(handle,'PaperSize',Position(3:4));
 
-return
+% set(handle,'PaperPosition',[0,0,OuterPosition(3),OuterPosition(4)]);
+% set(handle,'PaperSize',[OuterPosition(3),OuterPosition(4)]);
 
+% Save the pdf (this is the same method used by "saveas")
+print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi));
 
+% % Restore the previous settings
+set(handle,'PaperType',prePaperType);
+set(handle,'PaperUnits',prePaperUnits);
+set(handle,'Units',preUnits);
+set(handle,'PaperPosition',prePaperPosition);
+set(handle,'PaperSize',prePaperSize);
