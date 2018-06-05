@@ -508,45 +508,87 @@ for i = 1:np
     fprintf(1,'Extreme values of mdl0 %12.4e %12.4e \n',nanmin(nanmin(mdl0)),nanmax(nanmax(mdl0)));
     fprintf(1,'Extreme values of mdl1 %12.4e %12.4e \n',nanmin(nanmin(mdl1)),nanmax(nanmax(mdl1)));
     
-    % wrapped modeled values in radians
-    wrm0 = rwrapm(mdl0);
-    wrm1 = rwrapm(mdl1);
-    %     add mean direction from obs
-    %wrm0 = rwrapm(wrm0 + mean_direction(phao) - mean_direction(wrm0));
-    %wrm0 = rwrapm(wrm0 + mean_direction(phao) - mean_direction(wrm0));
-    %wrm0 = rwrapm(mdl0 + mean_direction(phao));
-    % cannot estimate mean direction from gradients
-    %if ismember(pselect,[5,7,9]) || pselect == 1
-    %     if ismember(pselect,[1,5,7,9])
-    %         wrm1 = rwrapm(wrm1 + mean_direction(phao) - mean_direction(wrm1));
-    %     end
     
-    fprintf(1,'Extreme values of wrm0 %12.4e %12.4e \n',nanmin(nanmin(wrm0)),nanmax(nanmax(wrm0)));
-    fprintf(1,'Extreme values of wrm1 %12.4e %12.4e \n',nanmin(nanmin(wrm1)),nanmax(nanmax(wrm1)));
-    
-    % residuals in radians
-    res0 = rwrapm(phao-mdl0);
-    res1 = rwrapm(phao-mdl1);
-    
-    % angular deviations for all pixels in subregion
-    devs_all00 = rarcm(phao,zeros(size(phao)));
-    devs_all0  = rarcm(phao,rwrapm(mdl0));
-    devs_all1  = rarcm(phao,rwrapm(mdl1));
-    
-    % 2012-JUN-25 select OK points
-    if pselect == 0
-        iok = ones(size(devs_all00));
-    else
-        iok=find(devs_all00>0);
+
+
+    %% handle wrapping
+    switch idatatype1
+        case 0 %% observable is phase in radians
+            %% residuals in radians
+            res0 = rwrapm(phao-mdl0);
+            res1 = rwrapm(phao-mdl1);
+            
+            % wrapped modeled values in radians
+            wrm0 = rwrapm(mdl0);
+            wrm1 = rwrapm(mdl1);
+            %     add mean direction from obs
+            %wrm0 = rwrapm(wrm0 + mean_direction(phao) - mean_direction(wrm0));
+            %wrm0 = rwrapm(wrm0 + mean_direction(phao) - mean_direction(wrm0));
+            %wrm0 = rwrapm(mdl0 + mean_direction(phao));
+            % cannot estimate mean direction from gradients
+            %if ismember(pselect,[5,7,9]) || pselect == 1
+            %     if ismember(pselect,[1,5,7,9])
+            %         wrm1 = rwrapm(wrm1 + mean_direction(phao) - mean_direction(wrm1));
+            %     end
+            
+            fprintf(1,'Extreme values of wrm0 %12.4e %12.4e \n',nanmin(nanmin(wrm0)),nanmax(nanmax(wrm0)));
+            fprintf(1,'Extreme values of wrm1 %12.4e %12.4e \n',nanmin(nanmin(wrm1)),nanmax(nanmax(wrm1)));
+            
+            % angular deviations for all pixels in subregion
+            devs_all00 = rarcm(phao,zeros(size(phao)));
+            devs_all0  = rarcm(phao,rwrapm(mdl0));
+            devs_all1  = rarcm(phao,rwrapm(mdl1));
+            
+            % 2012-JUN-25 select OK points
+            if pselect == 0
+                iok = ones(size(devs_all00));
+            else
+                iok=find(devs_all00>0);
+            end
+            
+             % 2010-MAR-22 OK to calculate scalar cost as average of vector costs
+            totcost00 = nanmean(colvec(devs_all00(iok)));
+            totcost0  = nanmean(colvec(devs_all0(iok)));
+            totcost1  = nanmean(colvec(devs_all1(iok)));
+            
+            objfun1 = objfun;
+        otherwise
+            warning(sprintf('idatatype1 is %d. Skipping wrapping operation.\n',idatatype1));
+            
+            %% residuals in radians
+            res0 = phao-mdl0;
+            res1 = phao-mdl1;
+
+            wrm0 = nan(size(mdl0));
+            wrm1 = nan(size(mdl0));
+            
+            % for unwrapped data, angular deviations are equivalent to
+            % residuals
+            devs_all00 = phao;
+            devs_all0  = res0;
+            devs_all1  = res1;
+                        
+            % 2012-JUN-25 select OK points
+            if pselect == 0
+                iok = ones(size(devs_all00));
+            else
+                iok=find(isfinite(devs_all00) == 1);
+            end
+
+            % use RMS to evaluate cost
+            totcost00 = nanrms(colvec(devs_all00(iok)));
+            totcost0  = nanrms(colvec(devs_all0(iok)));
+            totcost1  = nanrms(colvec(devs_all1(iok)));
+            
+            objfun1 = 'nanrms';
     end
-    % 2010-MAR-22 OK to calculate scalar cost as average of vector costs
-    totcost00 = nanmean(colvec(devs_all00(iok)));
-    totcost0  = nanmean(colvec(devs_all0(iok)));
-    totcost1  = nanmean(colvec(devs_all1(iok)));
     
-    fprintf(1,'Total Cost (by %s) of null  model = %12.4f %s for %6d observations in sub-region\n',objfun,totcost00,objlabel,numel(iok));
-    fprintf(1,'Total Cost (by %s) of initl model = %12.4f %s for %6d observations in sub-region\n',objfun,totcost0, objlabel,numel(iok));
-    fprintf(1,'Total Cost (by %s) of final model = %12.4f %s for %6d observations in sub-region\n',objfun,totcost1, objlabel,numel(iok));
+ 
+    
+    
+    fprintf(1,'Total Cost (by %s) of null  model = %12.4f %s for %6d observations in sub-region\n',objfun1,totcost00,objlabel,numel(iok));
+    fprintf(1,'Total Cost (by %s) of initl model = %12.4f %s for %6d observations in sub-region\n',objfun1,totcost0, objlabel,numel(iok));
+    fprintf(1,'Total Cost (by %s) of final model = %12.4f %s for %6d observations in sub-region\n',objfun1,totcost1, objlabel,numel(iok));
     
     % Added 2008-JUL-17 Kurt
     xax2 = [xmin, xmax];

@@ -1,5 +1,5 @@
 function grdwrite3(x,y,z,file,INFO)
-%GRDWRITE2  Write a GMT grid file
+%GRDWRITE3  Write a GMT grid file
 %
 % Uses built-in NetCDF capability (MATLAB R2008b or later) to
 % write a COARDS-compliant netCDF grid file

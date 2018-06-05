@@ -11,12 +11,6 @@ end
 % absolute value of residual
 yt3 = abs(yt2-yt1);
 
-h=figure;
-subplot(3,1,1);
-title(tlab,'FontName','Times','Fontsize',9);
-axis off
-
-subplot(3,1,2);
 iok = find(isfinite(yt1)==1);
 iok = intersect(iok,find(isfinite(yt2)==1));
 iok = intersect(iok,find(abs(yt1)>0.0));
@@ -24,8 +18,17 @@ iok = intersect(iok,find(abs(yt2)>0.0));
 
 if numel(iok) < 1
     warning('too few points','numel(iok) = %d LT 1\n',numel(iok));
+    h = 0;
     return;
 end
+
+
+h=figure;
+subplot(3,1,1);
+title(tlab,'FontName','Times','Fontsize',9);
+axis off
+
+subplot(3,1,2);
 xt=xt(iok);
 yt1=yt1(iok);
 yt2=yt2(iok);
