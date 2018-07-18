@@ -17,7 +17,8 @@ if fexist(file_name) == 0
 end
 
 %% decide to read GMT grid files or not
-if numel(strfind(file_name,'grd')) > 0
+%if numel(strfind(file_name,'grd')) > 0
+if contains(file_name,'grd') == 1  || contains(file_name,'pair') == 1
     file_type = 2
 else
     file_type = 1

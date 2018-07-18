@@ -193,11 +193,20 @@ if numel(tbreaks) > 0
             jj = jj+1;
             if ti >= tstart
                 dt = ti - tstart;
-                ft(jj) = 1.0 - exp(1*dt/metaparams(2)); % exponential growth
+                % 20180627 This is not growth
+                %ft(jj) = 1.0 - exp(1*dt/metaparams(2)); % exponential growth
+                % 20180627 This is growth
+                ft(jj) = exp(1*dt/metaparams(2)); % exponential growth
             else
                 ft(jj) = 0;
             end
-          
+        case {'sinusoidal'} % sinusoidal with period in years
+            mparams = 1;
+            ft = zeros(mparams,1);
+            jj = jj+1;
+            % tstart is zero crossing
+            dt = ti - tstart;
+            ft(jj) = sin(2*pi*dt/metaparams(2)); % sinusoidal with period in years
         case {'okmokexp3'} % 2 exprdecay with parameterizations with secular rate in between. For Okmok test case. Example of combining time functions.
             jj=2;
             mparams = 2;

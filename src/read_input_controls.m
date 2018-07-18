@@ -165,6 +165,9 @@ OPT.fnparout     = getval3(OPT,keys,vals,'fnparout','s');
 % name for output parameters in summary format
 OPT.fnsumout    = getval3(OPT,keys,vals,'fnsumout','s');
 
+% subregion to cut
+OPT.cutsubregion = getval3(OPT,keys,vals,'cutsubregion','s');
+
 
 
 % % Make sure a value is found
@@ -420,7 +423,7 @@ end
 %     fprintf(1,'figopt = %4s\n',dec2bin(figopt,4));
 % end
 
-if  ~ismember(OPT.orbopt,[0,1]);
+if  ~ismember(OPT.orbopt,[0,1])
     error(sprintf('ERROR: orbopt has invalid value of %f in %s\n',OPT.orbopt,OPT.fning));
 end
 
@@ -471,6 +474,18 @@ end
 %     allowed
 %     error(sprintf('ERROR: phaseprefix %s is not on list of allowed values above.\n',phaseprefix));
 % end
+
+% subregion
+if numel(OPT.cutsubregion) > 0
+    % expect string as for GMT w/e/s/n for example: -R-135/-133/34/35
+    cbuff = char(OPT.cutsubregion);
+    cbuff = strrep(cbuff,'-R','');
+    cbuff = strsplit(cbuff,'/');
+    
+    
+else
+    OPT.cutsubregion = 0; % 
+end
 
 fprintf(1,'%s completed reading input controls.\n',mfilename);
 return

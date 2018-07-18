@@ -1,12 +1,11 @@
 #!/bin/csh 
 
-#if ($#argv < 1) then
-#cat - << ENDOFDOC
-## Run GIPhT once for each pair listed in the list of interferograms specified 
-#by ilist keyword in gipht.in
-#ENDOFDOC
-#
-#else
+if ($#argv < 1) then
+cat - << ENDOFDOC
+Run GIPhT once for each pair listed in the list of interferograms specified 
+by ilist keyword in gipht.in
+ENDOFDOC
+else
 
 echo Reminder 
 echo 'RM -rf x_*'
@@ -30,8 +29,12 @@ foreach pair (pair*.lst)
 echo '---------------------'
 cat $pair
 
-set imast = `cat $pair | awk 'NR==1{print $7}'`
-set islav = `cat $pair | awk 'NR==1{print $8}'`
+# old style list from Diapason
+#set imast = `cat $pair | awk 'NR==1{print $7}'`
+#set islav = `cat $pair | awk 'NR==1{print $8}'`
+# new style list from GMTSAR workflow
+set imast = `cat $pair | awk 'NR==1{print $1}'`
+set islav = `cat $pair | awk 'NR==1{print $2}'`
 
 echo $pair $imast $islav
 
@@ -39,6 +42,7 @@ grep -v ilist gipht.in.save >! gipht.in
 echo "ilist = $pair" >> gipht.in
 
 
+module load matlab.r2017b
 matlab -nodisplay >! p${imast}_${islav}.log  <<!
 giphtpath
 gipht
@@ -53,4 +57,4 @@ end
 
 \cp gipht.in.save gipht.in
 
-#endif
+endif

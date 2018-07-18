@@ -731,7 +731,11 @@ for i = 1:np
     
     %% build images
     imA = reshape(     double(phao)/DNPC ,nlmesh3,ncmesh3);tlA = 'Initial';
-    imB = reshape(     double(wrm0)/DNPC ,nlmesh3,ncmesh3);tlB = 'Mod0';
+    if idatatype1 == 0
+        imB = reshape(     double(wrm0)/DNPC ,nlmesh3,ncmesh3);tlB = 'Mod0';
+    else
+        imB = reshape(     double(mdl0)/DNPC ,nlmesh3,ncmesh3);tlB = 'Mod0';
+    end
     imC = reshape(     double(res0)/DNPC ,nlmesh3,ncmesh3);tlC = 'Res0';
     imD = reshape(double(devs_all0)/DNPC ,nlmesh3,ncmesh3);tlD = 'Dev0';
     %if pselect == 3 || pselect == 5 || pselect == 7
@@ -743,13 +747,18 @@ for i = 1:np
     else
         imE = reshape(     double(phao)/DNPC ,nlmesh3,ncmesh3);tlE = 'Final';
     end
-    imF = reshape(     double(wrm1)/DNPC ,nlmesh3,ncmesh3);tlF = 'Mod1';
+    if idatatype1 == 0       
+        imF = reshape(     double(wrm1)/DNPC ,nlmesh3,ncmesh3);tlF = 'Mod1';
+    else
+        imF = reshape(     double(mdl1)/DNPC ,nlmesh3,ncmesh3);tlF = 'Mod1';        
+    end
+        
     imG = reshape(     double(res1)/DNPC ,nlmesh3,ncmesh3);tlG = 'Res1';
     imH = reshape(double(devs_all1)/DNPC ,nlmesh3,ncmesh3);tlH = 'Dev1';
     
     %   propagate zeros or missing data as black pixels
     % areas with elevation less than 1 m
-    if std(bz) > 1
+    if nanstd(bz) > 1
         inull=find(abs(bz) < 1);
     else
         inull = [];
@@ -856,7 +865,7 @@ for i = 1:np
         , umr, umx, umy, umz...
         , demx,demy);
     
-    % set color table
+    % set limits of color table
     switch idatatype1 %%TODO handle a different data type for each pair
         case 0
             climit=[-0.5, +0.5];
@@ -865,6 +874,7 @@ for i = 1:np
             climit(2) = nanmax(nanmax([imA imB imC imD imE imF imG imH]));
     end
     
+    % set color table
     if bitget(figopt,1) == 1
         % show missing pixels as black
         %ctab = cmapblackzero; % black at zero in middle
@@ -873,7 +883,7 @@ for i = 1:np
         ctab = colormap('jet');
     end
         
-%     %% get centroid of Okada source
+%% get centroid of Okada source
 %     xcentroid = p1(get_parameter_index('Okada1_Centroid_Easting_in_m____',qnames));
 %     ycentroid = p1(get_parameter_index('Okada1_Centroid_Northing_in_m___',qnames));
 %     icentroid = NaN;
@@ -919,17 +929,26 @@ for i = 1:np
     feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
     
     %% make 4-panel plot of wrapped phase
+    feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
     tlA = ''; tlF = '';
     datelabel = '';
+        % set limits of color table
+    switch idatatype1 %%TODO handle a different data type for each pair
+        case 0
+            climit=[-0.5, +0.5];
+        otherwise
+            climit(1) = nanmin(nanmin([imA imF imG imH])); 
+            climit(2) = nanmax(nanmax([imA imF imG imH]));
+    end
+ 
     nf=nf+1; h(nf)=utmimage4(imA,imF,imG,imH ...
         ,tlA,tlF,tlG,tlH ...
         ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes...
         ,datelabel,idatatype1,datalabel);
-    feval(printfun,sprintf('%s_%03d_4PAN',runname,i));
-    
+    feval(printfun,sprintf('%s_%03d_4PAN',runname,i));  
      
     
-    % Make profiles
+    %% Make profiles
     % decide to show rate or not
     itref = get_parameter_index('Reference_Epoch_in_years________',pnames);
 %   20151121 not defined in final estimate

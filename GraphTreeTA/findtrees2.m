@@ -166,15 +166,17 @@ nrows = nm(1);
 
 % if MATLAB version is too old or too recent, this function may not work as
 % intended
-if verLessThan('matlab', '7.10')
-    warning('Using old version of null')
-    N = null(Q);
-elseif isequal(verLessThan('matlab', '15.0'), 0)
-    warning('Check new version definition of null, may not be compatible with previous versions')
-else
-    % rational null space
-    N = null(Q,'r');
-end
+% if verLessThan('matlab', '7.10')
+%     warning('Using old version of null')
+%     N = null(Q);
+% elseif isequal(verLessThan('matlab', '15.0'), 0)
+%     warning('Check new version definition of null, may not be compatible with previous versions')
+% else
+%     % rational null space
+%     N = null(Q,'r');
+% end
+% 20180716 should work
+N = null(Q);
   
 [nrnull,ncnull] = size(N); % stores number of rows and columns of null matrix
 
