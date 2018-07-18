@@ -70,7 +70,8 @@ function [ur,uz,B] = sun69kf(varargin)
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 %  POSSIBILITY OF SUCH DAMAGE.
 
-error(nargchk(4,6,nargin))
+%error(nargchk(4,6,nargin))
+narginchk(4,6)
 
 for ii = 1:nargin
    if ~isnumeric(varargin{ii})
