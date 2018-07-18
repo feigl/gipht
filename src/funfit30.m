@@ -753,8 +753,9 @@ elseif nin == 3 ...
     %     J. Geophys. Res., 74, 5995-6011.
     %
     
-    E = mu / (1 + 2.0*nu);  % Young's Modulus (un-numbered equation Sun p. 9997)
-    
+    % E = mu / (1 + 2.0*nu);  % Young's Modulus (un-numbered equation Sun p. 9997)
+    % Correction 20180718  
+    E = 2.0 * mu * (1 + nu);  % Young's Modulus % https://en.wikipedia.org/wiki/Elastic_modulus
     %
     %
     %     0 j=j+1;pnames{j} = sprintf('SunDisk1 Easting in m          '); pscl(j)=1.0E3;
