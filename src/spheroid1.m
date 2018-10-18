@@ -1,5 +1,6 @@
-function [sph]=spheroid(a,b,c,matrl,phi,theta,P)
+function [sph]=spheroid1(a,b,c,matrl,phi,theta,P)
 % Calculate spheroid parameters and save in output vector sph
+% renamed spheroid1 to avoid shadowing built-in matlab routine of name spheroid
 
 lamda=matrl(1);
 mu=matrl(2);
