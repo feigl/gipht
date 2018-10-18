@@ -8,7 +8,7 @@ function grdwrite3(x,y,z,file,INFO)
 % Matlab 2008b (and later) built-in NetCDF functionality
 % instead of GMT libraries.
 %
-% GRDWRITE2(X,Y,Z,'filename') will create a grid file containing the
+% GRDWRITE3(X,Y,Z,'filename') will create a grid file containing the
 % data in the matrix Z.  X and Y should be either vectors with
 % dimensions that match the size of Z or two-component vectors
 % containing the max and min values for each.
@@ -78,12 +78,18 @@ if nargin == 5
     else
         zname='z';
     end
+    if isfield(INFO,'ispixelreg') == 1
+        ispixelreg = INFO.ispixelreg;
+    else
+        ispixelreg = 0;
+    end
 else
     history='File written by MATLAB function grdwrite3.m';
     xname = 'x';
     yname = 'y';
     zname = 'z';
     desc = 'description left blank';
+    ispixelreg = 0;
 end
 vers='4.x';                             % is "x" OK?
 
@@ -91,16 +97,36 @@ vers='4.x';                             % is "x" OK?
 if (~isvector(x) || ~isvector(y))
     error('X and Y must be vectors!');
 end
-if (length(x) ~= size(z,2))    % number of columns don't match size of x
-    minx=min(x); maxx=max(x);
-    dx=(maxx-minx)/(size(z,2)-1);
-    x=minx:dx:maxx;                       % write as a vector
-end
-if (length(y) ~= size(z,1))    % number of rows don't match size of y
-    miny=min(y); maxy=max(y);
-    dy=(maxy-miny)/(size(z,1)-1);
-    y=miny:dy:maxy;                       % write as a vector
-end
+% if ispixelreg == 1
+% % this is for pixel registration
+%     if (length(x) ~= size(z,2))    % number of columns don't match size of x
+%         warning('resizing X for pixel registration');
+%         minx=min(x); maxx=max(x);
+%         dx=(maxx-minx)/(size(z,2));
+%         x=minx:dx:maxx;                       % write as a vector
+%     end
+%     if (length(y) ~= size(z,1))    % number of rows don't match size of y
+%         warning('resizing Y for pixel registration');
+%         miny=min(y); maxy=max(y);
+%         dy=(maxy-miny)/(size(z,1));
+%         y=miny:dy:maxy;                       % write as a vector
+%     end
+% else
+    % default is for node registration
+    if (length(x) ~= size(z,2))    % number of columns don't match size of x
+        warning('resizing X for node registration');
+        minx=min(x); maxx=max(x);
+        dx=(maxx-minx)/(size(z,2)-1);
+        x=minx:dx:maxx;                       % write as a vector
+    end
+    if (length(y) ~= size(z,1))    % number of rows don't match size of y
+        warning('resizing Y for node registration');
+        miny=min(y); maxy=max(y);
+        dy=(maxy-miny)/(size(z,1)-1);
+        y=miny:dy:maxy;                       % write as a vector
+    end
+
+%end
 
 % match Matlab class to NetCDF data type
 switch class(z)

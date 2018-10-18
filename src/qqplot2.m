@@ -259,31 +259,31 @@ xlabel('Value');
 ylabel('Number of occurrences');
 h(2) = gcf;
 
-% draw another QQ plot using bins from chi2gof 
-figure;
-[dummy,isort] = sort(evals1);
-
-set(gca,'FontName','Helvetica','Fontsize',12,'FontWeight','bold');
-subplot(2,1,1);
-plot(evals1(isort)/n,ovals(isort)/n,'ro-');
-axis([0 1 0 1]);
-axis square;
-hold on;
-plot([0 1],[0 1],'b:');
-title(titlestr);
-ylabel('Observed frequency');
-
-subplot(2,1,2);
-plot(evals1(isort)/n,(ovals(isort)-evals1(isort))/n,'ro-');
-axis([0 1 -Inf +Inf]);
-axis tight
-hold on;
-plot([0 1],[0 0],'b:');
-
-ylabel('Observed - expected frequency');
-xlabel('Expected frequency');
-
-h(3) = gcf;
+% % draw another QQ plot using bins from chi2gof 
+% figure;
+% [dummy,isort] = sort(evals1);
+% 
+% set(gca,'FontName','Helvetica','Fontsize',12,'FontWeight','bold');
+% subplot(2,1,1);
+% plot(evals1(isort)/n,ovals(isort)/n,'ro-');
+% axis([0 1 0 1]);
+% axis square;
+% hold on;
+% plot([0 1],[0 1],'b:');
+% title(titlestr);
+% ylabel('Observed frequency');
+% 
+% subplot(2,1,2);
+% plot(evals1(isort)/n,(ovals(isort)-evals1(isort))/n,'ro-');
+% axis([0 1 -Inf +Inf]);
+% axis tight
+% hold on;
+% plot([0 1],[0 0],'b:');
+% 
+% ylabel('Observed - expected frequency');
+% xlabel('Expected frequency');
+% 
+% h(3) = gcf;
 
 return
 

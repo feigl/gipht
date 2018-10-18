@@ -56,7 +56,7 @@ figure; hold on;
 % clim = [-cmaxabs,+cmaxabs];
 
 %% set up a colortable
-clim = [nanmin(colvec(IMAGE)),nanmax(colvec(IMAGE))]
+clim = [nanmin(colvec(IMAGE)),nanmax(colvec(IMAGE))];
 
 %% draw the image
 imagesc(xe/lengthfact,ye/lengthfact,IMAGE,clim);
