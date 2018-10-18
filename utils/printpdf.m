@@ -58,7 +58,7 @@ set(handle,'Units','inches');
 PaperPosition = get(handle,'PaperPosition');
 
 % get the size of the white space
-Position = get(handle,'Position')
+Position = get(handle,'Position');
 OuterPosition = get(handle,'OuterPosition');
 
 hlabel = sprintf('%s %s %s',pdfFileName, datestr(now,31),getenv('USER'));

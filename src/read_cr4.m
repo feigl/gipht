@@ -56,17 +56,17 @@ fid=fopen(cr4_file_name,'r','ieee-le'); % little endian
 % 
 nrows
 mcols
-npixels = 2*nrows*mcols
-[r,count1]=fread(fid,npixels,'float32');
+nwords = 2*nrows*mcols
+[r,count1]=fread(fid,nwords,'float32');
 
-fprintf(1,'Number of 4-byte numbers read     = %ld\n',count1);
+fprintf(1,'Number of 4-byte words read       = %ld\n',count1);
 
 fprintf(1,'Number of pixels         expected = %ld\n',nrows * mcols); 
 fprintf(1,'Number of pixels             read = %ld\n',count1/2);
 
 %% parse
-x = r(1:2:npixels-1); % real part
-y = r(2:2:npixels); % imaginary part
+x = r(1:2:nwords-1); % real part
+y = r(2:2:nwords); % imaginary part
 
 z = complex(x,y);
 z = reshape(z,mcols,nrows);

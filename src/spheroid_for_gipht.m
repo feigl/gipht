@@ -1,4 +1,4 @@
-function [sph]=spheroid(a,b,c,matrl,phi,theta,P)
+function [sph]=spheroid_for_gipht(a,b,c,matrl,phi,theta,P)
 % Calculate spheroid parameters and save in output vector sph
 
 lamda=matrl(1);
