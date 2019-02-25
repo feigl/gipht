@@ -1,8 +1,7 @@
 function  [x,y,utmzone] = deg2utm(Lat,Lon)
-% -------------------------------------------------------------------------
+% project geographic coordinates (latitude, longitude in degrees) into cartographic coordinates (easting, northing in meters) using Universal Transverse Mercator (UTM) projection, assuming WGS84 ellipsoid.
 % [x,y,utmzone] = deg2utm(Lat,Lon)
 %
-% Description: Function to convert lat/lon vectors into UTM coordinates (WGS84).
 % Some code has been extracted from UTM.m function by Gabriel Ruiz Martinez.
 %
 % Inputs:
@@ -43,6 +42,7 @@ function  [x,y,utmzone] = deg2utm(Lat,Lon)
 % Aug/06: fixed a problem (found by Rodolphe Dewarrat) related to southern 
 %    hemisphere coordinates. 
 % Aug/06: corrected m-Lint warnings
+% 2013/11/21 Kurt Feigl use mean longitude to set zone number
 %-------------------------------------------------------------------------
 
 % Copyright (c) 2006, Rafael Palacios
@@ -76,7 +76,7 @@ function  [x,y,utmzone] = deg2utm(Lat,Lon)
 % Argument checking
 %
 %error(nargchk(2, 2, nargin));  %2 arguments required
-narginchk(2, 2);  %2 arguments required
+narginchk(2,2);
 n1=length(Lat);
 n2=length(Lon);
 if (n1~=n2)
@@ -89,8 +89,11 @@ end
 x=zeros(n1,1);
 y=zeros(n1,1);
 %utmzone(n1,:)='60 X';
-utmzone = sprintf('60 X');
+utmzone = cell(n1,1);
 
+%2013/11/21 Kurt Feigl use mean longitude to set zone number 
+Huso = fix( ( mean(Lon) / 6 ) + 31);
+S = ( ( Huso * 6 ) - 183 );
 
 % Main Loop
 %
@@ -110,8 +113,8 @@ for i=1:n1
    lat = la * ( pi / 180 );
    lon = lo * ( pi / 180 );
 
-   Huso = fix( ( lo / 6 ) + 31);
-   S = ( ( Huso * 6 ) - 183 );
+%    Huso = fix( ( lo / 6 ) + 31);
+%    S = ( ( Huso * 6 ) - 183 );
    deltaS = lon - ( S * ( pi / 180 ) );
 
    if (la<-72), Letra='C';
@@ -159,6 +162,7 @@ for i=1:n1
 
    x(i)=xx;
    y(i)=yy;
-   utmzone(i,:)=sprintf('%02d %c',Huso,Letra);
+   %utmzone(i,:)=sprintf('%02d %c',Huso,Letra);
+   utmzone{i}=sprintf('%02d %c',Huso,Letra);
 end
 

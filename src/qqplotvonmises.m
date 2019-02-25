@@ -6,7 +6,7 @@
 % Kurt Feigl
 % last modified 2008-MAR-30
 
-function qqplotvonmises(data,titlestring)
+ function [Sm, teststring1, U2, teststring2] = qqplotvonmises(data,titlestring)
 
 % number of data points
 n=length(data);
@@ -44,9 +44,9 @@ data2 = angle(complex(cos(data*2*pi - md),sin(data*2*pi - md)))/2/pi;
 % % shift mean to origin and convert to radians
 data3 = angle(complex(cos(data2*2*pi - md),sin(data2*2*pi - md)));
 % Test if data are distributed as Von Mises - Mardia and Jupp
-[Sm, teststring1] = vonmisesness(data3);
+[Sm, teststring1] = vonmisesness(data3)
 % Test if data are distributed as Von Mises - Fisher
-[U2, teststring2] = vonmisesness2(data3);
+[U2, teststring2] = vonmisesness2(data3)
 
 
 
@@ -58,7 +58,8 @@ q=zeros(n,1);
 xqm=zeros(n,1);
 
 
-for i=1:length(x)	
+%for i=1:length(x)	
+for i=1:numel(x)	
   q(i)=(i-0.5)/n;
   %xqm(i)=phiinv(q(i));
   %xqm(i) = icdf(dist,q(i),a,b,c);
@@ -67,7 +68,7 @@ for i=1:length(x)
 end
 
 
-
+figure;
 plot(xqm,x,'r+');
 hold on
 axis square
@@ -98,7 +99,7 @@ statstring=sprintf(' DBL=%1d mu=%.3fcy d0=%.3fcy k=%.3f R=%.4f Sm=%.2f U2=%.4f'.
    ,dbl,md/pi/2,d0/pi/2,kappa,Rbar,Sm,U2);
 if nargin < 3
    title(statstring);
- else
+else
     title(strcat(titlestring, statstring));
 %    text(-0.48,1.15*max(Ncounts),statstr);
 end
