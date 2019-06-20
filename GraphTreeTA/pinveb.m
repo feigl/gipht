@@ -27,7 +27,6 @@ function [ x, c, s] = pinveb(A, tol, index)
 [mtest ntest] = size(S);
 if ntest == 1
     s = S;
-    disp('test 1')
 else
     s = diag(S); % store singular values in a vector
 end
@@ -37,7 +36,7 @@ n = 1:numel(s); % store indices of singluar values
 % Assign tolerance and cut-off values 
 if nargin < 2 
     % if tolerance isn't specified, use default
-    tol = max(size(A)) * eps(norm(s,inf))
+    tol = max(size(A)) * eps(norm(s,inf));
     sp = s(s > tol);
     p = numel(sp);
 elseif nargin == 2 
@@ -64,15 +63,15 @@ x = Vp*inv(Sp)*Up';
 c = cond(x);
 
 % Plot singular value spectrum with truncation cut-off
-figure
-plot(n, s/s(1), 'ko')
-hold on
-plot(p*ones(1, 10), linspace(min(s./s(1)), max(s./s(1)), 10), 'b--')
-hold off
-xlabel('i')
-ylabel('(s/s(1))')
-title('L curve for singluar values showing current truncation')
-axis tight
+% figure
+% plot(n, s/s(1), 'ko')
+% hold on
+% plot(p*ones(1, 10), linspace(min(s./s(1)), max(s./s(1)), 10), 'b--')
+% hold off
+% xlabel('i')
+% ylabel('(s/s(1))')
+% title('L curve for singluar values showing current truncation')
+% axis tight
 
 end
 

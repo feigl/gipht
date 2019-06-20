@@ -143,9 +143,9 @@ end % reading parameters from file
 %20170802 if ismember(pselect,[7,9]) == 1  % observable is gradient
 switch idatatype1
     case 0  % observable is phase
-        p0(get_parameter_index('Offset',pnames)) =  0.0; % cycles
-        lb(get_parameter_index('Offset',pnames)) = -0.5; % cycles
-        ub(get_parameter_index('Offset',pnames)) = +0.5; % cycles
+%         p0(get_parameter_index('Offset',pnames)) =  -0.5; % cycles
+%          lb(get_parameter_index('Offset',pnames)) = -0.5; % cycles
+%          ub(get_parameter_index('Offset',pnames)) = +0.5; % cycles
         ifast = 0;
     case 2 % observable is range - bounds to be defined later
 %         p0(get_parameter_index('Offset',pnames)) =  nan;
@@ -224,8 +224,8 @@ for k=1:me  %    % loop over epochs
 %                 fprintf(1,'Fixing bounds to initial estimate on %s %16.7g %16.7g %16.7g\n'...
 %                     ,pnames{pindex(ii)},p0(pindex(ii)),lb(pindex(ii)),ub(pindex(ii)));
 %             else               
-                lb(pindex(ii)) = p0(pindex(ii)) + lb(pindex(ii));                % update lower bound
-                ub(pindex(ii)) = p0(pindex(ii)) + ub(pindex(ii));                % update upper bound
+%                 lb(pindex(ii)) = p0(pindex(ii)) + lb(pindex(ii));                % update lower bound
+%                 ub(pindex(ii)) = p0(pindex(ii)) + ub(pindex(ii));                % update upper bound
                 fprintf(1,'Updating                       bounds on %s %16.7g %16.7g %16.7g\n'...
                     ,pnames{pindex(ii)},p0(pindex(ii)),lb(pindex(ii)),ub(pindex(ii)));
  %           end

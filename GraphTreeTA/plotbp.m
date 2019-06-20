@@ -1,4 +1,4 @@
-function ktours = plotbp(tepochs, bpest, DD, species, iuniqorbs, uniqdates, plotts,ylab, cal_date)
+function ktours = plotbp_bradyMSF(tepochs, bpest, DD, species, iuniqorbs, uniqdates, plotts,ylab, cal_date)
 %function ktours = plotbp(tepochs, bpest, DD, trees, iuniqorbs, uniqdates, plotts,ylab)
 %
 % plot pseudo-absolute Bperp as a function of time 

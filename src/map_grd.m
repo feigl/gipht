@@ -61,13 +61,18 @@ grd_axis = axis;
 
 %% plot symbols if requested
 if plot_symbols == 1
-    for i=1:numel(SYMS.sym)
-        sym_ind = find(SYMS.ind == i);
-        sym_code = char(SYMS.sym{i});
-        sym_color = char(sym_code(1));
-        plot(SYMS.x(sym_ind)/lengthfact,SYMS.y(sym_ind)/lengthfact,SYMS.sym{i}, 'MarkerFaceColor', sym_color);
-    end
+    if isfield('ind', SYMS) == 1
+        for i=1:numel(SYMS.sym)
+            sym_ind = find(SYMS.ind == i);
+            sym_code = char(SYMS.sym{i});
+            sym_color = char(sym_code(1));
+            plot(SYMS.x(sym_ind)/lengthfact,SYMS.y(sym_ind)/lengthfact,SYMS.sym{i}, 'MarkerFaceColor', sym_color);
+        end
     else
+        for i=1:numel(SYMS.x)
+            plot(SYMS.x(i)/lengthfact,SYMS.y(i)/lengthfact,SYMS.sym{i});
+        end
+    end
 end
 axis(grd_axis)
 %% add labels and title

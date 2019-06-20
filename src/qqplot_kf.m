@@ -166,8 +166,8 @@ fprintf(1,'Testing the null hypothesis that the data are random sample from a %s
 
 % significance level
 %alpha = 1.0e-6;
-alpha = 0.05; 
-nbins = 20;
+alpha = .1;%0.05; 
+nbins = 100%20;
 switch m
     case 1
         [chi2gof_h,chi2gof_p,chi2gof_stats] = chi2gof(data ...
