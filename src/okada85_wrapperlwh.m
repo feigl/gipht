@@ -48,11 +48,10 @@ for j=1:ncentroids
     %% calculate dimensions of volume change in terms of length assuming ratio of sides stays the same
     % dV = V2 - V0
     % dV = L0*W0*H0 - L2*W2*H2
-    %dV = (L1 * W1)*(H2 - H1) + (L1 * H1)*(W2 - W1) + (W1 * H1)*(L2 - L1);
     V0 = F(j).dx*F(j).dy*F(j).dz;
-    L2 = ((F(j).dV + V0)/((F(j).dy/F(j).dx)*(F(j).dz/F(j).dx)))^(1/3)
-    W2 = (F(j).dy/F(j).dx)*L2
-    H2 = (F(j).dz/F(j).dx)*L2
+    L2 = ((F(j).dV + V0)/((F(j).dy/F(j).dx)*(F(j).dz/F(j).dx)))^(1/3);
+    W2 = (F(j).dy/F(j).dx)*L2;
+    H2 = (F(j).dz/F(j).dx)*L2;
     
     
     %% loop over three orthogonal dikes
@@ -61,21 +60,21 @@ for j=1:ncentroids
             case 1 % horizontal fault
                 dipd    =    0;  % dip in degrees
                 striked =    0;  % strike in degrees
-                length  = F(j).dy;  % length of fault in meters
-                width   = F(j).dx;  % width of fault in meters
-                open   = H2 - F(j).dz
+                length  = F(j).dx;  % length of fault in meters
+                width   = F(j).dy;  % width of fault in meters
+                open   = H2 - F(j).dz;
             case 2 % vertical fault in X-Z plane
                 dipd    =   90;  % dip in degrees
                 striked =   90;  % strike in degrees clockwise from north
                 length  = F(j).dx; % length of fault in meters
                 width   = F(j).dz; % width of fault in meters
-                open   = W2 - F(j).dy
-            case 3 % vertical fault in Y-Z plane
+                open   = W2 - F(j).dy;
+            case 3 % vertical fault in X-Y plane
                 dipd    =   90;  % dip in degrees
                 striked =    0;  % strike in degrees clockwise from north
-                length  = F(j).dz; % length of fault in meters
-                width   = F(j).dy; % width of fault in meters
-                open   = L2 - F(j).dx
+                length  = F(j).dy; % length of fault in meters
+                width   = F(j).dz; % width of fault in meters
+                open   = L2 - F(j).dx;
             otherwise
                 error(sprintf('unknown value of i = %d\n',i));
         end

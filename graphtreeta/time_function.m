@@ -124,6 +124,24 @@ if numel(tbreaks) > 0
                 end
             end
             
+        case {'sawtooth'} % sawtooth
+            mparams = numel(tbreaks)-1; % number of intervals
+            ft = zeros(mparams,1);
+            for j=1:numel(tbreaks)-1
+                jj = jj+1;
+                if ti >= tbreaks(j)  % interferogram starts during interval
+                    %                    ft(jj) = ti - tbreaks(j);
+                    if ti < tbreaks(j+1)            % and ends during interval
+                        ft(jj) = ti - tbreaks(j);
+                    elseif ti >= tbreaks(j+1)        % and ends after interval
+                        ft(jj) = tbreaks(j+1) - tbreaks(j);
+                    end
+                else
+                    ft(jj) = 0;
+                end
+            end
+ 
+            
         case {'pwl', 'ber', 'ber_tikh'} % PIECEWISE LINEAR: options of Berardino and Tikhonov regularization
             mparams = numel(tbreaks)-1; % number of intervals
             ft = zeros(mparams,1);
@@ -180,7 +198,53 @@ if numel(tbreaks) > 0
             else
                 ft(jj) = 0;
             end
+         case {'logdecay'} % exponential growth at exponentially decaying rate
+            %time constant set to tstart
+            mparams = 1;
+            ft = zeros(mparams,1);
+            jj = jj+1;
+            if ti >= tstart
+                dt = ti - tstart;
+                ft(jj) = 1.0-log(-1*dt/metaparams(2)); % exponential decay
+            else
+                ft(jj) = 0;
+            end
+
             
+         case {'exprdecay_coso'} % exponential growth at exponentially decaying rate
+            %time constant set to tstart
+            mparams = 1;
+            ft = zeros(mparams,1);
+            jj = jj+1;
+            if ti >= tstart
+                dt = ti - tstart;
+                ft(jj) = metaparams(3)*metaparams(4)*(1.0-exp(-1*dt/metaparams(2))); % exponential decay
+            else
+                ft(jj) = 0;
+            end
+         case {'exprdecay_coso2'} % exponential growth at exponentially decaying rate
+            jj=2;
+            mparams = 2;
+            ft = zeros(mparams,1);
+            tswitch1=metaparams(3); % switch time
+            if tstart >= tswitch1
+                disp('error')
+            end
+            
+            if ti >= tstart && ti < tswitch1
+                dt1 = ti - tstart;
+                ft(1) = 1.0-exp(-1*dt1/metaparams(2)); % rate decays exponentially
+                ft(2) = 0;
+            elseif ti >= tswitch1
+                dt1 = ti - tstart;
+                dt2 = ti - tswitch1;
+                ft(1) = 1.0-exp(-1*dt1/metaparams(2)); % rate decays exponentially
+                ft(2) = 1.0-exp(-1*dt2/metaparams(3)); % rate
+            else
+                ft(1) = 0;
+                ft(2) = 0;
+                ft(3) = 0;
+            end
         case {'exprgrowth'} % exponential with time constant set to tstart
             mparams = 1;
             ft = zeros(mparams,1);
@@ -225,7 +289,29 @@ if numel(tbreaks) > 0
                 ft(2) = 0;
                 ft(3) = 0;
             end
+                      
+        case {'coso_exp2rate'} % 2 exprdecay with parameterizations with secular rate in between. For Okmok test case. Example of combining time functions.
+            jj=2;
+            mparams = 2;
+            ft = zeros(mparams,1);
+            tswitch1=metaparams(3); % switch time
+            if tstart >= tswitch1
+                disp('error')
+            end
             
+            if ti >= tstart && ti < tswitch1
+                dt1 = ti - tstart;
+                ft(1) = 1.0-exp(-1*dt1/metaparams(2)); % rate decays exponentially
+                ft(2) = 0;
+            elseif ti >= tswitch1 
+                dt1 = ti - tstart;
+                dt2 = ti - tswitch1;
+                ft(1) = 1.0-exp(-1*dt1/metaparams(2)); % rate decays exponentially
+                ft(2) = dt2; % rate
+            else
+                ft(1) = 0;
+                ft(2) = 0;
+            end
             
         otherwise
             error(sprintf('undefined tfunc %s',tfunc));

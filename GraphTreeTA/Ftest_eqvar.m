@@ -1,12 +1,12 @@
 function [ F_calc, df1, df2, F_alpha] = Ftest_eqvar( var1, var2, n, alpha)
-%[ F_calc, df1, df2, F_alpha] = Ftest_eqvar( var1, var2, n, alpha)
-%   Test whehter model 1 provides a significantly better fit than model 2
-%   based on variance of residuals
-%Elena Baluyut, 11-17-14
-% edited ECR 20180613
+% [ F_calc, df1, df2, F_alpha] = Ftest_eqvar( var1, var2, n, alpha)
+% Test whehter model 1 provides a significantly better fit than model 2
+% based on variance of residuals
+% Elena Reinisch, 11-17-14
+% ECR 20180613
 
     disp('Test for equality of variances:')
-    disp('Ho = two normal populations have the same variance')
+    disp('Ho = second normal population does not have significantly higher variance than first normal population')
     disp('Ha = second normal population has higher variance')
     
     % define degrees of freedom
@@ -23,7 +23,5 @@ function [ F_calc, df1, df2, F_alpha] = Ftest_eqvar( var1, var2, n, alpha)
     else
         disp('cannot reject Ho at this alpha, model 2 does not have significantly higher variance than model 1 at this alpha')
     end
-
-% end
 
 return
