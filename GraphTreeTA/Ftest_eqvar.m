@@ -1,6 +1,6 @@
 function [ F_calc, df1, df2, F_alpha] = Ftest_eqvar( var1, var2, n, alpha)
 %[ F_calc, df1, df2, F_alpha] = Ftest_eqvar( var1, var2, n, alpha)
-%   Test whehter model 2 provides a significantly better fit than model 1
+%   Test whehter model 1 provides a significantly better fit than model 2
 %   based on variance of residuals
 %Elena Baluyut, 11-17-14
 % edited ECR 20180613
