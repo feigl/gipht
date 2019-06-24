@@ -143,11 +143,11 @@ else
     G = zeros(ndat,mparams);
     
     % Check that system is overdetermined (unless Berardino case)
-    if (strncmp(tfunc, 'pwl', 3) == 0) && (strncmp(tfunc, 'ber', 3) == 0)
-        if ndat <= mparams
-            error('Underdetermined system; cannot perform temporal adjustment.  Change parameterizations.')
-        end
-    end
+%     if (strncmp(tfunc, 'pwl', 3) == 0) && (strncmp(tfunc, 'ber', 3) == 0)
+%         if ndat <= mparams
+%             error('Underdetermined system; cannot perform temporal adjustment.  Change parameterizations.')
+%         end
+%     end
 
     % Build design matrix G from temporal function
     for i=1:ndat

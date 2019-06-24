@@ -38,7 +38,7 @@ switch file_type
         % 1992.59836065574 1993.46027397260 ../intf/1992220_1993169/unwrap_mask_ll.grd   % unwrapped phase in radians
         
         % Read the arguments into a Cell Array
-        CDAT=textscan(fid,'%f%f%s','CommentStyle','%');
+        CDAT=textscan(fid,'%f%f%s','CommentStyle','%')
         fclose(fid);
         [nrows,ncols] = size(CDAT);
         if ncols == 3 && nrows > 0
@@ -58,7 +58,8 @@ switch file_type
         % Read the arguments into a Cell Array
         CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','%')
         fclose(fid);
-        [nrows,ncols] = size(CDAT)
+        [ndum,ncols] = size(CDAT)
+        [nrows, ndum] = size(CDAT{1})
         if ncols == 5 && nrows > 0
             yyyymmdd1    = CDAT{1};  % Master Date
             yyyymmdd2    = CDAT{2};  % Slave Date
@@ -66,7 +67,7 @@ switch file_type
             mpercys      = CDAT{4};  % fringe spacing meters per cycle
             names        = CDAT{5};  % fifth column of dat file is the grid file name
             
-            np = nrows;
+            np = nrows
             for i=1:np
                 str1 = char(yyyymmdd1(i));
                 str2 = char(yyyymmdd2(i));

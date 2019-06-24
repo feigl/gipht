@@ -437,7 +437,7 @@ elseif nin == 3 ...
     pvv=colvec(p( 9*me+1: 9*me+me)); % parameters describing orbit velocity - vertical    component
     pd =colvec(p(10*me+1:10*me+me)); % additive offset
     pg =colvec(p(11*me+1:  mparam)); % geophysical parameters
-    
+ 
     %     for ikp = 1:numel(pg)
     %         fprintf(1,'%d %s %12.4e\n',ikp,PST.names{ikp+koffset},pg(ikp));
     %     end
@@ -489,12 +489,8 @@ elseif nin == 3 ...
     if idatatype1 == -1
         % east component of gradient only
         nui = (DD * px) .* DST.dx;
-%     elseif idatatype1 == 0
-%         nui = (DD * px) .* DST.x0 ...
-%             + (DD * py) .* DST.y0 ...
-%             + (DD * pz) .* DST.z0 ...
-%             + (DD * pd)*2*pi; % additive constant
     else
+        %        nuisance parameters 3 components of gradient plus offset
         nui = (DD * px) .* DST.x0 ...
             + (DD * py) .* DST.y0 ...
             + (DD * pz) .* DST.z0 ...
@@ -690,7 +686,7 @@ elseif nin == 3 ...
     %     j=j+1;pnames{j} = sprintf('YangPS Easting in m            '); pscl(j)=1.0E3;
     %     j=j+1;pnames{j} = sprintf('YangPS Northing in m           '); pscl(j)=1.0E3;
     %     j=j+1;pnames{j} = sprintf('YangPS Depth in m              '); pscl(j)=1.0E3;
-    %     j=j+1;pnames{j} = sprintf('YangPS Excess Pressure in mu =Pa   '); pscl(j)=1.0E-3;
+    %     j=j+1;pnames{j} = sprintf('YangPS Excess Pressure in Pa   '); pscl(j)=1.0E-3;
     %     j=j+1;pnames{j} = sprintf('YangPS semimajor axis a  m     '); pscl(j)=1.0E3;
     %     j=j+1;pnames{j} = sprintf('YangPS semiminor axis b in m   '); pscl(j)=1.0E3;
     %     j=j+1;pnames{j} = sprintf('YangPS Azimuth deg CCW from N  '); pscl(j)=1.0;
@@ -757,9 +753,9 @@ elseif nin == 3 ...
     %     J. Geophys. Res., 74, 5995-6011.
     %
     
-    %E = mu / (1 + 2.0*nu);  % Young's Modulus (un-numbered equation Sun p. 9997)
-    E = mu * 2*(1 + nu);  % Young's Modulus (un-numbered equation Sun p. 9997)
-    
+    % E = mu / (1 + 2.0*nu);  % Young's Modulus (un-numbered equation Sun p. 9997)
+    % Correction 20180718  
+    E = 2.0 * mu * (1 + nu);  % Young's Modulus % https://en.wikipedia.org/wiki/Elastic_modulus
     %
     %
     %     0 j=j+1;pnames{j} = sprintf('SunDisk1 Easting in m          '); pscl(j)=1.0E3;

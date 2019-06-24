@@ -1,0 +1,104 @@
+% Variables to control GIPHT. This file is for Bradys Hot Springs
+% Can be used for lava loading problem
+
+% parameter name must start in column 1 with the parameter value the second word
+% parameter names must be lower case
+
+% COORDINATES
+%       These values should be specified in the same system as the DEM,
+%       as described in the dem_descriptor.dat file
+
+%ilist = file_names.dat       % #T72_jul14best
+% name of output parameter file
+fnparout = paramout.txt
+fnsumout = test.txt
+
+% use small area with GMT GRID FILES
+ilist = grd_file_names.dat          % list of interferograms
+
+% name of DEM descriptor in Diapason format
+demdescfile = /Users/Elena/InSAR_development/Project_SanEmidio/SQUEESAR/dem_cut_utm2.grd
+
+ %npix        = 10000     %
+npix        = 5000     %
+ pselect     = 1        % randomly choose pixels              
+% pselect     = 5        % select pixels of phase using quadtree
+% pselect     = 7        % select pixels of gradient using quadtree
+  pixinpatch  = 1        % mininum number of valid (nonzero) pixels in a patch
+  ithresh     = 64 %32       % minimum misfit (circular mean deviation) to mean ( 1 DN is 1 / 
+256 pixel)
+  maxcmd      =  32 %16      % minimum misfit (circular mean deviation) to ramp ( 1 DN is 1 / 2
+56 pixel) 
+
+
+% UNIT VECTOR FROM TARGET TO SATELLITE
+% 12 valid records from orbit file /data/bradys/TSX/orbits/headers/6984.orb
+% taken from /data/bradys/TSX/raw/20150714_orb.txt
+% 0.556398 , -0.101079 , 0.824745
+unitv_east = 0.354476
+unitv_north = -0.077933 
+unitv_up = 0.931812
+%
+
+
+% fringe spacing
+% mpercy = 0.1181 % meters for ALOS
+  mpercy = 0.0284 % meters for ERS and ENVISAT
+% mpercy = 0.0155 % meters for TSX
+
+
+% CHOOSE ALGORITHM FOR INVERSION  
+%     0 to skip Simulated Annealing (FAST for forward modeling, skip statisti
+cs)
+%     1 to run Simulated Annealing (under development)
+%     2 to run S.A. with recording (BEST)
+anneal = 0
+
+
+% nsaruns = 3 % number of runs through Simulated Annealing
+%   Error using distcomp.interactiveclient/start (line 88)
+%  Failed to start matlabpool.
+%   This is caused by:
+%   You requested a minimum of 16 workers but only 12 workers are allowed with
+%    the local scheduler.
+
+timefun = timefun_linear
+% objective function to calculate cost
+% objfun = funcostrarc
+objfun = funcoststdnres
+
+
+% fitting function to caluculate range change values from model parameters
+%datafilename = ../abaqus_kurt/masterlark1/OkmokFullE2-Forward.dat  % Abaqus from Masterla
+rk et al. 2011
+
+
+% initial values of parameters
+%fnparin = brick_init.gin
+%fnparin = okada_init_poststack.gin
+%fnparin = brick2_init.gin
+fnparin = okada3_init.gin
+%fnparin = nuis_init.gin
+%fnparin = brick_post.gin
+
+% How handle values for multi-panel plots
+%figopt % xx1 propagate nulls from quadtree, paint missing data black
+%figopt % x1x calculate modeled values at all pixel locations
+%figopt % 1xx request grids and profiles of vector components of displacement
+%figopt = 000 % none of the above
+%figopt = 111 % do all of the above
+%figopt = 110 % best-looking plots without black
+%figopt = 001 % good for trial and error
+figopt = 011% best for plotting; originally 011 for simple for demo
+
+% How to make figures
+%printfun = printpdf  % make figures in PDF
+%printps  = printps   % make figures in PostScript
+printfun = printnull % do not write figures to files (fast)
+
+
+fitfun = funfit30
+%fitfun = funfitBrady
+%fitfun = funfitOkada3
+%fitfun = funfitOkadalwh
+%fitfun = funfitOkadalwh2

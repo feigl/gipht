@@ -10,7 +10,7 @@ function [ F_calc, df1, df2, F_alpha, H] = Ftest_modelcomp( SSWR1, SSWR2, p1, p2
 
 
     disp('Performing regression F test on models 1 and 2, Assume Model 1 is less complex than Model 2.')
-    disp('Ho = no significant difference in fits')
+    disp('Ho = Model 2 does not provide significantly better fit than Model 1')
     disp('Ha = Model 2 provides a better fit than Model 1')
 
     % define degrees of freedom
