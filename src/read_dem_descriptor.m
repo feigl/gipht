@@ -1,4 +1,4 @@
-function [isgeo,y1,x1,nl,nc,l1,c1,ml,mc,dl,dc,fi2,lat0,lon0,y0,x0,hemisphere,iutmzone,isgmtgrid] = read_dem_descriptor(demdescfile)
+function [isgeo,y1,x1,nl,nc,l1,c1,ml,mc,dl,dc,fi2,lat0,lon0,y0,x0,hemisphere,iutmzone,isgmtgrid,INFO] = read_dem_descriptor(demdescfile)
 %function [isgeo,y1,x1,nl,nc,l1,c1,ml,mc,dl,dc,fi2] = read_dem_descriptor(demdescfile)
 % read a descriptor file to get DEM parameters
 %[isgeo,y1,x1,nl,nc,lstart,cstart,ml,mc,dl,dc,fi2] = read_dem_descriptor(demdescfile)
@@ -23,8 +23,10 @@ function [isgeo,y1,x1,nl,nc,l1,c1,ml,mc,dl,dc,fi2,lat0,lon0,y0,x0,hemisphere,iut
 % 2009-JUL-20 Return cartographic origin lon0, lat0
 % 2010-APR-02 Handle Lambert
 % 20160411    Read DEM from GMT .grd file
+% 20190404 also return INFO structure
 
 fprintf(1,'%s begins ...\n',mfilename);
+
 
 isgeo=0;y1=0;x1=0;nl=0;nc=0;ml=0;mc=0;dl=0;dc=0;fi2='';
 % l1=0;c1=0; 2010-JUL-08
@@ -259,4 +261,6 @@ end
 % fprintf(1,'Read %4d pairs containing key %s\n',i,key);
 %
 return
+end
+
 

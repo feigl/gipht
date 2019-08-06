@@ -1,11 +1,12 @@
-function PST = build_pst(fitfun,mparam,p0,p1,psig,pnames,bounds,datafilename,pscl,pflag,timefun)
+function PST = build_pst(fitfun,mparam,p0,p1,psig,pnames,bounds,datafilename,pscl,timefun)
 %function ierr = write_fitfunin(fnamein,fitfun,mparams,p,pnames,bounds,pscl)
 % Build a PST structure containing parameters with name fname
 % Kurt 20101111 add scale factor 
 % Kurt 20160818 add timefun
+% Kurt 20190404 set pflag inside this routine
 
 
-if nargin ~= 11
+if nargin ~= 10
     error('Wrong number of arguments');
 end
 
@@ -25,7 +26,14 @@ for i = 1:mparam
     PST.sigma(i)  = psig(i);     % uncertainty   
     PST.scale(i)  = pscl(i);     % scale factor in same units as above
 %    PST.flag{i}   = 'N#';        % flag
-    PST.flag{i}   = pflag{i};     % flag
+    %PST.flag{i}   = pflag{i};     % flag
+    if abs(bounds(i,2)-bounds(i,1)) > 1e-6 * p0(i)
+        %bstat = 'free ';
+        PST.flag{i} = 'E#';
+    else
+        %bstat = 'fixed';
+        PST.flag{i} = 'F#';
+    end
 end
 
 fn=fieldnames(PST);

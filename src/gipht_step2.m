@@ -374,13 +374,19 @@ psig = NaN*ones(size(p0));
 for i=1:numel(p0)
     pflags{i} = 'N#';
 end
+% PST00 = build_pst(fitfun,mparam,zeros(size(p0)),zeros(size(p0)),zeros(size(p0))...
+%     ,pnames,bounds,datafilename,pscl,pflags,timefun);
+% 20190404 build pflag inside the routine
 PST00 = build_pst(fitfun,mparam,zeros(size(p0)),zeros(size(p0)),zeros(size(p0))...
-    ,pnames,bounds,datafilename,pscl,pflags,timefun);
+    ,pnames,bounds,datafilename,pscl,timefun);
 
 
 %% build parameter structure PST0 for initial estimate
 p1 = p0;
-PST0 = build_pst(fitfun,mparam,p0,p1,psig,pnames,bounds,datafilename,pscl,pflags,timefun);
+%PST0 = build_pst(fitfun,mparam,p0,p1,psig,pnames,bounds,datafilename,pscl,pflags,timefun);
+
+% 20190404 build pflag inside the routine
+PST0 = build_pst(fitfun,mparam,p0,p1,psig,pnames,bounds,datafilename,pscl,timefun);
 ierr = check_struct(PST0);
 %%ierr2 = write_pst(PST0,fnamepstin);
 
@@ -397,6 +403,31 @@ fprintf(1,'Calling fitting function for first time to initialize.\n');
 %fhandle = @fitfun;
 % fhandle = @funfit28
 % [rng,TST] = fhandle(DST,PST);
+
+%TODO remove this hack 
+% 20190404 get bounds from TST
+if isfield(TST,'lb') ...
+        && isfield(TST,'ub') ...
+        && isfield(TST,'p0') ...
+        && isfield(TST,'p1')
+    warning(sprintf('Revising PST0 from TST\n')); 
+%     PST0.lb = TST.lb;
+%     PST0.ub = TST.ub;
+%     PST0.p0 = TST.p0;
+%     PST0.p1 = TST.p1;
+    bounds(:,1) = TST.lb;
+    bounds(:,2) = TST.ub;
+    p0 = TST.p0;
+    p1 = TST.p1;
+    PST0 = build_pst(fitfun,mparam,p0,p1,psig,pnames,bounds,datafilename,pscl,timefun);
+    %% print results
+    fprintf(1        ,'\n\nI          Parameter_Name               P0(initial)     P1(final)     Adj   PlusMinusBnd\n');
+    for i = 1:mparam
+       fmtstr = getfmt(p1(i),pnames{i});
+       fprintf(1,fmtstr,pflag{i},i,pnames{i},p0(i),p1(i),p1(i)-p0(i),NaN,NaN,abs(bounds(i,1)-bounds(i,2))/2.0);
+    end
+end
+    
 DST.phamod = rng;
 
 % evaluate function at initial estimate

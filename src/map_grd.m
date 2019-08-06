@@ -20,7 +20,7 @@ else
     cmap = jet;
 end
 
-if nargin == 3
+if nargin >= 3
     if isstruct(varargin{3}) == 1
         plot_symbols = 1;
         SYMS = varargin{3};
@@ -31,6 +31,13 @@ if nargin == 3
 else
     plot_symbols = 0;
 end
+
+if nargin >= 4
+    draw_grid = varargin{4}
+else
+    draw_grid = 0;
+end
+
 
 %% read input GMT grid file and its metadata
 [xe,ye,IMAGE] = grdread3(grdfilename);
@@ -57,6 +64,11 @@ figure; hold on;
 
 %% set up a colortable
 clim = [nanmin(colvec(IMAGE)),nanmax(colvec(IMAGE))];
+if abs(clim(1)-clim(2)) <= eps
+    warning('mininum and maximum values are equal');
+    clim(1) = clim(1) - 0.1*abs(clim(1));
+    clim(2) = clim(2) + 0.1*abs(clim(2));
+end
 
 %% draw the image
 imagesc(xe/lengthfact,ye/lengthfact,IMAGE,clim);
@@ -64,6 +76,13 @@ colormap(cmap);
 axis xy;
 axis equal;
 axis tight;
+
+if draw_grid == 1
+    grid on;
+    %Grid-line transparency, specified as a value in the range [0,1]. A
+    %value of 1 means opaque and a value of 0 means completely transparent.
+    set(gca,'XGrid','on','YGrid','on','GridColor',[0.5 0.5 0.5],'GridAlpha',1,'Layer','top');
+end
 
 %% plot symbols if requested
 if plot_symbols == 1
@@ -75,7 +94,7 @@ end
 %% add labels and title
 xlabel(xlab);
 ylabel(ylab);
-tstr = sprintf('%s\n[%s]',INFO.title,grdfilename);
+tstr = sprintf('%s [%s]\n%s',INFO.title,grdfilename,INFO.description);
 title(tstr,'Interpreter','None');
 
 %% make color bar

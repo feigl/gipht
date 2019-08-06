@@ -627,7 +627,7 @@ for fd=[1 fidtxtout]
     fprintf(fd,'Cost  of final model   = %.7f %s for %6d observations in inverted data set %s\n',cost1,   datalabel, ndata, runname);
     fprintf(fd,'Cost  improvement      = %.7f %s for %6d observations in inverted data set %s\n',cost0-cost1,   datalabel, ndata, runname);
     if isfinite(crit69)==1
-        fprintf(fd,'Critical value of cost = %.7f %sfor %6d observations in inverted data set %s\n',crit69,  datalabel, ndata, runname);
+        fprintf(fd,'Critical value of cost = %.7f %s for %6d observations in inverted data set %s\n',crit69,  datalabel, ndata, runname);
     end
     if istatcode == 1
         

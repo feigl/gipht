@@ -12,6 +12,17 @@ function uENZ = okada85_wrapper3(xobs,yobs,F,nu)
 %% count number of observation points
 nobs= numel(xobs);
 
+% % Check for NaN values
+% inan = find(isnan(xobs)==1);
+% if numel(inan) > 0
+%     warning('Found %d NaN values in xobs\n',numel(inan));
+% end
+% inan = find(isnan(yobs)==1);
+% if numel(inan) > 0
+%     warning('Found %d NaN values in yobs\n',numel(inan));
+% end
+
+
 %% count number of fault centroids
 ncentroids = numel(F);
 
@@ -32,6 +43,15 @@ slip    =    0; % amount of in-plane slip in meters
 %onev = ones(size(F(j).x));
 % for j=1
 for j=1:ncentroids
+%     Check for NaN values
+%     FieldNames = fieldnames(F(j));
+%     for k=1:numel(FieldNames)
+%         FieldName1 = char(FieldNames{k});
+%         if isnan(F(j).(FieldName1)) == 1
+%             warning(sprintf('Found NaN value in field %d %s of centroid %d\n',k,FieldName1,j));
+%         end
+%     end
+
     %% coordinates of observation points in meters
     Eobspts_wrt_fault =     xobs - F(j).x;               % relative position of obs point wrt to fault centroid
     Nobspts_wrt_fault =     yobs - F(j).y;               % relative position of obs point wrt to fault centroid

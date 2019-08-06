@@ -156,7 +156,7 @@ end
 
 %% choose the units for the objective function
 switch objfun
-    case {'funcoststdnres','funcoststdnres4'}
+    case {'funcoststdnres','funcoststdnres4','funcostrarcminroughness'}
          objlabel = '[dimless]';
     case {'funcostrarc'}
          objlabel = '[cycles]';

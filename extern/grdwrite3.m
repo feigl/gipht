@@ -55,7 +55,9 @@ end
 
 % set descriptive variables
 conv='COARDS/CF-1.0';
-title=file;
+%title=file;
+title = sprintf('written by %s',mfilename);
+
 if nargin == 5
     history=['File written by MATLAB function grdwrite3.m ' datestr(now)];   
     if isfield(INFO,'description') == 1
