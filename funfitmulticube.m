@@ -3,7 +3,8 @@ function varargout = funfitmulticube(varargin)
 
 
 %% model for range change using multicube parameterization
-% 201900305 Kurt Feigl
+% 20190305 Kurt Feigl
+% 20190807 Kurt Feigl
 
 % number of arguments entered as input
 nin = nargin;
