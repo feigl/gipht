@@ -694,7 +694,7 @@ end
 
 %% calculate some derived parameters
 %% TODO move these into the fitting functions as a fourth option
-% iq = 0;
+iq = 0;
 %
 % % total volume change
 % iq = iq+1;
@@ -744,149 +744,156 @@ end
 % qnames{iq} = sprintf('Total_Net_Volume_Increase_in_m3');
 
 
-% DERIVED PARAMETERS FOR OKADA1
-% iii=get_parameter_index('Okada1_Length_in_m______________',pnames);
+%% DERIVED PARAMETERS FOR OKADA1
+iii=get_parameter_index('Okada1_Length_in_m______________',pnames);
 %if psig(iii) > 0
-%if p0(iii) > 0
-%     for i=1:10
-%         utmzone10(i,:)=utmzone0;
-%     end
-%     % Geographic coordinates of Okada centroid
-%     [Xcorners10,Ycorners10,Hcorners10,Ncorners] = disloc_to_seismo(p0(iii:iii+9));
-%     [LatCorners10,LonCorners10]=utm2deg(Xcorners10,Ycorners10,utmzone10);
-%     [Xcorners11,Ycorners11,Hcorners11,Ncorners] = disloc_to_seismo(p1(iii:iii+9));
-%     [LatCorners11,LonCorners11]=utm2deg(Xcorners11,Ycorners11,utmzone10);
-%     clear utmzone10;
-%
-%     iq = iq+1;
-%     q0(iq) = Xcorners10(10);
-%     q1(iq) = Xcorners11(10);
-%     qsig(iq) = NaN;
-%     qnames{iq} = sprintf('Okada1_Centroid_Easting_in_m____');
-%     iq = iq+1;
-%     q0(iq) = Ycorners10(10);
-%     q1(iq) = Ycorners11(10);
-%     qsig(iq) = NaN;
-%     qnames{iq} = sprintf('Okada1_Centroid_Northing_in_m___');
-%     iq = iq+1;
-%     q0(iq) = LatCorners10(10);
-%     q1(iq) = LatCorners11(10);
-%     qsig(iq) = NaN;
-%     qnames{iq} = sprintf('Okada1_Centroid_latitude__in_deg');
-%     iq = iq+1;
-%     q0(iq) = LonCorners10(10);
-%     q1(iq) = LonCorners11(10);
-%     qsig(iq) = NaN;
-%     qnames{iq} = sprintf('Okada1_Centroid_longitude_in_deg');
-%
-%     %   fprintf(fd,'Initial UTM coordinates of 4 corners, upper center, and Centroid of Okada\n');
-%     %   for i=[1 2 3 4 7 10]
-%     %      fprintf(fd,'%s %12.4f %12.4f %12.4f\n',Ncorners{i},Xcorners0(i),Ycorners0(i),Hcorners0(i));
-%     %   end
-%     %   fprintf(fd,'Final   UTM coordinates of 4 corners, upper center, and Centroid of Okada\n');
-%     %   for i=[1 2 3 4 7 10]
-%     %      fprintf(fd,'%s %12.4f %12.4f %12.4f\n',Ncorners{i},Xcorners1(i),Ycorners1(i),Hcorners1(i));
-%     %   end
-%     %
-%     %   fprintf(fd,'Initial Lon Lat of 4 corners, upper center, Centroid of Okada\n');
-%     %   for i=[1 2 3 4 7 10]
-%     %      fprintf(fd,'%s %12.4f %12.4f %12.4f\n',Ncorners{i},LonCorners0(i),LatCorners0(i),Hcorners0(i));
-%     %   end
-%     %   fprintf(fd,'Final   Lon Lat of 4 corners, upper center, Centroid of Okada\n');
-%     %%   for i=[1 2 3 4 7 10]
-%     %      fprintf(fd,'%s %12.4f %12.4f %12.4f\n',Ncorners{i},LonCorners1(i),LatCorners1(i),Hcorners1(i));
-%     %   end
-%
-%
-%     % conventional strike
-%     iq=iq+1;
-%     str = 180 + p0(get_parameter_index('Okada1_Strike',pnames));
-%     if str > 360
-%         str = str - 180;
-%     end
-%     q0(iq) = str;
-%     str = 180 + p1(get_parameter_index('Okada1_Strike',pnames));
-%     if str > 360
-%         str = str - 180;
-%     end
-%     q1(iq) = str;
-%     qsig(iq) = psig(get_parameter_index('Okada1_Strike',pnames));
-%     qnames{iq} = sprintf('Okada1_Convt_strike_in_deg_CW_N');
-%
-%     % Okada U1
-%     % q0(9) = qg0(12);
-%     % q1(9) = qg1(12);
-%     %q0(9) = -1*p0(get_parameter_index('Okada1_RL_Strike_Slip',pnames));
-%     %q1(9) = -1*p1(get_parameter_index('Okada1_RL_Strike_Slip',pnames));
-%     %qnames{9} = sprintf('Okada_slip_U1_in_meters________');
-%     % Okada U2
-%     % q0(10) = -1*qg0(13);
-%     % q1(10) = -1*qg1(13);
-%     %q0(10) = -1*p0(get_parameter_index('Okada1_Downdip_Slip',pnames));
-%     %q1(10) = -1*p1(get_parameter_index('Okada1_Downdip_Slip',pnames));
-%     %qnames{10} =sprintf('Okada_slip_U2_in_meters________');
-%     % Okada U3
-%     % q0(11) = qg0(14);
-%     % q1(11) = qg1(14);
-%     %q0(11) = p0(get_parameter_index('Okada1_Tensile_Opening',pnames));
-%     %q1(11) = p1(get_parameter_index('Okada1_Tensile_Opening',pnames));
-%     %qnames{11} =sprintf('Okada_slip_U3_in_meters________');
-
-%     %rake
-%     iq = iq+1;
-%     q0(iq) = 180*(atan2(-1*p0(get_parameter_index('Okada1_RL_Strike_Slip',pnames))...
-%         ,p0(get_parameter_index('Okada1_Downdip_Slip'  ,pnames))...
-%         ))/pi;  % change sign of U2 for negative dip bug in disloc
-%     q1(iq) = 180*(atan2(-1*p1(get_parameter_index('Okada1_RL_Strike_Slip',pnames))...
-%         ,p1(get_parameter_index('Okada1_Downdip_Slip',  pnames))...
-%         ))/pi;  % change sign of U2 for negative dip bug in disloc
-%     qsig(iq) = NaN;
-%     qnames{iq} = sprintf('Derived_Okada1_rake_in_deg_CCW_');
-%
-%     % geometric potency
-%     iq = iq+1;
-%     q0(iq) = p0(get_parameter_index('Okada1_Length',pnames))...
-%         *p0(get_parameter_index('Okada1_Width', pnames))...
-%         *norm([p0(get_parameter_index('Okada1_RL_Strike_Slip',pnames))...
-%         ,         p0(get_parameter_index('Okada1_Downdip_Slip',  pnames))...
-%         ,         p0(get_parameter_index('Okada1_Tensile',       pnames))]);
-%     q1(iq) = p1(get_parameter_index('Okada1_Length',pnames))...
-%         *p1(get_parameter_index('Okada1_Width', pnames))...
-%         *norm([p1(get_parameter_index('Okada1_RL_Strike_Slip',pnames))...
-%         ,         p1(get_parameter_index('Okada1_Downdip_Slip'  ,pnames))...
-%         ,         p1(get_parameter_index('Okada1_Tensile',       pnames))]);
-%     qnames{iq} = sprintf('Derived_Okada1_potency_in_m3___');
-% qsig(iq) = NaN;
-%     qsig(iq) = 0;
-%     if isfinite(psig(get_parameter_index('Okada1_Tensile',pnames))) == 1
-%         qsig(iq) = qsig(iq) ...
-%             +((psig(get_parameter_index('Okada1_Length'  ,pnames))  ...
-%             * psig(get_parameter_index('Okada1_Width'  , pnames))   ...
-%             * psig(get_parameter_index('Okada1_Tensile', pnames))))^2;
-%   20130419 uncertainty is sqrt of sum of squares
-%     qsig(iq) = sqrt((psig(get_parameter_index('Okada1_RL_Strike_Slip'  ,pnames)))^2  ...
-%         + (psig(get_parameter_index('Okada1_Downdip_Slip'  , pnames)))^2   ...
-%         + (psig(get_parameter_index('Okada1_Tensile', pnames)))^2);
-%     2014-01-13 above gives strange results
-%     qsig(iq) = NaN;
-%
-% end
-
-% % moment, assuming shear modulus = 30 GPa
-% iq = iq+1;
-% if q0(iq-1) > 0; q0(iq) = 3e10*q0(iq-1); else q0(iq) = NaN; end;
-% if q1(iq-1) > 0; q1(iq) = 3e10*q1(iq-1); else q1(iq) = NaN; end;
-% qnames{iq} = sprintf('Derived_Okada1_moment_in_Nm____');
-% qsig(iq) = NaN;
-%
-% % magnitude
-% iq = iq+1;
-% if q0(iq-1) > 0; q0(iq) = 2*log10(q0(iq-1))/3 - 6.03; else q0(iq) = NaN; end
-% if q1(iq-1) > 0; q1(iq) = 2*log10(q1(iq-1))/3 - 6.03; else q1(iq) = NaN; end
-% qnames{iq} = sprintf('Derived_Okada1_Mw______________');
-% qsig(iq) = NaN;
-%
-% %end
+    if p0(iii) > 0
+%         for i=1:10
+%             utmzone10(i,:)=utmzone0;
+%         end
+%         % Geographic coordinates of Okada centroid
+%         [Xcorners10,Ycorners10,Hcorners10,Ncorners] = disloc_to_seismo(p0(iii:iii+9));
+%         [LatCorners10,LonCorners10]=utm2deg(Xcorners10,Ycorners10,utmzone10);
+%         [Xcorners11,Ycorners11,Hcorners11,Ncorners] = disloc_to_seismo(p1(iii:iii+9));
+%         [LatCorners11,LonCorners11]=utm2deg(Xcorners11,Ycorners11,utmzone10);
+%         clear utmzone10;
+%         
+%         iq = iq+1;
+%         q0(iq) = Xcorners10(10);
+%         q1(iq) = Xcorners11(10);
+%         qsig(iq) = NaN;
+%         qnames{iq} = sprintf('Okada1_Centroid_Easting_in_m____');
+%         iq = iq+1;
+%         q0(iq) = Ycorners10(10);
+%         q1(iq) = Ycorners11(10);
+%         qsig(iq) = NaN;
+%         qnames{iq} = sprintf('Okada1_Centroid_Northing_in_m___');
+%         iq = iq+1;
+%         q0(iq) = LatCorners10(10);
+%         q1(iq) = LatCorners11(10);
+%         qsig(iq) = NaN;
+%         qnames{iq} = sprintf('Okada1_Centroid_latitude__in_deg');
+%         iq = iq+1;
+%         q0(iq) = LonCorners10(10);
+%         q1(iq) = LonCorners11(10);
+%         qsig(iq) = NaN;
+%         qnames{iq} = sprintf('Okada1_Centroid_longitude_in_deg');
+        
+        %   fprintf(fd,'Initial UTM coordinates of 4 corners, upper center, and Centroid of Okada\n');
+        %   for i=[1 2 3 4 7 10]
+        %      fprintf(fd,'%s %12.4f %12.4f %12.4f\n',Ncorners{i},Xcorners0(i),Ycorners0(i),Hcorners0(i));
+        %   end
+        %   fprintf(fd,'Final   UTM coordinates of 4 corners, upper center, and Centroid of Okada\n');
+        %   for i=[1 2 3 4 7 10]
+        %      fprintf(fd,'%s %12.4f %12.4f %12.4f\n',Ncorners{i},Xcorners1(i),Ycorners1(i),Hcorners1(i));
+        %   end
+        %
+        %   fprintf(fd,'Initial Lon Lat of 4 corners, upper center, Centroid of Okada\n');
+        %   for i=[1 2 3 4 7 10]
+        %      fprintf(fd,'%s %12.4f %12.4f %12.4f\n',Ncorners{i},LonCorners0(i),LatCorners0(i),Hcorners0(i));
+        %   end
+        %   fprintf(fd,'Final   Lon Lat of 4 corners, upper center, Centroid of Okada\n');
+        %%   for i=[1 2 3 4 7 10]
+        %      fprintf(fd,'%s %12.4f %12.4f %12.4f\n',Ncorners{i},LonCorners1(i),LatCorners1(i),Hcorners1(i));
+        %   end
+        
+        
+%         % conventional strike
+%         iq=iq+1;
+%         str = 180 + p0(get_parameter_index('Okada1_Strike',pnames));
+%         if str > 360
+%             str = str - 180;
+%         end
+%         q0(iq) = str;
+%         str = 180 + p1(get_parameter_index('Okada1_Strike',pnames));
+%         if str > 360
+%             str = str - 180;
+%         end
+%         q1(iq) = str;
+%         qsig(iq) = psig(get_parameter_index('Okada1_Strike',pnames));
+%         qnames{iq} = sprintf('Okada1_Convt_strike_in_deg_CW_N');
+        
+        % Okada U1
+        % q0(9) = qg0(12);
+        % q1(9) = qg1(12);
+        %q0(9) = -1*p0(get_parameter_index('Okada1_RL_Strike_Slip',pnames));
+        %q1(9) = -1*p1(get_parameter_index('Okada1_RL_Strike_Slip',pnames));
+        %qnames{9} = sprintf('Okada_slip_U1_in_meters________');
+        % Okada U2
+        % q0(10) = -1*qg0(13);
+        % q1(10) = -1*qg1(13);
+        %q0(10) = -1*p0(get_parameter_index('Okada1_Downdip_Slip',pnames));
+        %q1(10) = -1*p1(get_parameter_index('Okada1_Downdip_Slip',pnames));
+        %qnames{10} =sprintf('Okada_slip_U2_in_meters________');
+        % Okada U3
+        % q0(11) = qg0(14);
+        % q1(11) = qg1(14);
+        %q0(11) = p0(get_parameter_index('Okada1_Tensile_Opening',pnames));
+        %q1(11) = p1(get_parameter_index('Okada1_Tensile_Opening',pnames));
+        %qnames{11} =sprintf('Okada_slip_U3_in_meters________');
+        
+%         %rake
+%         iq = iq+1;
+%         q0(iq) = 180*(atan2(-1*p0(get_parameter_index('Okada1_RL_Strike_Slip',pnames))...
+%             ,p0(get_parameter_index('Okada1_Downdip_Slip'  ,pnames))...
+%             ))/pi;  % change sign of U2 for negative dip bug in disloc
+%         q1(iq) = 180*(atan2(-1*p1(get_parameter_index('Okada1_RL_Strike_Slip',pnames))...
+%             ,p1(get_parameter_index('Okada1_Downdip_Slip',  pnames))...
+%             ))/pi;  % change sign of U2 for negative dip bug in disloc
+%         qsig(iq) = NaN;
+%         qnames{iq} = sprintf('Derived_Okada1_rake_in_deg_CCW_');
+        
+        % geometric potency
+        iq = iq+1;
+        q0(iq) = p0(get_parameter_index('Okada1_Length',pnames))...
+            *p0(get_parameter_index('Okada1_Width', pnames))...
+            *norm([p0(get_parameter_index('Okada1_Coplanar_slip_in_m_______',pnames))...
+            ,      p0(get_parameter_index('Okada1_Tensile_Opening_in_m_____',pnames))]);
+        q1(iq) = p1(get_parameter_index('Okada1_Length',pnames))...
+            *p1(get_parameter_index('Okada1_Width', pnames))...
+            *norm([p1(get_parameter_index('Okada1_Coplanar_slip_in_m_______',pnames))...
+            ,      p1(get_parameter_index('Okada1_Tensile_Opening_in_m_____',pnames))]);
+        qnames{iq} = sprintf('Derived_Okada1_potency_in_m3___');
+        qsig(iq) = NaN;
+        %         qsig(iq) = 0;
+        %         if isfinite(psig(get_parameter_index('Okada1_Tensile',pnames))) == 1
+        %             qsig(iq) = qsig(iq) ...
+        %                 +((psig(get_parameter_index('Okada1_Length'  ,pnames))  ...
+        %                 * psig(get_parameter_index('Okada1_Width'  , pnames))   ...
+        %                 * psig(get_parameter_index('Okada1_Tensile', pnames))))^2;
+        %             20130419 uncertainty is sqrt of sum of squares
+        %             qsig(iq) = sqrt((psig(get_parameter_index('Okada1_RL_Strike_Slip'  ,pnames)))^2  ...
+        %                 + (psig(get_parameter_index('Okada1_Downdip_Slip'  , pnames)))^2   ...
+        %                 + (psig(get_parameter_index('Okada1_Tensile', pnames)))^2);
+        %             2014-01-13 above gives strange results
+        %             qsig(iq) = NaN;
+        %
+        %         end
+        
+        % Seismic moment, using input shear modulus 
+        iq = iq+1;
+        if q0(iq-1) > 0
+            q0(iq) = p0(get_parameter_index('Shear_Modulus_in_Pa_____________',pnames))*q0(iq-1);
+        else
+            q0(iq) = NaN;
+        end
+        if q1(iq-1) > 0
+            q1(iq) = p1(get_parameter_index('Shear_Modulus_in_Pa_____________',pnames))*q1(iq-1);
+        else
+            q1(iq) = NaN;
+        end
+        qnames{iq} = sprintf('Derived_Okada1_moment_in_Nm____');
+        qsig(iq) = NaN;
+        
+        % magnitude
+        iq = iq+1;
+        if q0(iq-1) > 0; q0(iq) = 2*log10(q0(iq-1))/3 - 6.03; else q0(iq) = NaN; end
+        if q1(iq-1) > 0; q1(iq) = 2*log10(q1(iq-1))/3 - 6.03; else q1(iq) = NaN; end
+        qnames{iq} = sprintf('Derived_Okada1_Mw______________');
+        qsig(iq) = NaN;
+        
+    end
+%end
 %
 % % DERIVED PARAMETERS FOR OKADA2
 % iii=get_parameter_index('Okada2_Length_in_m______________',pnames);
@@ -1088,25 +1095,25 @@ end
 %     qnames{iq} = sprintf('YangPS_latitude_in_degrees______');
 % end
 %
-% %  PRINT OUT THE DERIVED PARAMETERS
-% qnames = truncate_parameter_names(qnames);
-% iq1 = 1;
-% iq2 = iq;
-% uqb(iq1:iq2)=NaN;
-% lqb(iq1:iq2)=NaN;
-% % 2012 JUL 10
-% %qsig(iq1:iq2)=NaN;
-% for i=iq1:iq2
-%     qflags{i} = 'D#';
-%     adj = q1(i)-q0(i);
-%     %    sadj = NaN;
-%     sadj = abs(adj/qsig(i));
-%     outfmt = getfmt(q1(i),qnames{i});
-%
-%     fprintf(1        ,outfmt,qflags{i},i+mparam,qnames{i} ,q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
-%     fprintf(fidtxtout,outfmt,qflags{i},i+mparam,qnames{i}, q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
-% end
-% fclose(fidtxtout);
+%  PRINT OUT THE DERIVED PARAMETERS
+qnames = truncate_parameter_names(qnames);
+iq1 = 1;
+iq2 = iq;
+uqb(iq1:iq2)=NaN;
+lqb(iq1:iq2)=NaN;
+% 2012 JUL 10
+%qsig(iq1:iq2)=NaN;
+for i=iq1:iq2
+    qflags{i} = 'D#';
+    adj = q1(i)-q0(i);
+    %    sadj = NaN;
+    sadj = abs(adj/qsig(i));
+    outfmt = getfmt(q1(i),qnames{i});
+
+    fprintf(1        ,outfmt,qflags{i},i+mparam,qnames{i} ,q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
+    fprintf(fidtxtout,outfmt,qflags{i},i+mparam,qnames{i}, q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
+end
+fclose(fidtxtout);
 
 %% update parameter list
 PST1.sigma = colvec(psig);

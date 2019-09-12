@@ -5,12 +5,18 @@ function ok=fexist(fname)
 % returns 1 if fname does exist
 
 % home-made version
-ok=fopen(fname,'r');
-if ok > 0
-   fclose(ok);
-   ok = 1;
+if numel(fname) > 0
+    [fid,message]=fopen(fname,'r');
+    if fid > 0
+        fclose(fid);
+        ok = 1;
+    else
+        message
+        ok = 0;
+    end
 else
-   ok = 0;
+    error(sprintf('File name "fname" not defined.\n'));
+    ok = 0;
 end
 
 % Use built-in function instead
