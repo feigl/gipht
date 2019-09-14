@@ -18,7 +18,7 @@ LICENSING:
 
 Copyright (c) 2009 Kurt Feigl, Cliff Thurber All rights reserved. U.S. Patent No. 7,446,705.  
 
-Copyright (c) Kurt Feigl, Cliff Thurber, Lee Powell, Peter Sobol, Aaron Masters, S. Tabrez Ali, Elena C. Baluyut,
+Copyright (c) Kurt Feigl, Cliff Thurber, Lee Powell, Peter Sobol, Aaron Masters, S. Tabrez Ali, Elena C. Reinisch,
 University of Wisconsin-Madison
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
