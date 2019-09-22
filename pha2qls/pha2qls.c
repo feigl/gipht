@@ -36,6 +36,7 @@
  *  2012/10/04 Version 2.5 Kurt - work on header, -T
  *  2012/10/06 Version 2.5b Kurt - still looking for bug
  *  2014/01/06 Version 2.5c Kurt - still looking for bug
+ *  2019/09/22 Version 2.6  Kurt - OK to release
  *
  *  example ./pha2qls <inputfile.pha> xsize ysize [-o <outputfile>]
  */
