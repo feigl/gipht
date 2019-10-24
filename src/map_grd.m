@@ -66,8 +66,10 @@ figure; hold on;
 clim = [nanmin(colvec(IMAGE)),nanmax(colvec(IMAGE))];
 if abs(clim(1)-clim(2)) <= eps
     warning('mininum and maximum values are equal');
-    clim(1) = clim(1) - 0.1*abs(clim(1));
-    clim(2) = clim(2) + 0.1*abs(clim(2));
+    %clim(1) = clim(1) - 0.1*abs(clim(1));
+    %clim(2) = clim(2) + 0.1*abs(clim(2));
+    clim(1) = -Inf;
+    clim(2) = +Inf;
 end
 
 %% draw the image
