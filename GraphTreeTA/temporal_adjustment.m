@@ -117,7 +117,7 @@ end
 %% Check number of components for PWL, switch parameterizations if necessary 
 
 if strcmp(tfunc, 'pwl') == 1 && ntrees > 1
-    warning('More than one distinct component (rank deficiency greater than 2.  Switching to rate parameterization outlined by Berardino et al. (2002)')
+    warning('More than one distinct component (rank deficiency greater than 2. Switching to rate parameterization outlined by Berardino et al. (2002)')
 end
 
 %% Build design matrix G
@@ -213,9 +213,9 @@ else %continue with inversion
     
     V = incidence_to_cov(Q, dsig);
     
-    figure
-    spy(V);
-    title('data covariance matrix V');
+%     figure
+%     spy(V);
+%     title('data covariance matrix V');
     
   %% Perform the inversion using classic linear algebra solution to least-squares with pseudo-inverse
     
