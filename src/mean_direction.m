@@ -39,7 +39,7 @@ if n > 0
     Cbar = sum(cos(theta));
     Sbar = sum(sin(theta));
 else
-    %warning('Number of data points is less than or equal to zero.');
+    warning('Number of finite data points is less than or equal to zero.');
     thetabar = NaN;
     return;
 end
@@ -65,12 +65,17 @@ elseif Cbar < 0
 elseif Sbar < 0 && Cbar > 0
     thetabar = atan(Sbar/Cbar) + 2.0*pi;
 else
-    warning(sprintf('Undefined case Sbar = %10.4f Cbar = %10.4f\n',Sbar,Cbar));
+    warning(sprintf('Undefined Case 1: Sbar = %10.4f Cbar = %10.4f\n',Sbar,Cbar));
     thetabar = NaN;
 end
 
-if isreal(thetabar) ~= 1 || isfinite(thetabar) ~= 1 
-    warning(sprintf('Undefined case Sbar = %10.4f Cbar = %10.4f thetabar = %g\n',Sbar,Cbar, thetabar));
+if isfinite(thetabar) ~= 1 
+    warning(sprintf('Undefined Case 2: Sbar = %10.4f Cbar = %10.4f thetabar = %g\n',Sbar,Cbar, thetabar));
+    thetabar = NaN;
+end
+ if isreal(thetabar) ~= 1  
+    thetabar
+    warning(sprintf('Undefined Case 3: Sbar = %10.4f Cbar = %10.4f thetabar = %g\n',Sbar,Cbar, thetabar));
     thetabar = NaN;
 end
     
