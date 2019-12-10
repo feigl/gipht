@@ -4,6 +4,7 @@ if ($#argv < 1) then
 cat - << ENDOFDOC
 Run GIPhT once for each pair listed in the list of interferograms specified 
 by ilist keyword in gipht.in
+20191108 exclude lines with #
 ENDOFDOC
 else
 
@@ -23,7 +24,8 @@ echo $ilist
 # make several files, each listing 1 interferometric pair
 #grep a $ilist >! tmp.ilist 
 #split -p a tmp.ilist ilist.
-cat $ilist | grep a | awk -f `which splitp.awk`
+#cat $ilist | grep a | awk -f `which splitp.awk`
+cat $ilist | grep -v '#' | awk -f `which splitp.awk`
 
 foreach pair (pair*.lst)
 echo '---------------------'

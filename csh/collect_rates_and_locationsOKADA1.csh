@@ -3,7 +3,7 @@
 # 20190226 Kurt Feigl
 
 cd OKADA1
-set out = 'OKADA1withLocation.txt'
+set out = 'collected_rates.txt'
 
 # get decimal years
 grep -i time_fn_@_epoch_001_in_years____ p2*/x*.log | awk 'NF==9 && $4 == $9 {print $4}' >! tmp.epoch1
@@ -37,11 +37,11 @@ grep 'Cost  of final model' p2*/x*.log | awk 'NF>=13{print $6,$9}' >! tmp.cost
 # write 1-line header
 #echo "Master  Slave Volume_Change_in_cubic_meters___ Uncertainty Cost N Xe Ye Ze" >! $out               
 #echo "Master  Slave SunDisk1_Excess_Pressure_in_Pa__ Uncertainty " >! $out
-echo "Master  Slave Volume_Change_in_cubic_meters___ Uncertainty Cost Ndata Xe sX Ye sY Ze sZ" >! $out               
+echo "Master Slave VolumeChangem3 Uncertainty Cost Ndata Xe sX Ye sY Ze sZ" >! $out               
                
 # write data
 #paste tmp.epochs12 tmp.param_sigma | sed 's/:F#//' | sed 's/:/ /' | awk '$1 == $4{print $2,$3,$6,$7}' >> $out               
 #paste tmp.epochs12 tmp.param_sigma | sed 's/:F#//' | sed 's/:/ /' | awk '{print $1,$2,$5,$6}' >> $out                
 #paste tmp.epoch1 tmp.epoch2 tmp.param_sigma | sed 's/:F#//' | sed 's/:/ /' | awk '{print $1,$2,$5,$6}' >> $out                
-paste tmp.epochs12 tmp.param_sigma tmp.cost tmp.xs tmp.ys tmp.zs | awk '{print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13}' >> $out                
+paste tmp.epochs12 tmp.param_sigma tmp.cost tmp.xs tmp.ys tmp.zs | awk '{print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12}' >> $out                
 
