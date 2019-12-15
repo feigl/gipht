@@ -53,21 +53,24 @@ DIP    =    pg(4); % dip in degrees
 LENGTH =    pg(1);
 WIDTH  =    pg(2);
 
-if isfinite(pg(8)) == 1 && isfinite(pg(9)) == 1
-    % in terms of downdip and right-lateral strike slip
-%     RAKE   =    atan2(pg(8),pg(8)) * 180./pi; % rake in degrees
-%     SLIP   =    hypot(pg(8),pg(9));           % slip magnitude in meters
-    % parameterized in terms of rake
-    RAKE = pg(9);
-    SLIP = pg(8);
-end
+% if isfinite(pg(8)) == 1 && isfinite(pg(9)) == 1
+%     % in terms of downdip and right-lateral strike slip
+% %     RAKE   =    atan2(pg(8),pg(8)) * 180./pi; % rake in degrees
+% %     SLIP   =    hypot(pg(8),pg(9));           % slip magnitude in meters
+%     % parameterized in terms of rake
+% end
+RAKE = pg(9);
+SLIP = pg(8);
 OPEN   =    pg(10);                       % tensile opening in meters
 
-if abs(OPEN) < 0.01 && abs(SLIP) < 0.01
-    OPEN
-    SLIP
-    warning('Slip is less than 0.01 in absolute value\n');
-end
+% if abs(OPEN) < 0.01 && abs(SLIP) < 0.01
+%     fprintf(1,'OPEN = %12.4e SLIP = %12.4e \n',OPEN, SLIP)
+%     warning('Slip is less than 0.01 in absolute value\n');
+% end
+
+%fprintf(1,'Fault centroid Easting = %12.4e Northing = %12.4e \n',pg(6),pg(7))
+
+
 
 E =     xyobs(1,:) - pg(6);               % relative position of obs point wrt to fault centroid
 N =     xyobs(2,:) - pg(7);               % relative position of obs point wrt to fault centroid

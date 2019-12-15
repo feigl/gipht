@@ -78,40 +78,29 @@ if (nin == 1 || nin == 2) && nout == 2 && isstruct(varargin{1}) == 0
     j=j+1;pnames{j} = sprintf('Mogi2 Northing in m            '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('Mogi2 Depth in m               '); pscl(j)=1.0E4;
     j=j+1;pnames{j} = sprintf('Mogi2 Volume Increase in m3    '); pscl(j)=1.0E6;
+    %
     j=j+1;pnames{j} = sprintf('Okada1 Length in m             '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('Okada1 Width in m              '); pscl(j)=1.0E3;
-%     j=j+1;pnames{j} = sprintf('Okada1 Depth in m              '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('Okada1 Centroid Depth in m     '); pscl(j)=1.0E3;
-%     j=j+1;pnames{j} = sprintf('Okada1 Negative Dip in deg     '); pscl(j)=1.0;
     j=j+1;pnames{j} = sprintf('Okada1 Dip in deg              '); pscl(j)=1.0;
-%   j=j+1;pnames{j} = sprintf('Okada1 Strike CCW from N in deg'); pscl(j)=1.0;
     j=j+1;pnames{j} = sprintf('Okada1 Strike CW from N in deg '); pscl(j)=1.0;
-%     j=j+1;pnames{j} = sprintf('Okada1 Easting in m            '); pscl(j)=1.0E3;
-%     j=j+1;pnames{j} = sprintf('Okada1 Northing in m           '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('Okada1 Centroid Easting in m   '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('Okada1 Centroid Northing in m  '); pscl(j)=1.0E3;
-%     j=j+1;pnames{j} = sprintf('Okada1 RL Strike Slip in m     '); pscl(j)=1.0E-3;
-%     j=j+1;pnames{j} = sprintf('Okada1 Downdip Slip in m       '); pscl(j)=1.0E-3;
     j=j+1;pnames{j} = sprintf('Okada1 Coplanar slip in m      '); pscl(j)=1.0E-3;
     j=j+1;pnames{j} = sprintf('Okada1 Rake in deg CCW         '); pscl(j)=1.0E-3;
     j=j+1;pnames{j} = sprintf('Okada1 Tensile Opening in m    '); pscl(j)=1.0E-3;
+    %
     j=j+1;pnames{j} = sprintf('Okada2 Length in m             '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('Okada2 Width in m              '); pscl(j)=1.0E3;
-%   j=j+1;pnames{j} = sprintf('Okada2 Depth in m              '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('Okada2 Centroid Depth in m     '); pscl(j)=1.0E3;
-%   j=j+1;pnames{j} = sprintf('Okada2 Negative Dip in deg     '); pscl(j)=1.0;
     j=j+1;pnames{j} = sprintf('Okada2 Dip in deg              '); pscl(j)=1.0;
-%   j=j+1;pnames{j} = sprintf('Okada2 Strike CCW from N in deg'); pscl(j)=1.0;
     j=j+1;pnames{j} = sprintf('Okada2 Strike CW from N in deg '); pscl(j)=1.0;
-%     j=j+1;pnames{j} = sprintf('Okada2 Easting in m            '); pscl(j)=1.0E3;
-%     j=j+1;pnames{j} = sprintf('Okada2 Northing in m           '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('Okada2 Centroid Easting in m   '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('Okada2 Centroid Northing in m  '); pscl(j)=1.0E3;
-%     j=j+1;pnames{j} = sprintf('Okada2 RL Strike Slip in m     '); pscl(j)=1.0E-3;
-%     j=j+1;pnames{j} = sprintf('Okada2 Downdip Slip in m       '); pscl(j)=1.0E-3;
     j=j+1;pnames{j} = sprintf('Okada2 Coplanar slip in m      '); pscl(j)=1.0E-3;
     j=j+1;pnames{j} = sprintf('Okada2 Rake in deg CCW         '); pscl(j)=1.0E-3;
     j=j+1;pnames{j} = sprintf('Okada2 Tensile Opening in m    '); pscl(j)=1.0E-3;
+    %
     j=j+1;pnames{j} = sprintf('YangPS Easting in m            '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('YangPS Northing in m           '); pscl(j)=1.0E3;
     j=j+1;pnames{j} = sprintf('YangPS Depth in m              '); pscl(j)=1.0E3;
@@ -609,8 +598,8 @@ elseif nin == 3 ...
             else
                 uokada1 = zeros(3,ndata);
             end
-            %kp = 19;
-            kp = 18; % 20150721
+            %kp = 18; % 20150721
+            kp = 19; % 20191215
             % coseismic
             if  sum(abs(pg(kp+7:kp+9))) > 1.e-3
                 %uokada2 = disloc(pg(kp:kp+9),[DST.x';DST.y'],nu);
@@ -618,8 +607,8 @@ elseif nin == 3 ...
             else
                 uokada2 = zeros(3,ndata);
             end
-            %kp = 57;
-            kp = 56; % 20150721
+            %kp = 56; % 20150721
+            kp = 57; % 20191215
             % poroelastic
             if  sum(abs(pg(kp+7:kp+9))) > 1.e-3
                 uokada3 = okada85_wrapper(pg(kp:kp+9),[DST.x';DST.y'],nu2 ) ...
