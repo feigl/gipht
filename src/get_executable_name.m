@@ -5,7 +5,7 @@ function cmdstr = get_executable_name(srcname)
 % find the proper extension for this computer
 [pathstr,fname,ext] = fileparts(srcname);
 exeext  = mexext;
-exename = strrep(srcname,ext,sprintf('.%s',exeext(4:end)));
+exename = strrep(srcname,ext,sprintf('.%s',exeext(4:end)))
 
 % if numel(getenv('GIPHT_HOME')) > 0
 %     cmdstr = strcat(getenv('GIPHT_HOME'),filesep,'src',filesep,exename);

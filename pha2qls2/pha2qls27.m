@@ -50,8 +50,8 @@ npatches = NaN;
 
 %cmd1 = get_executable_name('pha2qls.c');
 %cmd1 = get_executable_name(pha2qlsname)
-%cmd1 = '/Users/feigl/gipht/pha2qls2/pha2qls.maci64' ; % version 2.6
-cmd1 = '/Users/feigl/gipht/pha2qls/pha2qls.maci64' ; % version 2.7
+cmd1 = '/Users/feigl/gipht/pha2qls2/pha2qls.maci64' ; % version 2.7
+%cmd1 = '/Users/feigl/gipht/pha2qls/pha2qls.maci64' ; % version 2.6
 
 % file names and sizes, ithresh = 4 DN, minpix = 16
 % 20180925 add -F to fill original bad values with zeros
