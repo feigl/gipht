@@ -696,14 +696,9 @@ static quadtree_node
                     i2buf[0]=(signed short) i1;                               /* Column Index (X coordinate) of Upper Left Corner   */
                     i2buf[1]=(signed short) j1;                               /* Row    Index (Y coordinate) of Upper Left Corner   */
                     i2buf[2]=(signed short) i2-i1+1;		                  /* Number of pixels, width and height of square patch */
-                    //
-                    // i2buf[3]=(signed short) rint(256.0f*(double)cmdr);        /* mean phase value in 256^2 DN */
-                    // i2buf[4]=(signed short) rint(256.0f*slopevector.slopex);  /* value of phase gradient in +X direction in 256^2 DN == 1 cycle/pixel */
-                    // i2buf[5]=(signed short) rint(256.0f*slopevector.slopey);  /* value of phase gradient in -Y direction in 256^2 DN == 1 cycle/pixel */
-                    //
                     i2buf[3]=(signed short) rint(256.0f*(double)cmdr);        /* mean phase value in 256^2 DN */
-                    i2buf[4]=(signed short) rint(256.0f*256.0f*slopevector.slopex);  /* value of phase gradient in +X direction in 256^2 DN == 1 cycle/pixel */
-                    i2buf[5]=(signed short) rint(256.0f*256.0f*slopevector.slopey);  /* value of phase gradient in -Y direction in 256^2 DN == 1 cycle/pixel */
+                    i2buf[4]=(signed short) rint(256.0f*slopevector.slopex);  /* value of phase gradient in +X direction in 256^2 DN == 1 cycle/pixel */
+                    i2buf[5]=(signed short) rint(256.0f*slopevector.slopey);  /* value of phase gradient in -Y direction in 256^2 DN == 1 cycle/pixel */
                 }
                 else {
                     fprintf(stderr, "ERROR patch is not square! %5d %5d %5d %5d (%5d)\n", i1, i2, j1, j2, cmdr);
@@ -727,14 +722,13 @@ static quadtree_node
                 /* write X gradient value to all pixels in patch */
                 for (j = j1; j <= j2; j++){
                     for (i = i1; i <= i2; i++){
-                        d2 = rint(slopevector.slopex*256.0f*256.0f); /* coded on interval  */
+                        d2 = rint(slopevector.slopex*256.0); /* coded on interval 256*[-128, +127] */
                         if (fabs(d2) > 0) {
                             i2a = (signed short) d2;
                             /*fprintf(stderr,"%5d %5d %12.4e %12.4e %12.4e %5d\n",i,j,d,d2,i2a); */
                         }
                         else {
                             i2a = 0;
-                            /* fprintf(stderr,"%5d %5d %12.4e %5d\n",i,j,d2,i2a);*/                     
                         }
                         i2grx[i+j*nxpad] = i2a;
                     }
@@ -742,14 +736,13 @@ static quadtree_node
                 /* write Y gradient value to all pixels in patch */
                 for (j = j1; j <= j2; j++){
                     for (i = i1; i <= i2; i++){
-                        d2 = rint(slopevector.slopey*256.0f*256.0f); /* coded on interval 256*[-128, +127] */
+                        d2 = rint(slopevector.slopey*256.0); /* coded on interval 256*[-128, +127] */
                         if (fabs(d2) > 0) {
                             i2a = (signed short) d2;
                             /*fprintf(stderr,"%5d %5d %12.4e %12.4e %12.4e %5d\n",i,j,d,d2,i2a); */
                         }
                         else {
                             i2a = 0;
-                            /* fprintf(stderr,"%5d %5d %12.4e %5d\n",i,j,d2,i2a); */
                         }
                         i2gry[i+j*nxpad] = i2a;
                     }
@@ -1018,7 +1011,7 @@ slopexy slope3(signed char *ic1, long nrows, long ncols)
                 c2 = ic1[   j *ncols+i];
                 cdif = c2 - c1;
                 
-                if ((c1 != 0) && (c2 != 0)){            
+                if (c1 !=0 && c2 != 0){
                     cdiffs[kount] = cdif;
                     kount++;
                 }
@@ -1027,7 +1020,7 @@ slopexy slope3(signed char *ic1, long nrows, long ncols)
                 }
             }
         }
-        if (kount > 1){
+        if (kount > nnull){
             cmeandir1 = cmeandir(cdiffs,kount);
             sr = (double) cmeandir1 / (double) kount;
         }
@@ -1046,7 +1039,7 @@ slopexy slope3(signed char *ic1, long nrows, long ncols)
                 c1 = ic1[j*ncols + i-1];
                 cdif = c2 - c1;
                 
-                if ((c1 != 0) && (c2 != 0)){ 
+                if (c1 !=0 && c2 != 0){
                     cdiffs[kount] = cdif;
                     kount++;
                 }
@@ -1055,7 +1048,7 @@ slopexy slope3(signed char *ic1, long nrows, long ncols)
                 }
             }
         }
-        if (kount > 1){
+        if (kount > nnull){
             cmeandir1 = cmeandir(cdiffs,kount);
             sc = (double) cmeandir1 / (double) kount;
         }

@@ -56,7 +56,7 @@ cmd1 = '/Users/feigl/gipht/pha2qls2/pha2qls.maci64' ; % version 2.7
 % file names and sizes, ithresh = 4 DN, minpix = 16
 % 20180925 add -F to fill original bad values with zeros
 % cmd2=sprintf('%s %d %d -V -P %s -X %s -Y %s -L %d -N %d -M %d -Q %d -F'...
-cmd2=sprintf('%s %d %d -V -P %s -X %s -Y %s -L %d -N %d -M %d -Q %d'...
+cmd2=sprintf('%s %d %d -V -P %s -X %s -Y %s -L %d -N %d -M %d -Q %d' ...
     ,sphnam,ncols,nrows,qphnam...
     ,grxnam,grynam ...
     ,ithresh,minpix,maxcmd,maxpix);
@@ -66,9 +66,9 @@ fprintf(1,'Starting pha2qls with command line:\n%s\n',cmd3);
 %[unixstat,unixout] = unix(cmd3);
 [unixstat,unixout] = system(cmd3);
 if unixstat == 0
-   fprintf(1,'pha2qls successful.\n');
-   %whos unixout
-   %unixout
+   whos unixout
+   unixout
+   fprintf(1,'pha2qls successful.\n');   
    key = 'N(OK patches)  =';
    k = strfind(unixout,key)+numel(key)+1;
    if k > 0

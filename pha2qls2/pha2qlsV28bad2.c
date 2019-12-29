@@ -38,8 +38,7 @@
  *  2014/01/06 Version 2.5c Kurt - still looking for bug
  *  2019/09/22 Version 2.6  Kurt - OK to release*  
  *  2019/12/27 Version 2.7  Kurt - Make estimation of gradients more robust
- *  2019/12/28 Version 2.8  Kurt - Segmentation fault - cannot figure out why
- *  2019/12/29 Version 2.9  Kurt - 
+ *  2019/12/28 Version 2.8  Kurt - Try to find aberrant values of gradient
  *  example ./pha2qls <inputfile.pha> xsize ysize [-o <outputfile>]
  */
 
@@ -61,14 +60,15 @@ static FILE *fpgry   = NULL;
 static FILE *fptxt   = NULL;
 
 static char *pname, txtoutflag=0, nanchar=0;
-static unsigned short maxpix=1000;              /* maximum number of pixels in a patch       */
-static unsigned short minpix=4;                 /* minimum number of VALID pixels in a patch */
+static long npatches=0;                 /* number of patches */
+static unsigned short maxpix=1024;      /* maximum number of pixels in a patch       */
+static unsigned short minpix=4;         /* minimum number of VALID pixels in a patch */
 
-static signed char i1thresh=16;       /* max Circular Mean Deviation for misfit to 3-parameter ramp model */
-static signed char maxcmd=32;         /* max Circular Mean Deviation for misfit to 3-parameter ramp model */
-static signed char  *i1arr, *i1out, *i1wrk, *i1mod, *i1vec;  /* arrays of phase values coded as 1 byte  per pixel */
+static signed char i1thresh=16;         /* max Circular Mean Deviation for misfit to 3-parameter ramp model */
+static signed char maxcmd=32;           /* max Circular Mean Deviation for misfit to 3-parameter ramp model */
+static signed char  *i1arr, *i1out, *i1wrk, *i1mod;  /* arrays of phase values coded as 1 byte  per pixel */
 static signed short *i2out, *i2grx, *i2gry;          /* arrays of phase values coded as 2 bytes per pixel*/
-static long nx, ny, npix, npatches=0, nnulltotr=0, nnulltotw=0, nnullpatches=0, nxpad, nypad, npixpad;
+static long nx, ny, npix, nnulltotr=0, nnulltotw=0, nnullpatches=0, nxpad, nypad, npixpad;
 static quadtree_node do_create(unsigned int tlx, unsigned int jn, unsigned int ie, unsigned int js, unsigned int level);
 /* static double pi=3.141529; Corrected 20140106 */
 static double pi=3.141592653589793; /* Corrected 20140106 */
@@ -82,7 +82,7 @@ quadtree_node
     return do_create(iw, jn, ie, js, level+1);
 }
 
-void usage(){
+usage(){
     fprintf(stderr, "%s performs quadtree partitioning on a file of wrapped phase values\n", pname);
     fprintf(stderr, "usage pha2qls [options] input.pha nx ny \n");
     fprintf(stderr, "Required arguments: \n");
@@ -109,7 +109,7 @@ void usage(){
     exit(-1);
 }
 
-int main(argc, argv)
+main(argc, argv)
 int argc;
 char **argv; {
     long nw = 0; /* number of words written */
@@ -117,6 +117,7 @@ char **argv; {
     long maxpatch;
     signed char c, c1;
     signed short i2a;
+    /*20121004    signed short lsthdr[6]; */ /* header record */
     signed int lsthdr[3]; /* header record */
     int iopt,ierr;
     /* file names */
@@ -135,7 +136,7 @@ char **argv; {
     pi = 4.0 * atan(1.0);
     pname = argv[0];
     
-    fprintf(stdout, "pha2qls version 2.9 of 2019-12-29 \n");
+    fprintf(stdout, "pha2qls version 2.8 of 2019-12-28 \n");
     fprintf(stderr, "Copyright (c) 2011 Kurt L. Feigl & Peter E. Sobol\n");
     fprintf(stderr, "University of Wisconsin-Madison\n");
     fprintf(stderr, "All rights reserved\n\n");
@@ -362,7 +363,6 @@ char **argv; {
     i1out = calloc(npixpad, sizeof(signed char)); if (i1out == NULL) {fprintf(stderr, "%s: failure to allocate space for i1out buffer\n", pname); exit(-1);}
     i1wrk = calloc(npixpad, sizeof(signed char)); if (i1wrk == NULL) {fprintf(stderr, "%s: failure to allocate space for i1wrk buffer\n", pname); exit(-1);}
     i1mod = calloc(npixpad, sizeof(signed char)); if (i1mod == NULL) {fprintf(stderr, "%s: failure to allocate space for i1mod buffer\n", pname); exit(-1);}
-    
     i2out = calloc(npixpad, sizeof(signed short));if (i2out == NULL) {fprintf(stderr, "%s: failure to allocate space for i2out buffer\n", pname); exit(-1);}
     i2grx = calloc(npixpad, sizeof(signed short));if (i2grx == NULL) {fprintf(stderr, "%s: failure to allocate space for i2grx buffer\n", pname); exit(-1);}
     i2gry = calloc(npixpad, sizeof(signed short));if (i2gry == NULL) {fprintf(stderr, "%s: failure to allocate space for i2gry buffer\n", pname); exit(-1);}
@@ -378,8 +378,8 @@ char **argv; {
     
     
     /* Start the output phase list with NP NX NY where
-     * Where NP is # patches, NX & NY are the number of rows and number of col
-     * 2012-OCT-04 */
+     * Where NP is # patches, NX & NY are the number of rows and number of col 
+     2012-OCT-04 */
     lsthdr[0]= (signed int) 0;	/* needs to be filled in later */
     lsthdr[1]= (signed int) nx;
     lsthdr[2]= (signed int) ny;
@@ -578,6 +578,9 @@ char **argv; {
     fprintf(stderr, "Reduction      = %#10.1f percent\n", 100.0f * (1.0f - change));
     
     /* write header to binary list */
+    /* 20121004    lsthdr[1]=np;	*/ /* rewrite Npatches */
+    /* 20121004    nw = fwrite(lsthdr, sizeof(signed short), 6, fplst); */
+    /* 2012-OCT-04 */
     lsthdr[0]= (signed int) npatches;
     lsthdr[1]= (signed int) nx;
     lsthdr[2]= (signed int) ny;
@@ -669,8 +672,8 @@ static quadtree_node
     }
     
     
-    /*estimate slopes */
-    /* slopevector=slope2(i1wrk, nrows, ncols); *//* data,nrows,ncols */
+    /* estimate slopes */
+    /* slopevector=slope2(i1wrk, nrows, ncols); */ /* data,nrows,ncols */
     slopevector=slope3(i1wrk, nrows, ncols); /* data,nrows,ncols */
     
     /* calculate mean direction  */
@@ -696,14 +699,9 @@ static quadtree_node
                     i2buf[0]=(signed short) i1;                               /* Column Index (X coordinate) of Upper Left Corner   */
                     i2buf[1]=(signed short) j1;                               /* Row    Index (Y coordinate) of Upper Left Corner   */
                     i2buf[2]=(signed short) i2-i1+1;		                  /* Number of pixels, width and height of square patch */
-                    //
-                    // i2buf[3]=(signed short) rint(256.0f*(double)cmdr);        /* mean phase value in 256^2 DN */
-                    // i2buf[4]=(signed short) rint(256.0f*slopevector.slopex);  /* value of phase gradient in +X direction in 256^2 DN == 1 cycle/pixel */
-                    // i2buf[5]=(signed short) rint(256.0f*slopevector.slopey);  /* value of phase gradient in -Y direction in 256^2 DN == 1 cycle/pixel */
-                    //
                     i2buf[3]=(signed short) rint(256.0f*(double)cmdr);        /* mean phase value in 256^2 DN */
-                    i2buf[4]=(signed short) rint(256.0f*256.0f*slopevector.slopex);  /* value of phase gradient in +X direction in 256^2 DN == 1 cycle/pixel */
-                    i2buf[5]=(signed short) rint(256.0f*256.0f*slopevector.slopey);  /* value of phase gradient in -Y direction in 256^2 DN == 1 cycle/pixel */
+                    i2buf[4]=(signed short) rint(256.0f*slopevector.slopex);  /* value of phase gradient in +X direction in 256^2 DN == 1 cycle/pixel */
+                    i2buf[5]=(signed short) rint(256.0f*slopevector.slopey);  /* value of phase gradient in -Y direction in 256^2 DN == 1 cycle/pixel */
                 }
                 else {
                     fprintf(stderr, "ERROR patch is not square! %5d %5d %5d %5d (%5d)\n", i1, i2, j1, j2, cmdr);
@@ -721,37 +719,40 @@ static quadtree_node
                 /* write modeled value to all pixels in patch */
                 for (j = j1; j <= j2; j++){
                     for (i = i1; i <= i2; i++){
-                        i1out[i+j*nxpad] = i1mod[(i-i1) + (j-j1)*ncols];    /* modeled value from 3-parameter ramp model */
+                        i1out[i+j*nxpad] = i1mod[(i-i1) + (j-j1)*ncols];   /* modeled value from 3-parameter ramp model */
+                        /*i1out[i+(j-1)*nxpad] = i1mod[(i-i1) + (j-j1)*ncols]; */   /* modeled value from 3-parameter ramp model */
                     }
                 }
                 /* write X gradient value to all pixels in patch */
                 for (j = j1; j <= j2; j++){
                     for (i = i1; i <= i2; i++){
-                        d2 = rint(slopevector.slopex*256.0f*256.0f); /* coded on interval  */
+                        d2 = rint(slopevector.slopex*256.0); /* coded on interval 256*[-128, +127] */
+                        /*d2 = floor(slopevector.slopex*256.0*256.0); *//* coded on interval [-0.5,+0.5] cycle =  [-2^15, 2^15+1] DN */
                         if (fabs(d2) > 0) {
                             i2a = (signed short) d2;
-                            /*fprintf(stderr,"%5d %5d %12.4e %12.4e %12.4e %5d\n",i,j,d,d2,i2a); */
+                            /*fprintf(stderr,"%5d %5d %12.4e %5d\n",i,j,d2,i2a)*/; 
                         }
                         else {
                             i2a = 0;
-                            /* fprintf(stderr,"%5d %5d %12.4e %5d\n",i,j,d2,i2a);*/                     
                         }
-                        i2grx[i+j*nxpad] = i2a;
+                        /*i2grx[i+j*nxpad] = i2a; */
+                        i2grx[i+(j-1)*nxpad] = i2a;
                     }
                 }
                 /* write Y gradient value to all pixels in patch */
                 for (j = j1; j <= j2; j++){
                     for (i = i1; i <= i2; i++){
-                        d2 = rint(slopevector.slopey*256.0f*256.0f); /* coded on interval 256*[-128, +127] */
+                        d2 = rint(slopevector.slopey*256.0);  /* coded on interval 256*[-128, +127] */
+                        /* d2 = floor(slopevector.slopey*256.0*256.0); */ /* coded on interval [-0.5,+0.5] cycle =  [-2^15, 2^15+1] DN */
                         if (fabs(d2) > 0) {
                             i2a = (signed short) d2;
                             /*fprintf(stderr,"%5d %5d %12.4e %12.4e %12.4e %5d\n",i,j,d,d2,i2a); */
                         }
                         else {
                             i2a = 0;
-                            /* fprintf(stderr,"%5d %5d %12.4e %5d\n",i,j,d2,i2a); */
                         }
-                        i2gry[i+j*nxpad] = i2a;
+                        /*i2gry[i+j*nxpad] = i2a; */
+                        i2gry[i+(j-1)*nxpad] = i2a;
                     }
                 }
             }
@@ -815,7 +816,7 @@ signed char cmeandir(signed char *ic1, long n)
 /* inputs: ic1:patch data, n:number of points in patch, nnull:number of nulls in patch */
 /* Peter Sobol 2009-11-13 */
 {
-    double c=0.0f, s=0.0f, r, t;
+    double c=0.0f, s=0.0f, r, t, d;
     signed char ic3;
     long i;
     
@@ -835,17 +836,19 @@ signed char cmeandir(signed char *ic1, long n)
         else {
             t = atan(s/c) + pi;
         }
-        return (signed char) rint(128.0f*t/pi);
+        d = rint(128.0f*t/pi);   
     }
     else {
-        return (signed char) 0;
+        d = 0.;
     }
+    ic3 = (signed char) d;
+    return ic3;
 }
 
 slopexy slope1(signed char *ic1, long nrows, long ncols)
 /* mean slope for each direction for a square input matrix of nrows*ncols
- * If one or fewer elements return 0 for slope
- * Peter Sobol 2009-11-01 */
+   If one or fewer elements return 0 for slope
+   Peter Sobol 2009-11-01 */
 {
     double sx=0.0f, sy=0.0f, sum=0.0f;
     signed char cdif;
@@ -1018,7 +1021,7 @@ slopexy slope3(signed char *ic1, long nrows, long ncols)
                 c2 = ic1[   j *ncols+i];
                 cdif = c2 - c1;
                 
-                if ((c1 != 0) && (c2 != 0)){            
+                if (c1 != 0 && c2 != 0){
                     cdiffs[kount] = cdif;
                     kount++;
                 }
@@ -1042,11 +1045,10 @@ slopexy slope3(signed char *ic1, long nrows, long ncols)
             }    
         for (j=0; j < nrows; j++) {
             for (i=1; i < ncols; i++) {
-                c2 = ic1[j*ncols + i  ];
                 c1 = ic1[j*ncols + i-1];
-                cdif = c2 - c1;
-                
-                if ((c1 != 0) && (c2 != 0)){ 
+                c2 = ic1[j*ncols + i  ];   
+                cdif = c2 - c1;          
+                if (c1 != 0 && c2 != 0){
                     cdiffs[kount] = cdif;
                     kount++;
                 }
@@ -1306,6 +1308,7 @@ char *strextension(char *strin, char *extension){ /*replace or postpend extensio
     strcpy(strtemp, strin);
     strcat(strtemp, extension);
     return(strtemp);
+    
 }
 
 char *strreplace(char *st, char *orig, char *repl) {
