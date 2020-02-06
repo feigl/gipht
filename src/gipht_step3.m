@@ -695,6 +695,7 @@ end
 %% calculate some derived parameters
 %% TODO move these into the fitting functions as a fourth option
 iq = 0;
+qnames = '';
 %
 % % total volume change
 % iq = iq+1;
@@ -1096,24 +1097,26 @@ iii=get_parameter_index('Okada1_Length_in_m______________',pnames);
 % end
 %
 %  PRINT OUT THE DERIVED PARAMETERS
-qnames = truncate_parameter_names(qnames);
-iq1 = 1;
-iq2 = iq;
-uqb(iq1:iq2)=NaN;
-lqb(iq1:iq2)=NaN;
-% 2012 JUL 10
-%qsig(iq1:iq2)=NaN;
-for i=iq1:iq2
-    qflags{i} = 'D#';
-    adj = q1(i)-q0(i);
-    %    sadj = NaN;
-    sadj = abs(adj/qsig(i));
-    outfmt = getfmt(q1(i),qnames{i});
-
-    fprintf(1        ,outfmt,qflags{i},i+mparam,qnames{i} ,q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
-    fprintf(fidtxtout,outfmt,qflags{i},i+mparam,qnames{i}, q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
+if numel(qnames) > 0
+    qnames = truncate_parameter_names(qnames);
+    iq1 = 1;
+    iq2 = iq;
+    uqb(iq1:iq2)=NaN;
+    lqb(iq1:iq2)=NaN;
+    % 2012 JUL 10
+    %qsig(iq1:iq2)=NaN;
+    for i=iq1:iq2
+        qflags{i} = 'D#';
+        adj = q1(i)-q0(i);
+        %    sadj = NaN;
+        sadj = abs(adj/qsig(i));
+        outfmt = getfmt(q1(i),qnames{i});
+        
+        fprintf(1        ,outfmt,qflags{i},i+mparam,qnames{i} ,q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
+        fprintf(fidtxtout,outfmt,qflags{i},i+mparam,qnames{i}, q0(i),q1(i),adj,qsig(i),sadj,(uqb(i)-lqb(i))/2.0);
+    end
+    fclose(fidtxtout);
 end
-fclose(fidtxtout);
 
 %% update parameter list
 PST1.sigma = colvec(psig);

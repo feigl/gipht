@@ -64,15 +64,18 @@ x = Vp*inv(Sp)*Up';
 c = cond(x);
 
 % Plot singular value spectrum with truncation cut-off
-figure
-plot(n, s/s(1), 'ko')
-hold on
-plot(p*ones(1, 10), linspace(min(s./s(1)), max(s./s(1)), 10), 'b--')
-hold off
-xlabel('i')
-ylabel('(s/s(1))')
-title('L curve for singluar values showing current truncation')
-axis tight
+% 20200205 Kurt Feigl - only plot if more than one singular value
+if n > 1 
+    figure
+    plot(n, s/s(1), 'ko')
+    hold on
+    plot(p*ones(1, 10), linspace(min(s./s(1)), max(s./s(1)), 10), 'b--')
+    hold off
+    xlabel('i')
+    ylabel('(s/s(1))')
+    title('L curve for singluar values showing current truncation')
+    axis tight
+end
 
 end
 

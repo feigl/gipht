@@ -308,7 +308,7 @@ for ifile = [1 fidtxtout]
 end
 fclose(fidtxtout);
 
- set(FigHandle, 'Position', [100, 100, 995, 895]);%1049
-save('OkmokBplot')
+set(FigHandle, 'Position', [100, 100, 995, 895]);%1049
+%save('OkmokBplot')
 return;
 

@@ -4,6 +4,7 @@ function h = map_grd(varargin)
 % map a GMT grid file named grdfilename and return graphics handle
 % 20160814 Kurt Feigl
 % 20170830 add SYM argument for plotting
+% 20200129 TODO return INFO as optional output
 
 %% parse input arguments
 if nargin >= 1

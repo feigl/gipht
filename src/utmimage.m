@@ -175,6 +175,9 @@ ha=text(0.95,0.98,datelabel...
 
 hold on;
 axis xy; 
+% 20200205 try to fix aspect ratio
+axis equal;
+axis tight;
 
 %% plot markers
 if marksize > 0 && numel(dotx) > 0 && numel(doty) > 0

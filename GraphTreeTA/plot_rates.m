@@ -50,8 +50,8 @@ ymax = nanmax(Qrate+rs)/scalefactor;
 
 % draw mean in blue
 %errorbar_plus2((max(tu)+min(tu))/2.,pest1,(max(tu)-min(tu))/2.,psig1,'ko-',5);
-tdura = max(tu)-min(tu)
-tmean = min(tu)+tdura/2.
+tdura = max(tu)-min(tu);
+tmean = min(tu)+tdura/2.;
 errorbar_plus2(tmean,pest1,tdura/2.,psig1,'ko-',5);
 
 for i=1:numel(tbreaks)
@@ -74,7 +74,7 @@ else
     xlabel('Date');
     [axy, axm, axd] = dyear2yyyymmdd(get(gca, 'XTick'));
     tick_labels = datetime(axy, axm, axd);
-    set(gca, 'XTickLabel',datestr(tick_labels, 'yyyy-mmm-dd'), 'XTickLabelRotation', -75) %char(tick_labels)
+    set(gca, 'XTickLabel',datestr(tick_labels, 'yyyy-mmm-dd'), 'XTickLabelRotation', -75); %char(tick_labels)
 end
 
 return

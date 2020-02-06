@@ -24,22 +24,34 @@ labelcolor = [0. 0. 0.]; % Black
 %       marksizes(i) = 1;
 %    end
 % end
+
+%% get extrema
 xutmmin = wesn(1);
 xutmmax = wesn(2);
 yutmmin = wesn(3);
 yutmmax = wesn(4);
 
+%% find extents
 yutmmid = (yutmmax+yutmmin)/2.0;
 yutmdif = yutmmax-yutmmin;
 xutmdif = xutmmax-xutmmin;
-rat = (8/11)*(yutmdif/xutmdif);
-if rat > 1.0
-    warning(sprintf('Scale ratio (%10.4f) is greater than 1.0\n',rat));
-    rs = min([1.0, 0.90/rat]); % rescale factor 2011-JUL-04
-else
-    rs = 1.0;
-end
 
+
+%% This makes aspect ratio strange
+% rat = (8/11)*(yutmdif/xutmdif);
+% if rat > 1.0
+%     warning(sprintf('Scale ratio (%10.4f) is greater than 1.0\n',rat));
+%     rs = min([1.0, 0.90/rat]); % rescale factor 2011-JUL-04
+% else
+%     rs = 1.0;
+% end
+
+%% 20200205 Define scale and aspect ratio
+rat = 8/11.;
+%rs = yutmdif/xutmdif;
+rs = 1.0;
+
+%%
 nodot = 100;
 
 h1=figure;

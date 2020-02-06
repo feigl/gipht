@@ -163,10 +163,10 @@ else
 end
 
 %% Print Data Summary
-fprintf(1,'i,data(i),dsig(i)\n');
-for i = 1:numel(data)
-    fprintf (1,'%5d %12.4g %12.4g \n',i,data(i),dsig(i));
-end
+% fprintf(1,'i,  data(i),  dsig(i)\n');
+% for i = 1:numel(data)
+%     fprintf (1,'%5d %12.4f %12.4f \n',i,data(i),dsig(i));
+% end
 
 disp 'Length of data vector, excluding constraints';ndat
 disp 'Dimensons of design matrix, including constraints';nm = size(G)
@@ -297,7 +297,7 @@ end
 
 fprintf(1,   'index  dateM dateS observed modeled residual res/sigma\n');
 for i = 1:ndat
-    fprintf (1,'%5d %#12.4f %#12.4f %#12.4g %#12.4g %#12.4g %#12.4g %#10.4f\n',i,tm(i),ts(i),data(i),dmod(i),res(i),data_sigma(i),res(i)./data_sigma(i));
+    fprintf (1,'%5d %#12.4f %#12.4f %#12.4f %#12.4f %#12.4f %#12.4f %#10.4f\n',i,tm(i),ts(i),data(i),dmod(i),res(i),data_sigma(i),res(i)./data_sigma(i));
 end
 
 % calculate chi-squared ourselves
@@ -306,7 +306,7 @@ var=sum((res).^2)/(numel(res)-mparams);
 chisquare=sum((res./dsig).^2)/(numel(res));
 wvar=sum((res./dsig).^2)/(numel(res)-mparams);
 fprintf(1,'MSE,       mean standard error (or factor used to scale variance of estimated parameters) is %20.4f\n',mse);
-fprintf(1,'SSWR,      sum of squared weighted residuals                                               is %20.4f\n',sswr);
+fprintf(1,'SSWR,      sum of squared weighted residuals                                              is %20.4f\n',sswr);
 fprintf(1,'sqrt(MSE), square root of MSE                                                             is %20.4f\n',sqrt(mse));
 fprintf(1,'sqrt(SSWR),square root SSWR                                                               is %20.4f\n',sqrt(sswr));
 fprintf(1,'var, Sample variance in units of data                                                     is %20.4e\n',var);

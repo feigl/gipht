@@ -82,10 +82,10 @@ t0 = min([t1 t2]);
 t0 = dateshift(t0,'start','year');
 
 %% integer indices to epochs
-i1 = floor(days(duration(t1-t0)))
-i2 = floor(days(duration(t2-t0)))
+i1 = floor(days(duration(t1-t0)));
+i2 = floor(days(duration(t2-t0)));
 
-[iepochs,iuniq,juniq] = unique([i1 i2])
+[iepochs,iuniq,juniq] = unique([i1 i2]);
 %tepochs = iepochs/intconst;
 
 % Unique epochs in years
