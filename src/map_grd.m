@@ -45,10 +45,14 @@ end
 INFO = grdinfo3(grdfilename);
 
 %% if coordinates are in UTM meters, then plot in kilometers
-if contains(INFO.xname,'meters') == 1 || contains (INFO.yname,'meters') == 1
+if    contains(INFO.xname,'meters') == 1 ...
+   || strcmp (INFO.yname,'m') == 1 ...
+   || strcmp (INFO.yname,'m') == 1 
     lengthfact = 1.e3; % plot in km
-    xlab = strrep(INFO.xname,'in meters','[km]');
-    ylab = strrep(INFO.yname,'in meters','[km]');   
+%     xlab = strrep(INFO.xname,'in meters','[km]');
+%     ylab = strrep(INFO.yname,'in meters','[km]');   
+    xlab = 'Easting [km]';
+    ylab = 'Northing [km]';   
 else
     lengthfact = 1; % no scaling
     xlab = INFO.xname;
@@ -64,7 +68,8 @@ figure; hold on;
 % clim = [-cmaxabs,+cmaxabs];
 
 %% set up a colortable
-clim = [nanmin(colvec(IMAGE)),nanmax(colvec(IMAGE))];
+%clim = [nanmin(colvec(IMAGE)),nanmax(colvec(IMAGE))];
+clim = [quantile(colvec(IMAGE),0.05),quantile(colvec(IMAGE),0.95)];
 if abs(clim(1)-clim(2)) <= eps
     warning('mininum and maximum values are equal');
     %clim(1) = clim(1) - 0.1*abs(clim(1));

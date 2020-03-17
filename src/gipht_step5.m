@@ -863,25 +863,26 @@ for i = 1:np
         , uns, mds, urs, ucs...
         , omr, omx, omy, omz...
         , umr, umx, umy, umz...
-        , demx,demy);
+        , demx,demy ...
+        , OPT.demdescfile, idatatype1);
     
     % set limits of color table
     switch idatatype1 %%TODO handle a different data type for each pair
         case 0
             climit=[-0.5, +0.5];
+            if bitget(figopt,1) == 1
+                
+                ctab = cmapblackzero(1); % black at zero at bottom of color bar
+            else
+                ctab = colormap('jet');
+            end
         otherwise
-            climit(1) = nanmin(nanmin([imA imB imC imD imE imF imG imH])); 
-            climit(2) = nanmax(nanmax([imA imB imC imD imE imF imG imH]));
+            climit(1) = nanmin(colvec([imA imB imC imD imE imF imG imH]));
+            climit(2) = nanmax(colvec([imA imB imC imD imE imF imG imH]));
+            ctab = cmapgraynan;
     end
     
     % set color table
-    if bitget(figopt,1) == 1
-        % show missing pixels as black
-        %ctab = cmapblackzero; % black at zero in middle
-        ctab = cmapblackzero(1); % black at zero at bottom of color bar
-    else
-        ctab = colormap('jet');
-    end
         
 %% get centroid of Okada source
 %     xcentroid = p1(get_parameter_index('Okada1_Centroid_Easting_in_m____',qnames));
@@ -913,6 +914,18 @@ for i = 1:np
         marksizes(ii) = marksize;
     end
     
+    %% set limits of color table
+    switch idatatype1 %%TODO handle a different data type for each pair
+        case 0
+            climit=[-0.5, +0.5];
+        otherwise
+%             climit(1) = nanmin(nanmin([imA imF imG imH])); 
+%             climit(2) = nanmax(nanmax([imA imF imG imH]));
+            climit(1) = quantile(colvec([imA imF imG imH]),0.05); 
+            climit(2) = quantile(colvec([imA imF imG imH]),0.95);
+    end
+
+    
     %% make 8-panel plot in portrait
     nf=nf+1; h(nf)=utmimage8(imA,imB,imC,imD,imE,imF,imG,imH...
         ,tlA,tlB,tlC,tlD,tlE,tlF,tlG,tlH...
@@ -932,14 +945,6 @@ for i = 1:np
     feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
     tlA = ''; tlF = '';
     datelabel = '';
-        % set limits of color table
-    switch idatatype1 %%TODO handle a different data type for each pair
-        case 0
-            climit=[-0.5, +0.5];
-        otherwise
-            climit(1) = nanmin(nanmin([imA imF imG imH])); 
-            climit(2) = nanmax(nanmax([imA imF imG imH]));
-    end
  
     nf=nf+1; h(nf)=utmimage4(imA,imF,imG,imH ...
         ,tlA,tlF,tlG,tlH ...
