@@ -49,7 +49,7 @@ narginchk(2, 2);
 nargoutchk(4, 6);
 
 if nargin == 2
-    dispflag = 1;
+    dispflag = 0;
 end% 
 
 if dispflag == 1

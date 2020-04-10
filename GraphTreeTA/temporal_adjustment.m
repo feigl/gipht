@@ -92,7 +92,7 @@ if max(tbreaks) > max(tu)
 end
 
 %% find components
-dispflag = 1;
+dispflag = 0;
 [trees, Q] = findtrees(tm,ts,dispflag); % find components and edge-vertex incidence matrix
 [ntrees,ndummy] = size(trees); % find number of components
 pairs = pairlist(Q); % store indices of epochs in pairs
