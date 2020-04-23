@@ -17,17 +17,21 @@ function [V] = incidence_to_cov(Q, dsig)
 % Elena C. Baluyut, UW-Madison
 % 2014-09-17
 
+
 % Build Laplacian from incidence matrix**
-L = Q*Q'; %edge Laplacian in terms of pair relationships
+L = Q*Q'; %edge Laplacian in terms of pair relationships - square
+
 
 % Build Correlation Matrix
 De = incidence_to_degree(Q'); %Degree in terms of pair relationships (transpose of current DD) M'
 
 corr = inv(sqrt(De))*L*inv(sqrt(De)); %theory reference: Merris, R. (1994) "Laplacian Matrices of Graphs: A Survey"
 
+
 % Find Covariance Matrix
 V = diag(dsig)*corr*diag(dsig);
 
 return
+end
 
 

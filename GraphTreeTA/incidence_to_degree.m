@@ -14,8 +14,16 @@ function [De] = incidence_to_degree(Q)
 %
 % Elena C. Baluyut, UW-Madison
 % 2014-08-27
+% 20200421 Kurt Feigl
 
-De = diag(sum(abs(Q)));
+%     help sum
+%     S = sum(X) is the sum of the elements of the vector X. If X is a matrix,
+%     S is a row vector with the sum over each column. 
+% original, should sum by columns
+%De = diag(sum(abs(Q)));
+% 20200421 sum by columns, explicitly
+De = diag(sum(abs(Q),1));
 
 return
+end
 

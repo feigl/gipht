@@ -1,5 +1,5 @@
-function [pest, psig, mse, dmod, tfit, pfit, sfitl, sfitu, rd, V, G, sswr, Vx, var, res_n] = temporal_adjustment(data,data_sigma,tm,ts,tbreaks,tfunc,metaparams)
-% function [pest, psig, mse, dmod, tfit, pfit, sfitl, sfitu, rd, V, G, sswr, Vx, var] = temporal_adjustment(data,data_sigma,tm,ts,tbreaks,tfunc,metaparams)
+function [pest, psig, mse, dmod, tfit, pfit, sfitl, sfitu, rd, V, G, sswr, Vx, var, res_n] = temporal_adjustment(data,data_sigma,tm,ts,tbreaks,tfunc,metaparams,verbose)
+%function [pest, psig, mse, dmod, tfit, pfit, sfitl, sfitu, rd, V, G, sswr, Vx, var, res_n] = temporal_adjustment(data,data_sigma,tm,ts,tbreaks,tfunc,metaparams,verbose)
 % Given time tags and data values, perform temporal adjustment. Solve the weighted least squares
 % problem Gm = d, where G is the design matrix, d is the data vector
 % (Qdiff), and m is the unknown parameter vector.  When m is not
@@ -53,11 +53,23 @@ function [pest, psig, mse, dmod, tfit, pfit, sfitl, sfitu, rd, V, G, sswr, Vx, v
 % Elena Baluyut and Kurt Feigl University of Wisconsin-Madison
 
 %% Initialize 
-fprintf(1,'%s begins ...\n',mfilename);
+
+
+narginchk(7,8);
+nargoutchk(14,15);
 
 % Set metaparams if not defined
 if exist('metaparams','var') == 0
     metaparams = nan;
+end
+
+% Set verbose if not defined
+if exist('verbose','var') == 0
+    verbose = 1;
+end
+
+if verbose == 1
+    fprintf(1,'%s begins ...\n',mfilename);
 end
 
 % Check for proper inversion function
@@ -81,9 +93,12 @@ ts = colvec(ts); % slave epoch
 tu = colvec(sort(unique([tm; ts]))); % unique set of epochs
 me = numel(tu);  % number of epochs
 
-fprintf(1,'Number of unique epochs me = %d\n',me);
+if verbose
+    fprintf(1,'Number of unique epochs me = %d\n',me);
+end
 
-if  min(tbreaks) <  min(tu)
+if  nanmin(tbreaks) <  nanmin(tu)
+    
     error('min(tbreaks) before first observation');
 end
 
@@ -94,8 +109,7 @@ if max(tbreaks) > max(tu)
 end
 
 %% find components
-dispflag = 1;
-[trees, Q] = findtrees(tm,ts,dispflag); % find components and edge-vertex incidence matrix
+[trees, Q] = findtrees(tm,ts,verbose); % find components and edge-vertex incidence matrix
 [ntrees,ndummy] = size(trees); % find number of components
 pairs = pairlist(Q); % store indices of epochs in pairs
  
@@ -109,15 +123,16 @@ data0 = data;
 tbreaks = colvec(sort(unique(tbreaks)));
 
 %Print reference epochs
-fprintf(1,'i,tbreaks(i)\n');
-for i=1:numel(tbreaks)
-    fprintf(1,'%d %12.5f\n',i,tbreaks(i));
+if verbose == 1
+    fprintf(1,'i,tbreaks(i)\n');
+    for i=1:numel(tbreaks)
+        fprintf(1,'%d %12.5f\n',i,tbreaks(i));
+    end
 end
 
-%% Check number of components for PWL, switch parameterizations if necessary 
-
+%% Check number of components for PWL
 if strcmp(tfunc, 'pwl') == 1 && ntrees > 1
-    warning('More than one distinct component (rank deficiency greater than 2. Switching to rate parameterization outlined by Berardino et al. (2002)')
+    error('More than one distinct component (rank deficiency greater than 2.\n Consider changing tfunc to rate parameterization outlined by Berardino et al. (2002)\n')
 end
 
 %% Build design matrix G
@@ -136,10 +151,19 @@ elseif strcmp(tfunc, 'ber') == 1
     [ G ] = ber_mat( Q, tu);
     mparams = me-1;
 else
+    switch tfunc
+        case {'nseg0','forge'} % need t2nd for these time functions         
+            t2nd = nanmin([tm; ts]);
+        otherwise
+            t2nd = nan;
+    end
     %For all other cases, use temporal adjustment
     % get number of parameters from temporal function
-    disp('number of parameters')
-    mparams = numel(time_function(tfunc, min([tm; tu]), tbreaks, metaparams));
+    %mparams = numel(time_function(tfunc, min([tm; tu]), tbreaks, metaparams));
+    mparams = numel(time_function(tfunc, nanmin(tu), tbreaks, metaparams, t2nd));
+    if verbose == 1
+        fprintf(1,'number of parameters mparams = %d\n',mparams);
+    end
     
     % Set up design matrix G
     G = zeros(ndat,mparams);
@@ -152,26 +176,55 @@ else
     end
 
     % Build design matrix G from temporal function
-    for i=1:ndat
-        tfm = time_function(tfunc, tm(i), tbreaks, metaparams); % time function for master
-        tfs = time_function(tfunc, ts(i), tbreaks, metaparams); % time function for slave
-        for j=1:mparams
-            G(i,j) = tfs(j)-tfm(j); % time function for pair
-        end
-    end % loop over data
-    
+    switch tfunc
+        case {'nseg0','forge'} % need t2nd for these time functions          
+            for i=1:ndat
+                t2nd = ts(i);
+                tfm = time_function(tfunc, tm(i), tbreaks, metaparams,t2nd); % time function for master
+                tfs = time_function(tfunc, ts(i), tbreaks, metaparams,t2nd); % time function for slave
+                for j=1:mparams
+                    G(i,j) = tfs(j)-tfm(j); % time function for pair
+                end
+            end % loop over data
+        otherwise
+            for i=1:ndat
+                tfm = time_function(tfunc, tm(i), tbreaks, metaparams); % time function for master
+                tfs = time_function(tfunc, ts(i), tbreaks, metaparams); % time function for slave
+                for j=1:mparams
+                    G(i,j) = tfs(j)-tfm(j); % time function for pair
+                end
+            end % loop over data
+    end
 end
 
 %% Print Data Summary
-% fprintf(1,'i,  data(i),  dsig(i)\n');
-% for i = 1:numel(data)
-%     fprintf (1,'%5d %12.4f %12.4f \n',i,data(i),dsig(i));
-% end
+if verbose == 1
+    fprintf(1,'i,  data(i),  dsig(i)\n');
+    for i = 1:numel(data)
+        fprintf (1,'%5d %12.4f %12.4f \n',i,data(i),dsig(i));
+    end
+end
 
-disp 'Length of data vector, excluding constraints';ndat
-disp 'Dimensons of design matrix, including constraints';nm = size(G)
-disp 'Rank of G'; rank(G)
-disp 'Rank defiency, including constraints'; rd = mparams - rank(G)
+nm = size(G);
+rd = mparams - rank(G);
+rankG  = rank(G);
+if verbose == 1
+    fprintf(1,'Length of data vector, excluding constraints %d\n',ndat);
+    fprintf(1,'Dimensons of design matrix, including constraints: %d by %d\n',nm(1),nm(2));
+    fprintf(1,'Rank of G = %d\n',rankG);
+    fprintf(1,'Rank defiency, including constraints %d\n',rd);
+end
+
+if verbose == 1
+    G
+    figure;
+    spy(G);
+    xlabel('column');ylabel('row');
+    title(sprintf('G matrix for %s has ndat = %d rows and mparams = %d columns'...
+        ,strrep(mfilename,'_',' '),ndat,mparams));
+end
+
+
 if rd > 0
     if ntrees > 1
         warning(sprintf('Number of trees (%d) is greater than 1.\n',ntrees));
@@ -179,17 +232,15 @@ if rd > 0
             warning('Performing temporal adjustment with more than one tree can lead to oscillatory solution');
         end
     end
-    figure;spy(G);hold on;
-    xlabel('column');ylabel('row');
-    title(sprintf('G matrix for %s has ndat = %d rows and mparams = %d columns'...
-        ,strrep(mfilename,'_',' '),ndat,mparams));
-    
-    fprintf(1,'Consider reducing the number of tbreaks.\n');
-    warning('Rank defiency persists!');
+    if verbose == 1
+        fprintf(1,'In %s, rank defiency persists! Consider reducing the number of tbreaks.\n',mfilename);
+    end
 end
 
 %% Initialize Least Squares
-disp 'Begin least squares adjustment...'
+if verbose == 1
+    fprintf(1,'Begin least squares adjustment...\n');
+end
 
 %    ls_with_cov assumes that the covariance matrix of B is known only up to a
 %    scale factor.  MSE is an estimate of that unknown scale factor, and
@@ -198,7 +249,8 @@ disp 'Begin least squares adjustment...'
 %    unnecessary.  To get the appropriate estimates in this case, you should
 %    rescale S and STDX by 1/MSE and sqrt(1/MSE), respectively.
 
-if ndat < 2    pest(1) = 0;  % arbitrarily make first epoch the origin
+if ndat < 2    
+    pest(1) = 0;  % arbitrarily make first epoch the origin
     pest(2) = data(1);
     psig(1) = 0;
     psig(2) = dsig(1);
@@ -229,14 +281,16 @@ else %continue with inversion
     [ pest, psig, mse, Vx, index] = lsqr_tikh( G, V, B, L2, beta_range);  
   
   else   % All other parameterizations     
-      [pest, psig, mse, Vx,] = ls_with_cov(A, B, V);
+     [pest, psig, mse, Vx] = ls_with_cov(A, B, V);
   end
   
-   % display results
-  fprintf(1,'i,pest(i), psig(i)\n');
-    for i=1:mparams
-        fprintf (1,'%5d %#12.4e %#12.4e\n',i,pest(i),psig(i));
-    end
+  % display results
+  if verbose == 1
+      fprintf(1,'i,pest(i), psig(i)\n');
+      for i=1:mparams
+          fprintf (1,'%5d %#12.4e %#12.4e\n',i,pest(i),psig(i));
+      end
+  end
     
     
  %% Interpolate results to find displacement per epoch 
@@ -276,8 +330,15 @@ else %continue with inversion
         pfit = zeros(size(tfit));
         sfitl = zeros(size(tfit));
         sfitu = zeros(size(tfit));
+        switch tfunc
+            case {'nseg0','forge'} % need t2nd for these time functions
+                t2nd = nanmin(tu);
+            otherwise
+                t2nd = nan;
+        end       
         for i=1:numel(tfit)
-            tf = time_function(tfunc, tfit(i),   tbreaks, metaparams); % find time value for given parameterization
+            %tf = time_function(tfunc, tfit(i),   tbreaks, metaparams); % find time value for given parameterization
+            tf = time_function(tfunc, tfit(i),   tbreaks, metaparams,t2nd); % find time value for given parameterization
             dm=0;
             dsl = 0;
             dsu = 0;
@@ -294,10 +355,11 @@ else %continue with inversion
 end
 
 %% Print results
-
-fprintf(1,   'index  dateM dateS observed modeled residual res/sigma\n');
-for i = 1:ndat
-    fprintf (1,'%5d %#12.4f %#12.4f %#12.4f %#12.4f %#12.4f %#12.4f %#10.4f\n',i,tm(i),ts(i),data(i),dmod(i),res(i),data_sigma(i),res(i)./data_sigma(i));
+if verbose == 1
+    fprintf(1,   'index  dateM dateS observed modeled residual res/sigma\n');
+    for i = 1:ndat
+        fprintf (1,'%5d %#12.4f %#12.4f %#12.4f %#12.4f %#12.4f %#12.4f %#10.4f\n',i,tm(i),ts(i),data(i),dmod(i),res(i),data_sigma(i),res(i)./data_sigma(i));
+    end
 end
 
 % calculate chi-squared ourselves
@@ -305,17 +367,20 @@ sswr = sum((res./dsig).^2)/numel(res);
 var=sum((res).^2)/(numel(res)-mparams);
 chisquare=sum((res./dsig).^2)/(numel(res));
 wvar=sum((res./dsig).^2)/(numel(res)-mparams);
-fprintf(1,'MSE,       mean standard error (or factor used to scale variance of estimated parameters) is %20.4f\n',mse);
-fprintf(1,'SSWR,      sum of squared weighted residuals                                              is %20.4f\n',sswr);
-fprintf(1,'sqrt(MSE), square root of MSE                                                             is %20.4f\n',sqrt(mse));
-fprintf(1,'sqrt(SSWR),square root SSWR                                                               is %20.4f\n',sqrt(sswr));
-fprintf(1,'var, Sample variance in units of data                                                     is %20.4e\n',var);
-fprintf(1,'sqrt(var), Sample standard deviation in units of data                                     is %20.4e\n',sqrt(var));
-fprintf(1,'chisquare, Chisquared                                                                     is %20.4f\n',chisquare);
-fprintf(1,'wvar, estimate of normalized sample variance                                              is %20.4f\n',wvar);
-if strcmp('ber_tikh', tfunc) == 1 
-fprintf(1,'index,     index of Tikhonov regularization parameter                                     is %20.4f\n',index);
-fprintf(1,'beta,      Tikhonov regularization parameter                                              is %20.4f\n',beta_range(index));
+
+if verbose == 1
+    fprintf(1,'MSE,       mean standard error (or factor used to scale variance of estimated parameters) is %20.4g\n',mse);
+    fprintf(1,'SSWR,      sum of squared weighted residuals                                              is %20.4g\n',sswr);
+    fprintf(1,'sqrt(MSE), square root of MSE                                                             is %20.4g\n',sqrt(mse));
+    fprintf(1,'sqrt(SSWR),square root SSWR                                                               is %20.4g\n',sqrt(sswr));
+    fprintf(1,'var, Sample variance in units of data                                                     is %20.4g\n',var);
+    fprintf(1,'sqrt(var), Sample standard deviation in units of data                                     is %20.4g\n',sqrt(var));
+    fprintf(1,'chisquare, Chisquared                                                                     is %20.4g\n',chisquare);
+    fprintf(1,'wvar, estimate of normalized sample variance                                              is %20.4g\n',wvar);
+    if strcmp('ber_tikh', tfunc) == 1
+        fprintf(1,'index,     index of Tikhonov regularization parameter                                     is %20.4g\n',index);
+        fprintf(1,'beta,      Tikhonov regularization parameter                                              is %20.4g\n',beta_range(index));
+    end
 end   
 return
 

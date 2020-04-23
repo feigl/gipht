@@ -1,4 +1,4 @@
-function [trees, Q, tepochs, iepochs, iuniqorbs, uniqdates] = findtrees(t0,t1,dispflag,imast,mdate,islav,sdate)
+function [trees, Q, tepochs, iepochs, iuniqorbs, uniqdates] = findtrees(t0,t1,verbose,imast,mdate,islav,sdate)
 % function [trees, Q, tepochs, iepochs, iuniqorbs, uniqdates] = findtrees(t0,t1,dispflag,imast,mdate,islav,sdate)
 % given pair-wise list of epochs t0 and t1, return a list of species
 % Previous Versions:
@@ -48,19 +48,19 @@ function [trees, Q, tepochs, iepochs, iuniqorbs, uniqdates] = findtrees(t0,t1,di
 %
 % Kurt L. Feigl, Elena C. Baluyut, UW-Madison 
 % 2015-02-09
+% 20200422 Kurt Feigl 
 
 
+narginchk(2,7);
+nargoutchk(2,6);
 
-nargchk(2,7,nargin);
-nargoutchk (4,6,nargout);
-
-if nargin == 2
-    dispflag = 1;
+if nargin < 2
+    verbose = 0;
 end% 
 
-if dispflag == 1
+if verbose == 1
     fprintf(1,'%s begins ...\n',mfilename);
-end;
+end
 
 % initialize values to return
 trees = NaN;
@@ -73,7 +73,7 @@ if length(t0) ~= length(t1)
 end
 
 np = length(t0);
-if dispflag == 1
+if verbose == 1
     disp 'number of pairs'
     np
 end
@@ -124,7 +124,7 @@ end
 me = length(iepochs);
 
 % Display values if desired
-if dispflag == 1
+if verbose == 1
     disp 'number of distinct epochs', me
     disp 'find differencing operator Q such that Q*epochs = pairs ...'
 end
@@ -146,7 +146,7 @@ rd = me - rank(Q);
 rd0 = rd;
 nspecies = rd;
 
-if dispflag == 1
+if verbose == 1
     disp 'Number of species'
     nspecies
 end

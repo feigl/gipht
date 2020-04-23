@@ -1,4 +1,4 @@
-function fixlabels(xlab,xfmt,ylab,yfmt)
+function fixlabels(xlab,xfmt,ylab,yfmt,xfontsize,yfontsize)
 %function h = fixlabels(xlabel,xfmt,ylabel,yfmt)
 % Print the same number of digits after the decimal point.
 %
@@ -17,9 +17,18 @@ function fixlabels(xlab,xfmt,ylab,yfmt)
 %       end
 %       set(gca,'XTickLabel',xticklabels2);
 
+narginchk(4,6);
+
+if exist('xfontsize','var') == 0
+    xfontsize = 10;
+end
+if exist('yfontsize','var') == 0
+    yfontsize = 10;
+end
+
 %if exist('xfmt','var')
 if numel(xfmt) > 0
-    xlabel(xlab,'FontName','Helvetica','Fontsize',10,'FontWeight','bold');
+    xlabel(xlab,'FontName','Helvetica','Fontsize',xfontsize,'FontWeight','bold');
     xticklabels=get(gca,'XTickLabel');
 %     xtickvals=str2num(xticklabels); % This returns only the mantissa, not the exponent
     xtickvals=get(gca,'XTick'); % 
@@ -36,14 +45,14 @@ if numel(xfmt) > 0
     %set(gca,'XTickLabelMode','manual');
     
     set(gca,'XTickLabel',xticklabels2);
-    set(gca,'FontName','Helvetica','Fontsize',10,'FontWeight','bold');
+    set(gca,'FontName','Helvetica','Fontsize',xfontsize,'FontWeight','bold');
 else
-    xlabel(xlab,'FontName','Helvetica','Fontsize',10,'FontWeight','bold','Interpreter','none');
+    xlabel(xlab,'FontName','Helvetica','Fontsize',xfontsize,'FontWeight','bold','Interpreter','none');
 end
 
 %if exist('yfmt','var')
 if numel(yfmt) > 0
-    ylabel(ylab,'FontName','Helvetica','Fontsize',10,'FontWeight','bold');
+    ylabel(ylab,'FontName','Helvetica','Fontsize',yfontsize,'FontWeight','bold');
     yticklabels=get(gca,'YTickLabel');
     %ytickvals=str2num(yticklabels) % This returns only the mantissa, not the exponent
     ytickvals  =get(gca,'YTick');
@@ -65,13 +74,13 @@ if numel(yfmt) > 0
     %set(gca,'YTickLabelMode','manual');
     yticklabels2 = char(yticklabels2);
     set(gca,'YTickLabel',yticklabels2);
-    set(gca,'FontName','Helvetica','Fontsize',10,'FontWeight','bold');
+    set(gca,'FontName','Helvetica','Fontsize',yfontsize,'FontWeight','bold');
 
     %h = gca;
 % else
 %     set(gca,'YTickLabelMode','auto');
 else
-    ylabel(ylab,'FontName','Helvetica','Fontsize',10,'FontWeight','bold','Interpreter','none');
+    ylabel(ylab,'FontName','Helvetica','Fontsize',yfontsize,'FontWeight','bold','Interpreter','none');
 end
 
 %h = gca;

@@ -18,26 +18,27 @@ function [x, sig, mse, Vx] = ls_with_cov(A, B, V)
 % Elena C. Baluyut, UW-Madison
 % 2014-9-19
 
-% Find weighting matrix    
- [S, rs] = pinveb(V); % calculates pseudoinverse similarly to pinv, but returns L-curve and rank
- % S = pinv(V);       % use when L-curve, etc. not needed
- 
+% Find weighting matrix
+[S, rs] = pinveb(V); % calculates pseudoinverse similarly to pinv, but returns L-curve and rank
+% S = pinv(V);       % use when L-curve, etc. not needed
+
 % Calculate least-squares estimator
- [Ga, rga] = pinveb(A'*S*A); % calculates pseudoinverse similarly to pinv, but returns L-curve and rank
-  if rga > 10e6
-     warning('nearly singular, consider reducing the number of parameters')
-  end
+[Ga, rga] = pinveb(A'*S*A); % calculates pseudoinverse similarly to pinv, but returns L-curve and rank
+if rga > 10e6
+    fprintf(1,'In %s Matrix is nearly singular (rga = %.4E), consider reducing the number of parameters\n,',mfilename,rga);
+end
 %  Ga = pinv(A'*S*A);        % use when L-curve, etc. not needed
- 
-    x = Ga*A'*S*B;
-  
+
+x = Ga*A'*S*B;
+
 % Calculate statistics
-    [n, m] = size(A);
-    dfe = n-m; % degrees of freedom
-    r = B - A*x; % residuals
-    mse = (r'*S*r)./ dfe; %mean squared error estimate from formula 9.64 in strang and borre (1997) pg 344
-    Vx = pinv(A'*S*A)*mse; % parameter covariance matrix
-    sig = sqrt(diag(pinv(A'*S*A)*mse)); % parameter uncertainty
-                         
+[n, m] = size(A);
+dfe = n-m; % degrees of freedom
+r = B - A*x; % residuals
+mse = (r'*S*r)./ dfe; %mean squared error estimate from formula 9.64 in strang and borre (1997) pg 344
+Vx = pinv(A'*S*A)*mse; % parameter covariance matrix
+sig = sqrt(diag(pinv(A'*S*A)*mse)); % parameter uncertainty
+
 return
+end
 

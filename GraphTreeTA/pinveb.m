@@ -27,7 +27,7 @@ function [ x, c, s] = pinveb(A, tol, index)
 [mtest ntest] = size(S);
 if ntest == 1
     s = S;
-    disp('test 1')
+%    disp('test 1')
 else
     s = diag(S); % store singular values in a vector
 end

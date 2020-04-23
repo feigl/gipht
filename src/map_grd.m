@@ -15,12 +15,18 @@ else
     return;
 end
 
+% second argument is color table
 if nargin >= 2
     cmap        = varargin{2};
 else
-    cmap = jet;
+    if contains(grdfilename,'amp') == true
+        cmap = gray;
+    else
+        cmap = jet;
+    end
 end
 
+% third argument is a structure
 if nargin >= 3
     if isstruct(varargin{3}) == 1
         plot_symbols = 1;
@@ -79,7 +85,13 @@ if abs(clim(1)-clim(2)) <= eps
 end
 
 %% draw the image
-imagesc(xe/lengthfact,ye/lengthfact,IMAGE,clim);
+%imagesc(xe/lengthfact,ye/lengthfact,IMAGE,clim);
+%pcolor(xe/lengthfact,ye/lengthfact,IMAGE);
+% set the transparency for values with NaN
+ALPHA=ones(size(IMAGE));
+ALPHA(isnan(IMAGE))=0.1;
+imagesc(xe/lengthfact,ye/lengthfact,IMAGE,'AlphaData',ALPHA);
+
 colormap(cmap);
 axis xy;
 axis equal;

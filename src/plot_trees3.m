@@ -1,5 +1,5 @@
-function Hfig = plot_trees(tepochs, scores, Qiev, itrees, xlab, ylab)
-%function Hfig = plot_trees(tepochs, scores, Qiev, trees,xlab, ylab)
+function Hfig = plot_trees3(tepochs, yvals, Qiev, itrees, xlab, ylab, titlestr)
+%function Hfig = plot_trees3(tepochs, yvals, Qiev, trees,xlab, ylab)
 %
 % plot graph 
 % for example pseudo-absolute Bperp as a function of time 
@@ -40,9 +40,9 @@ function Hfig = plot_trees(tepochs, scores, Qiev, itrees, xlab, ylab)
 % 2020-MAR-26 updated comments
 
 fidtxtout = fopen(sprintf('%sout.txt',mfilename),'a+t');
-for ifile = [1 fidtxtout]
-   fprintf(ifile,'%s begins at %s\n',mfilename,datestr(now,31));
-end
+% for ifile = [1 fidtxtout]
+%    fprintf(ifile,'%s begins at %s\n',mfilename,datestr(now,31));
+% end
 
 
 narginchk(4,8);
@@ -139,10 +139,10 @@ for i=1:np
    for j = 1:ntrees
       if sum(ismember(itrees(j,:),id0(i))) == 1 && sum(ismember(itrees(j,:),id1(i))) == 1  
          % draw symbol at vertices
-         plot([tepochs(id0(i)) tepochs(id1(i))],[scores(id0(i)) scores(id1(i))],mysym0{1+mod(j,length(mysym0))},'Linewidth',2,'MarkerFaceColor','k'); hold on;
+         plot([tepochs(id0(i)) tepochs(id1(i))],[yvals(id0(i)) yvals(id1(i))],mysym0{1+mod(j,length(mysym0))},'Linewidth',2,'MarkerFaceColor','k'); hold on;
          
          % draw dashed line on edges (pairs)  
-         plot([tepochs(id0(i)) tepochs(id1(i))],[scores(id0(i)) scores(id1(i))],mydash{1+mod(j,length(mydash))},'Linewidth',2,'MarkerFaceColor','k'); hold on;
+         plot([tepochs(id0(i)) tepochs(id1(i))],[yvals(id0(i)) yvals(id1(i))],mydash{1+mod(j,length(mydash))},'Linewidth',2,'MarkerFaceColor','k'); hold on;
       end
    end
 end
@@ -159,16 +159,16 @@ end
 % end
 
 % make title string
-titl = sprintf('np = %d me = %d ntrees = %d\n',np,me,ntrees);
+titl = strcat(titlestr,': ',sprintf('np = %d me = %d ntrees = %d\n',np,me,ntrees));
 
 title (titl,'FontName','Helvetica','Fontsize',14,'FontWeight','bold');
 xlabel(xlab,'FontName','Helvetica','Fontsize',14,'FontWeight','bold');
 ylabel(ylab,'FontName','Helvetica','Fontsize',14,'FontWeight','bold');
 set(gca,'FontName','Helvetica','Fontsize',14,'FontWeight','bold');
 
-for ifile = [1 fidtxtout]
-   fprintf(ifile,'%s ended at %s\n',mfilename,datestr(now,31));
-end
+% for ifile = [1 fidtxtout]
+%    fprintf(ifile,'%s ended at %s\n',mfilename,datestr(now,31));
+% end
 fclose(fidtxtout);
 
 % return graphics handle

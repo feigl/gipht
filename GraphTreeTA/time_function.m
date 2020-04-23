@@ -1,5 +1,5 @@
-function ft = time_function(tfunc, ti, tbreaks, metaparams)
-%function ft = time_function8(tfunc, ti, tbreaks, metaparams)
+function ft = time_function(tfunc, ti, tbreaks, metaparams,t2nd)
+%function ft = time_function8(tfunc, ti, tbreaks, metaparams,tnd)
 % return value of time function f(t) at ti
 %
 %    inputs:
@@ -65,8 +65,8 @@ function ft = time_function(tfunc, ti, tbreaks, metaparams)
 % UPDATES:
 % 2015-10-12 - add Okmok parameterization for modified exponential
 % okmokexp3, ECB 
-
-
+% 20200406 Kurt Feigl - add 'nseg0' code for piecewise linear with additive constant and then one rate for each interval
+% 20200422 Kurt Feigl - add t2nd to list of arguments to handle additive constant case
 
 %    If the persistent variable does not exist the first time you issue
 %     the persistent statement, it will be initialized to the empty matrix.
@@ -78,9 +78,21 @@ persistent nwarning
 %     nwarning = 0;
 % end
 
-if nargin ~= 4
-    error(sprintf('wrong number of arguments %d. Need 4\n',nargin));
+% if nargin < 4
+%     error(sprintf('wrong number of arguments %d. Need 4\n',nargin));
+% end
+narginchk(4,5);
+
+% Set metaparams if not defined
+if exist('t2nd','var') == 0
+    switch tfunc
+        case {'nseg0','forge'}
+            error(sprintf('Argument for second epoch t2nd is required for tfunc = %s\n',tfunc));
+        otherwise
+            t2nd = nan;
+    end
 end
+
 
 % Start of the time function, before this epoch, time function is 0
 tstart=metaparams(1);
@@ -130,6 +142,29 @@ if numel(tbreaks) > 0
                 end
             end
             
+       case {'nseg0'} % N SEGMENTS: Piece-wise linear with fewer breaks than epochs
+           % 20200422 include additive constant as first parameter
+            mparams = numel(tbreaks); % number of intervals plus one
+            ft = zeros(mparams,1);
+            % additive constant for 1st ("master") epoch earlier than 2nd ("slave") epoch 
+            jj = jj+1;        
+            if ti >= tstart && ti < t2nd
+                ft(jj) = -1.0; 
+            end
+            % add time intervals
+            for j=1:numel(tbreaks)-1
+                jj = jj+1;
+                if ti >= tbreaks(j)  % interferogram starts during interval
+                    %                    ft(jj) = ti - tbreaks(j);
+                    if ti < tbreaks(j+1)            % and ends during interval
+                        ft(jj) = ti - tbreaks(j);
+                    elseif ti >= tbreaks(j+1)        % and ends after interval
+                        ft(jj) = tbreaks(j+1) - tbreaks(j);
+                    end
+                else
+                    ft(jj) = 0;
+                end
+            end          
         case {'pwl', 'ber', 'ber_tikh'} % PIECEWISE LINEAR: options of Berardino and Tikhonov regularization
             mparams = numel(tbreaks)-1; % number of intervals
             ft = zeros(mparams,1);
@@ -207,7 +242,7 @@ if numel(tbreaks) > 0
             % tstart is zero crossing
             dt = ti - tstart;
             ft(jj) = sin(2*pi*dt/metaparams(2)); % sinusoidal with period in years
-        case {'okmokexp3'} % 2 exprdecay with parameterizations with secular rate in between. For Okmok test case. Example of combining time functions.
+         case {'okmokexp3'} % 2 exprdecay with parameterizations with secular rate in between. For Okmok test case. Example of combining time functions.
             jj=2;
             mparams = 2;
             ft = zeros(mparams,1);
@@ -263,9 +298,39 @@ if numel(tbreaks) > 0
                 ft(1) = 0;
                 ft(2) = 0;
                 ft(3) = 0;
+            end           
+        case {'forge'} % sinusoidal with period in years plus rate plus additive constant
+            mparams = 0;
+            mparams = mparams + 1;  % additive constant
+            mparams = mparams + 1;  % sinusodal term       
+            mparams = mparams + numel(tbreaks)-1; % number of intervals          
+            ft = zeros(mparams,1);  
+            
+           % additive constant for 1st ("master") epoch earlier than 2nd ("slave") epoch 
+            jj = jj+1;  
+            if ti >= tstart && ti < t2nd
+                ft(jj) = -1.0; 
             end
+                           
+            % sinusoidal with period in years          
+            dt = ti - tstart; % tstart is zero crossing
+            jj = jj+1; 
+            ft(jj) = sin(2*pi*dt/metaparams(2)); 
             
-            
+            % One rate per interval
+            for j=1:numel(tbreaks)-1
+                jj = jj+1;
+                if ti >= tbreaks(j)  % interferogram starts during interval
+                    %                    ft(jj) = ti - tbreaks(j);
+                    if ti < tbreaks(j+1)            % and ends during interval
+                        ft(jj) = ti - tbreaks(j);
+                    elseif ti >= tbreaks(j+1)        % and ends after interval
+                        ft(jj) = tbreaks(j+1) - tbreaks(j);
+                    end
+                else
+                    ft(jj) = 0;
+                end
+            end                       
         otherwise
             error(sprintf('undefined tfunc %s',tfunc));
     end
