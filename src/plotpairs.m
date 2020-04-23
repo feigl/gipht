@@ -143,12 +143,12 @@ axis manual
 % set(gca,'YLimMode','auto');
 box on
 
-set(gca,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','Xcolor','k','Ycolor','k');
-title(titlestring,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','HorizontalAlignment','Center'...
+set(gca,'FontName','Helvetica','Fontsize',10,'FontWeight','bold','Xcolor','k','Ycolor','k');
+title(titlestring,'FontName','Helvetica','Fontsize',10,'FontWeight','bold','HorizontalAlignment','Center'...
     ,'interpreter','none');
 % xlabel(xlab,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','color','k');
 % ylabel(ylab,'FontName','Helvetica','Fontsize',12,'FontWeight','bold','color','k');
-fixlabels(xlab,'%.1f',ylab,'%.0f',12,12);
+fixlabels(xlab,'%.1f',ylab,'%.0f',10,10);
 
 return
 
