@@ -112,7 +112,10 @@ set(handle,'PaperSize',Position(3:4));
 % Save the pdf (this is the same method used by "saveas")
 %print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi));
 % fill the page?
-print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi),'-fillpage');
+%print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi),'-fillpage');
+% make vector graphics look better on linux computers
+%https://www.mathworks.com/help/matlab/ref/print.html#bukyb6e-1-renderer
+print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi),'-fillpage','-painters');
 
 
 % % Restore the previous settings
