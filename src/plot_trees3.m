@@ -1,5 +1,5 @@
-function Hfig = plot_trees3(tepochs, yvals, Qiev, itrees, xlab, ylab, titlestr)
-%function Hfig = plot_trees3(tepochs, yvals, Qiev, trees,xlab, ylab)
+function plot_trees3(tepochs, yvals, Qiev, itrees, xlab, ylab, titlestr)
+%function plot_trees3(tepochs, yvals, Qiev, trees,xlab, ylab)
 %
 % plot graph 
 % for example pseudo-absolute Bperp as a function of time 
@@ -38,8 +38,9 @@ function Hfig = plot_trees3(tepochs, yvals, Qiev, itrees, xlab, ylab, titlestr)
 % 2008-MAR-29 correct annoying bug
 % 2014-JUL-06 include ylab as input
 % 2020-MAR-26 updated comments
+% 2020-APR-24 do not return graphics handle
 
-fidtxtout = fopen(sprintf('%sout.txt',mfilename),'a+t');
+fidtxtout = fopen(sprintf('%s_out.txt',mfilename),'a+t');
 % for ifile = [1 fidtxtout]
 %    fprintf(ifile,'%s begins at %s\n',mfilename,datestr(now,31));
 % end
@@ -49,7 +50,7 @@ narginchk(4,8);
 if nargin <= 6
    plotts = 0;
 end
-nargoutchk (1,1,nargout);
+nargoutchk(0,0);
 
 if exist('xlab','var') == 0
     xlab = 'year';
@@ -171,8 +172,8 @@ set(gca,'FontName','Helvetica','Fontsize',14,'FontWeight','bold');
 % end
 fclose(fidtxtout);
 
-% return graphics handle
-Hfig = gcf;
+% % return graphics handle
+% Hfig = gcf;
 return;
 end
 

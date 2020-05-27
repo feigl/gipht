@@ -1,8 +1,9 @@
-function h1 = plotpairs(tm,ts,Ydobs,Ydsig,Ydmod ...
+function plotpairs(tm,ts,Ydobs,Ydsig,Ydmod ...
 , tfit,Ydfit,Yfsigl,Yfsigu ...
 , xlab,ylab,titlestring,tbreaks, ref_pts, relative_dates ...
-, xaxislims, yaxislims)
-% function h1 = plotpairs5(tm,ts,Ydiff,Ydsig,Ydmod,pairnames ...
+, xaxislims, yaxislims ...
+, showfig)
+% function plotpairs5(tm,ts,Ydiff,Ydsig,Ydmod,pairnames ...
 % , tfit,Ydfit,Yfsig ...
 % , xlab,ylab,titlestring,tbreaks)
 % 
@@ -31,11 +32,12 @@ function h1 = plotpairs(tm,ts,Ydobs,Ydsig,Ydmod ...
 %   2014-07-15 add tbreaks
 %   2015-07-27 add options for fit (ref_pts);  Elena C. Baluyut, UW-Madison
 %   2018-01-15 add option for relative_dates
-%   2020-04-23 make green line thicker 
+%   2020-04-23 make green line thicker
+%   2020-04-24 do not return graphics handle
 
 
 %% Read arguments
-error(nargchk(12,17,nargin)); % incorrect number of input arguments
+narginchk(12,18); % count input arguments
 
 if nargin < 14
     ref_pts = 'mid'; % default to plotting along midpoint of pairs
@@ -72,10 +74,21 @@ if nargin < 17
     yaxislims = [-Inf, +Inf];
 end
 
+if nargin < 18
+    showfig = 1;
+end
+
 
 %% Start figure
-h1 = figure('color','w'); hold on; 
+if showfig == 1
+    h1 = figure('color','w');
+else
+    % do not show
+    h1 = figure('visible','off');
+end
+
 set(h1,'DefaultTextInterpreter','tex'); % or 'none'
+hold on; 
 
 if isreal(Yfsigl) == 0 || isreal(Yfsigu) == 0
     Yfsigl 

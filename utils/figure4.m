@@ -1,8 +1,16 @@
-function nf = figure4(nf)
-%function H = figure4(nf)
+function nf = figure4(nf,name_str)
+%function H = figure4(titlestr,nf)
 % open a square figure window in a quadrant of the full screen
 % Based on https://www.mathworks.com/matlabcentral/answers/141266-plotting-two-figures-side-by-side
 % 20200504 Kurt Feigl
+
+
+if exist('nf','var') == 0
+    nf=1;
+end
+if exist('name_str','var') == 0
+    name_str = sprintf('Figure %d',nf);
+end
 
 % get the size of the screen
 %screensize = get(0, 'ScreenSize' )
@@ -43,7 +51,7 @@ switch iquad
         position(2) = screensize(2);
 end
 %position
-H=figure(nf);
+H=figure('name',name_str,'ToolBar','none');
 %
 set(H,'OuterPosition',position);
 return
