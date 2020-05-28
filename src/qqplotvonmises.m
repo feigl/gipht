@@ -1,13 +1,25 @@
-%function qqplotvonmises(data,titlestring)
+function [Sm, teststring1, U2, teststring2] = qqplotvonmises(data,titlestring)
+%function [Sm, teststring1, U2, teststring2] = qqplotvonmises(data,titlestring)
 %
 % Produces a QQ plot of the data using Von Mises Distribution 
 % input angular data should be in cycles in the range [-1/2, +1/2]
 %
-% Kurt Feigl
-% last modified 2008-MAR-30
+% rr=wrapToPi(randn(1000,1))/pi - 0.5;
+% qqplotvonmises(rr,'wrapped normal')
+% 
+% 2008-MAR-30 Kurt Feigl
+% 2020-MAY-28 Cleaned up
 
- function [Sm, teststring1, U2, teststring2] = qqplotvonmises(data,titlestring)
+narginchk(0,2);
+nargoutchk(0,4);
 
+if nargin == 0
+    help(sprintf('%s',mfilename));
+    return;
+end
+if nargin < 2
+    titlestring = mfilename;
+end
 % number of data points
 n=length(data);
 
@@ -75,7 +87,7 @@ axis square
 axis ([-0.5 0.5 -0.5 0.5]);
 set(gca,'XTick',[-0.5:0.1:0.5]);
 set(gca,'YTick',[-0.5:0.1:0.5]);
-set(gca,'FontName','Helvetica','Fontsize',14,'FontWeight','bold');
+set(gca,'FontName','Helvetica','Fontsize',12,'FontWeight','bold');
 
  
 % Plot the theoretical line for the given md and kappa
@@ -95,14 +107,12 @@ plot([-0.5 +0.5],[0 0],'k--');
 xlabel('von Mises quantiles','FontName','Helvetica','Fontsize',14,'FontWeight','bold');
 ylabel('sample quantiles'   ,'FontName','Helvetica','Fontsize',14,'FontWeight','bold');
 % title(sprintf('DBL=%1d Mean.Dir = %.3f cy Cir.Std.Dev = %.3f cy Kappa = %.3f Rbar = %8.2f sigmastat = %.2f',dbl,md/pi/2,s0/pi/2,kappa,Rbar,sigmastat));
-statstring=sprintf(' DBL=%1d mu=%.3fcy d0=%.3fcy k=%.3f R=%.4f Sm=%.2f U2=%.4f'...
+statstring=sprintf('DBL=%1d mu=%.3fcy d0=%.3fcy k=%.3f R=%.4f Sm=%.2f U2=%.4f'...
    ,dbl,md/pi/2,d0/pi/2,kappa,Rbar,Sm,U2);
-if nargin < 3
-   title(statstring);
-else
-    title(strcat(titlestring, statstring));
-%    text(-0.48,1.15*max(Ncounts),statstr);
-end
+
+title(sprintf('%s\n%s\n%s\n%s',titlestring, statstring, teststring1, teststring2)...
+    ,'FontName','Helvetica','Fontsize',9,'FontWeight','normal');
+
 
 return
 

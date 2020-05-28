@@ -67,7 +67,7 @@ end
 % sample size
 n = numel(theta);
 if n < 50
-    teststring = sprintf('sample size n (%d) is too small. Need n greater than 50\n',n);
+    teststring = sprintf('sample size n (%d) is too small. Need n greater than 50.',n);
     warning(teststring);
     return
 end
@@ -147,9 +147,9 @@ end
    
 
 if U2 < crit
-   teststring = sprintf('Data ARE compatible with Von Mises distribution because U2 = %g is less than critical value %10.4f\n',U2,crit);
+   teststring = sprintf('Data ARE compatible with Von Mises distribution because U2 = %g is less than critical value %10.4f',U2,crit);
 else
-   teststring = sprintf('Data are NOT compatible with Von Mises distribution because U2 = %g is greater than critical value %10.4f\n',U2,crit);
+   teststring = sprintf('Data are NOT compatible with Von Mises distribution because U2 = %g is greater than critical value %10.4f',U2,crit);
 end
 
 if nargout < 2

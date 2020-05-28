@@ -125,9 +125,9 @@ end
 
 
 if S < Scrit95
-   teststring = sprintf('Data ARE compatible with Von Mises distribution because S = %g is less than critical Chi^2(2,0.05) = %g . (P = %8.2e)\n',S,Scrit95,P);
+   teststring = sprintf('Data ARE compatible with Von Mises distribution because S = %g is less than critical Chi^2(2,0.05) = %g . (P = %8.2e)',S,Scrit95,P);
 else
-   teststring = sprintf('Data are NOT compatible with Von Mises distribution because S = %g is greater than critical Chi^2(2,0.05)  = %g . (P = %8.2e)\n',S,Scrit95,P);
+   teststring = sprintf('Data are NOT compatible with Von Mises distribution because S = %g is greater than critical Chi^2(2,0.05)  = %g . (P = %8.2e)',S,Scrit95,P);
 end
 
 if nargout < 2
