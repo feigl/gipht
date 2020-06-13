@@ -43,15 +43,16 @@ if verbose == 1
             Merror
             value1 = nan;
         end
-        try
-            unit1 = model.param.evaluateUnit((sprintf('%s',parameterNames(i))));
-        catch Merror
-            Merror
-            unit1 = nan;
-        end
-        
-        fprintf(1,'%3d %-32s %10.4G [%s]\n',i,parameterNames(i),value1,unit1)
-    end
+        fprintf(1,'%3d %-32s %10.4G\n',i,parameterNames(i),value1)
+%         try
+%             unit1 = model.param.evaluateUnit((sprintf('%s',parameterNames(i))));
+%         catch Merror
+%             Merror
+%             unit1 = nan;
+%         end
+%         
+%         fprintf(1,'%3d %-32s %10.4G [%s]\n',i,parameterNames(i),value1,unit1)
+     end
 end
 
 % get numerical values
@@ -70,13 +71,14 @@ for i = 1:mParameters
     descr1 = char(model.param.descr(param_names(i)));
     descrs{i} = sprintf('%s',char(descr1));
     
-    % units
-    try
-        unit1 = char(model.param.evaluateUnit((sprintf('%s',parameterNames(i)))));
-    catch Mexcept
-        Mexcept
-        unit1 = '';
-    end
+%     % units
+%     try
+%         unit1 = char(model.param.evaluateUnit((sprintf('%s',parameterNames(i)))));
+%     catch Mexcept
+%         Mexcept
+%         unit1 = '';
+%     end
+    unit1 = 'NaN';
 
     % handle dimensionless quantities
     if strcmp(unit1,'1') == 1 || numel(unit1) == 0

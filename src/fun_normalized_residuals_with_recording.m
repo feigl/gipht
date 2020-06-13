@@ -27,9 +27,19 @@ else
     mparams = numel(PST.p1);
 end
 
-% for ip=1:mparams
-%     fprintf(1,'    Re-setting %d %-8s from %12.4e to %12.4e %s\n',ip,PST.name{ip},PST.p1(ip),params(ip),PST.description{ip});   
-% end
+if ncallcount == 0   
+    for ip=1:mparams
+        fprintf(1,' %-8s',PST.name{ip});
+    end
+    fprintf(1,'\n');
+else
+    for ip=1:mparams
+        %fprintf(1,'    Re-setting %d %-8s from %12.4e to %12.4e %s\n',ip,PST.name{ip},PST.p1(ip),params(ip),PST.description{ip});
+        %fprintf(1,'    Re-setting %d %-8s from %12.4e to %12.4e\n',ip,PST.name{ip},PST.p1(ip),params(ip));
+        fprintf(1,' %12.4e',params(ip));
+    end
+        fprintf(1,'\n');
+end
 
 % copy current value of parameters
 PST.p1=params;
@@ -45,7 +55,8 @@ end
 ndata = numel(DST.obs);
 
 % evaluate fitting function with current values of parameters, make column vector
-modeled = reshape(Hfitfun(PST,DST,TST),ndata,1);
+modeled = Hfitfun(PST,DST,TST);
+modeled = reshape(modeled,ndata,1);
 
 % calculate residual
 residual = DST.obs-modeled;

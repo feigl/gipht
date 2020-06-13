@@ -1,17 +1,24 @@
-function nreset = set_comsol_parameters2(model,PST)
+function nreset = set_comsol_parameters2(PST)
 % transfer PST.p1 of parameters from PST structure to MPH file
 % 20200611 Kurt Feigl
 
-narginchk(2,2);
+narginchk(1,1);
+
+%fprintf(1,'Entering %s\n',mfilename);
 
 mparams = numel(PST.p1);
 verbose = 1;
 nreset = 0;
 
-fprintf(1,'Entering %s\n',mfilename);
-PST.p1
+% extract model from structure
+model = PST.model;
 
-model = mphload(PST.fileNameMPH);
+% for i=1:mparams
+%     fprintf(1,'%10.4g ',PST.p1(i));
+% end
+% fprintf(1,'\n');
+
+%model = mphload(PST.fileNameMPH);
 
 for ip=1:mparams  % loop over indices to comsol parameters
     if isfinite(PST.p1(ip)) == 1
@@ -32,35 +39,17 @@ for ip=1:mparams  % loop over indices to comsol parameters
         
         
         if  db > eps
-            if verbose == 1
-                fprintf(1,'    Setting %d %-8s to %12.4e %s\n',ip,PST.name{ip},PST.p1(ip),PST.description{ip});
-            end
             %model.param.set('PRES', sprintf('%e[Pa]',PST.p1(ip)),descrs{ic});
-            model.param.set(sprintf('%s',PST.name{ip}),sprintf('%e[%s]',PST.p1(ip),PST.units{ip}),PST.description{ip});
+            pname1 = sprintf('%s',PST.name{ip});
+            unit1 = char(model.param.evaluateUnit(pname1));
+            desc1 = char(model.param.descr(pname1));
+            if verbose == 1
+                %fprintf(1,'    Setting %d %-8s to %12.4e %s\n',ip,PST.name{ip},PST.p1(ip),PST.description{ip});
+                fprintf(1,'    Setting %d %-8s to %12.4e [%s] %s\n',ip,pname1,PST.p1(ip),unit1,desc1);
+            end
+            model.param.set(pname1,sprintf('%e[%s]',PST.p1(ip),unit1),desc1);
             nreset = nreset + 1;
-        end
-        %     end
-        %
-        %
-        %         % % set Poisson's ratio
-        %         % %PST.NUP=0.2;
-        %         % if isfinite(PST.NUP)==1
-        %         %     model.param.set('NUP', sprintf('%e',PST.NUP),'Poissons Ratio');
-        %         % end
-        %         %
-        %         % % set Young's Modulus
-        %         % if isfinite(PST.EYM)==1
-        %         %     model.param.set('EYM', sprintf('%e[Pa]',PST.EYM), 'Youngs Modulus');
-        %         % end
-        %         %
-        %         % model.param.set('LENG', sprintf('%e[m]',PST.LENG), 'ellipsoid a axis');
-        %         % model.param.set('WIDTH', sprintf('%e[m]',PST.WIDTH), 'ellipsoid b axis');
-        %         % %model.param.set('PRES', sprintf('%e[Pa]',PST.PRES), 'pressure');
-        %
-        %         %end
-        %     end
-        % end
-        
+        end        
     end
 end   
     %     if verbose == 1
@@ -79,7 +68,7 @@ end
         %20150901 call function
     %   mphsave(model,char(mphname));
         % 20200612 call function, optimizing for speed
-        mphsave(model,PST.fileNameMPH,'optimize','speed');
+%        mphsave(model,PST.fileNameMPH,'optimize','speed');
     %
     %     if verbose == 1
     %         fprintf(1,'Finished task in %.1f seconds\n',toc(tstart));
