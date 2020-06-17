@@ -1,8 +1,9 @@
-function Tparams = get_comsol_parameters2(model,verbose)
+function Tparams = get_comsol_parameters2(fileNameMPH,verbose)
 %function Tparams = get_comsol_parameters(model,verbose)
 % given a comsol model object, return a table of parameters
 % 20200507 - supercedes version in gipht
 % return a table
+import com.comsol.model.util.*
 
 narginchk(0,2)
 nargoutchk(0,1);
@@ -15,10 +16,11 @@ if nargin < 2
     verbose = 1;
 end
 
+model = mphload(fileNameMPH);
 param_names = model.param.varnames;
 
 expr = mphgetexpressions(model.param);
-[mParameters,ncols] = size(expr)
+[mParameters,ncols] = size(expr);
 
 parameterNames = model.param.varnames;
 
@@ -71,14 +73,14 @@ for i = 1:mParameters
     descr1 = char(model.param.descr(param_names(i)));
     descrs{i} = sprintf('%s',char(descr1));
     
-%     % units
-%     try
-%         unit1 = char(model.param.evaluateUnit((sprintf('%s',parameterNames(i)))));
-%     catch Mexcept
-%         Mexcept
-%         unit1 = '';
-%     end
-    unit1 = 'NaN';
+    % units
+    try
+        unit1 = char(model.param.evaluateUnit((sprintf('%s',parameterNames(i)))));
+    catch Mexcept
+        Mexcept
+        unit1 = 'NaN';
+    end
+    
 
     % handle dimensionless quantities
     if strcmp(unit1,'1') == 1 || numel(unit1) == 0

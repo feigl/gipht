@@ -38,10 +38,10 @@ TBIG = readtable(fileNameBIG);
 
 % get the names of the variables
 varNames = TBIG.Properties.VariableNames
-[nTrials,nVariables] = size(TBIG);
+[nTrials,nVariables1] = size(TBIG);
 
 if nargin < 3
-    iCols = setdiff([1:nVariables]',iobjcolumn)
+    iCols = setdiff([1:nVariables1]',iobjcolumn)
 end
 
 % default is to take log10 of objective function
@@ -59,6 +59,14 @@ end
 ObjectiveVals = table2array(TBIG(:,iobjcolumn));
 [ObjectiveVals,iSort] = unique(ObjectiveVals,'sorted');
 TBIG = TBIG(iSort,:)
+[nUniqueTrials,nVariables2] = size(TBIG);
+if nVariables1 == nVariables2
+    nVariables = nVariables1;
+else
+    nVariables1
+    nVariables2
+    error('number of variables miscounted');
+end
 
 
 
@@ -109,8 +117,8 @@ obj68 = icdf('chi2',0.683,ndof) * ObjectiveVals(1)
 %% find the indices of values below threshold
 i68 = find(ObjectiveVals <= obj68);
 
-x68mins = nan(nVariables,1);
-x68maxs = nan(nVariables,1);
+x68mins = nan(nVariables1,1);
+x68maxs = nan(nVariables1,1);
 for i=iCols
     xvals = table2array(TBIG(:,i));
     x68min = nanmin(xvals(i68));
@@ -125,7 +133,7 @@ Toptimal = [Toptimal, table(x68maxs,'VariableNames',{'x68max'})];
 writetable(Toptimal,sprintf('%s_Toptimal_%s.csv',mfilename,datestr(now,30)));
 
 %% make grid of scatter plots
-if ismember(1,iSteps) == true
+if ismember(1,iSteps) == true && nUniqueTrials > 1
     nf=nf+1;figure;
     %corrplot(TBIG,'varNames',TBIG.Properties.VariableNames);
     [Rcorr,Pvalue,Handles] =corrplot(TBIG(:,iCols),'varNames',varNames(iCols));
