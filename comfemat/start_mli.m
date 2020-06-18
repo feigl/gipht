@@ -23,52 +23,59 @@ switch computer
             fprintf(1,'COMSOL mph server is not started. Trying to start...\n');
             [status0, output] = system('/Applications/COMSOL54/Multiphysics/bin/comsol mphserver &')
         end
-    case 'GLNXA64'
-        % kill -9 `ps aux | grep comsol | awk '{print $2}'`
+    case 'GLNXA64'       
+        hostname = getenv('HOSTNAME');
+        switch hostname
+            case 'porotomo.geology.wisc.edu'
+                %[status0, output] = system('/usr/local/comsol54/bin/comsol mphserver &');
+                sysstr = 'module load comsol54; comsol mphserver &';
+                mlipath = '/usr/local/comsol54/mli';
+            otherwise
+                hostname
+                error('Unknown hostname');
+        end
         [status0, output] = system('pgrep -f mphserver')
         pid = str2num(output);
         if status0 == 0 && numel(find(isfinite(pid) == true)) > 0
             fprintf(1,'COMSOL mph server is started.\n');
+            status1 = 0;
         else
             fprintf(1,'COMSOL mph server is not started. Trying to start...\n');
-            hostname = getenv('HOSTNAME');
-            switch hostname
-                case 'porotomo.geology.wisc.edu'                  
-                    %[status0, output] = system('/usr/local/comsol54/bin/comsol mphserver &');
-                    [status0, output] = system('module load comsol54; comsol mphserver &');
-                    addpath('/usr/local/comsol54/mli');
-                otherwise
-                    hostname
-                    error('Unknown hostname');
-            end
+            [status,output] = system('pkill -signal 9 -f mphserver');
+            [status0, output] = system(sysstr);
+            addpath(mlipath);
+            mphstart;
+            status1 = 0;
         end
+        
     otherwise
         error('Unknown computer');
 end
 
-% wait 3 seconds
-t = timer;
-t.StartDelay = 3;
-t.TimerFcn = @(myTimerObj, thisEvent)disp('3 seconds have elapsed');
-start(t);
-
-
-if status0 == 0
-    try
-        status1 = 0;
-        mphstart
-    catch ME
-        fprintf(1,'COMSOL mph server is not started. Trying to restart...\n');
-        switch computer
-            case 'MACI64'
-                [status1, output] = system('/Applications/COMSOL54/Multiphysics/bin/comsol mphserver &');
-            case 'GLNXA64'
-                [status1, output] = system('module load comsol54;comsol mphserver &')
-            otherwise
-                error('Unknown computer');
-        end
-    end
-end
+% % wait 3 seconds
+% t = timer;
+% t.StartDelay = 3;
+% t.TimerFcn = @(myTimerObj, thisEvent)disp('3 seconds have elapsed');
+% start(t);
+% 
+% 
+% if status0 == 0
+%     mphstart
+% %     try
+% %         status1 = 0;
+% %         mphstart
+% %     catch ME
+% %         fprintf(1,'COMSOL mph server is not started. Trying to restart...\n');
+% %         switch computer
+% %             case 'MACI64'
+% %                 [status1, output] = system('/Applications/COMSOL54/Multiphysics/bin/comsol mphserver &');
+% %             case 'GLNXA64'
+% %                 [status1, output] = system('module load comsol54;comsol mphserver &')
+% %             otherwise
+% %                 error('Unknown computer');
+% %         end
+% %     end
+% end
 
 if status1 == 0   
     %% import some utilities
