@@ -17,8 +17,9 @@ end
 switch computer
     case 'MACI64'
         [status0, output] = system('pgrep mphserver');
-        if status0 == 0
-            fprintf(1,'COMSOL mph server is started.\n');
+        if status0 == 0 && isempty(output) == false
+            fprintf(1,'COMSOL mph server is running.\n');
+            status1 = 0;
         else
             fprintf(1,'COMSOL mph server is not started. Trying to start...\n');
             [status0, output] = system('/Applications/COMSOL54/Multiphysics/bin/comsol mphserver &')
@@ -35,9 +36,10 @@ switch computer
                 error('Unknown hostname');
         end
         [status0, output] = system('pgrep -f mphserver')
-        pid = str2num(output);
-        if status0 == 0 && numel(find(isfinite(pid) == true)) > 0
-            fprintf(1,'COMSOL mph server is started.\n');
+%         pid = str2num(output);
+%         if status0 == 0 && numel(find(isfinite(pid) == true)) > 0
+        if status0 == 0 && isempty(output) == false
+            fprintf(1,'COMSOL mph server is running.\n');
             status1 = 0;
         else
             fprintf(1,'COMSOL mph server is not started. Trying to start...\n');
