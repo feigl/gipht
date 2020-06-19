@@ -16,15 +16,23 @@ end
 %% Comsol server must be started
 switch computer
     case 'MACI64'
-        [status0, output] = system('pgrep mphserver');
-        if status0 == 0 && isempty(output) == false
+        [status0, output] = system('pgrep mphserver')
+        %if status0 == 0 && isempty(output) ==      
+        pid = str2num(output);
+        if status0 == 0 && numel(find(isfinite(pid) == true)) > 0
             fprintf(1,'COMSOL mph server is running.\n');
             status1 = 0;
         else
             fprintf(1,'COMSOL mph server is not started. Trying to start...\n');
-            [status0, output] = system('/Applications/COMSOL54/Multiphysics/bin/comsol mphserver &')
+            % 20200619 Must run in foreground. Do not add ampersand to this command.
+            % 20200619 Name of option is different for Mac
+            [status0, output] = system('/Applications/COMSOL54/Multiphysics/bin/comsol server')
+            if status0 == 0 && isempty(output) == true
+                fprintf(1,'COMSOL mph server successfully restarted.\n');
+                status1 = 0;
+            end
         end
-    case 'GLNXA64'       
+    case 'GLNXA64'
         hostname = getenv('HOSTNAME');
         switch hostname
             case 'porotomo.geology.wisc.edu'
@@ -35,10 +43,11 @@ switch computer
                 hostname
                 error('Unknown hostname');
         end
-        [status0, output] = system('pgrep -f mphserver')
-%         pid = str2num(output);
-%         if status0 == 0 && numel(find(isfinite(pid) == true)) > 0
-        if status0 == 0 && isempty(output) == false
+        [status0, output] = system('pgrep -f mphserver');
+        %if status0 == 0 && isempty(output) == false
+        pid = str2num(output);
+        if status0 == 0 && numel(find(isfinite(pid) == true)) > 0
+            
             fprintf(1,'COMSOL mph server is running.\n');
             status1 = 0;
         else

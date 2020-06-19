@@ -75,6 +75,7 @@ for ip=1:mparams  % loop over indices to comsol parameters
                 fprintf(1,'    Setting %d %-8s to %12.4e [%s] %s\n',ip,pname1,params(ip),unit1,desc1);
             end
             %model.param.set(pname1,sprintf('%e [%s]',param1,unit1),desc1);
+            % rescale from dimensionless back to units in comsol
             model.param.set(pname1,sprintf('%e [%s]',param1*scale1,unit1),desc1);
             nreset = nreset + 1;
         end        
