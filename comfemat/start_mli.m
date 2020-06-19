@@ -36,9 +36,35 @@ switch computer
         hostname = getenv('HOSTNAME');
         switch hostname
             case 'porotomo.geology.wisc.edu'
-                %[status0, output] = system('/usr/local/comsol54/bin/comsol mphserver &');
-                sysstr = 'module load comsol54; comsol mphserver &';
+                fprintf(1,'Killing all comsol processes...\n');
+                [status,output] = system('pkill -f comsol')
+                fprintf(1,'Starting comsol server...\n');
+                [status0, output] = system('module load comsol54; comsol server &; sleep 5')
                 mlipath = '/usr/local/comsol54/mli';
+                addpath(mlipath);
+                mphstart;
+                status1 = 0;
+            otherwise
+                hostname
+                error('Unknown hostname');
+        end
+%         [status0, output] = system('pgrep -f mphserver');
+%         %if status0 == 0 && isempty(output) == false
+%         pid = str2num(output);
+%         if status0 == 0 && numel(find(isfinite(pid) == true)) > 0
+%             
+%             fprintf(1,'COMSOL mph server is running.\n');
+%             status1 = 0;
+%         else
+%             
+%             [status,output] = system('pkill -signal 9 -f mphserver');
+%             [status0, output] = system(sysstr);
+%             addpath(mlipath);
+%             mphstart;
+%             status1 = 0;
+%         end
+%         
+
             otherwise
                 hostname
                 error('Unknown hostname');
