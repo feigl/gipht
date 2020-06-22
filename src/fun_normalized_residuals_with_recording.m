@@ -21,10 +21,15 @@ else
 end
 
 % count parameters
-if numel(params) ~= numel(PST.p1)
+if numel(params) ~= numel(PST.name)
+    ncallcount
+    params
+    numel(params)
+    PST.name
     error('miscount of parameters');
 else
     mparams = numel(PST.p1);
+    
 end
 
 if ncallcount == 0   
@@ -41,8 +46,8 @@ else
         fprintf(1,'\n');
 end
 
-% copy current value of parameters
-PST.p1=params;
+% copy current value of parameters and rescale to values with units
+PST.p1 =  PST.p00 + params .* PST.scale;
 
 % get a handle on fitting function
 Hfitfun = PST.fitfun;

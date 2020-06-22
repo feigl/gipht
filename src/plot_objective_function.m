@@ -37,11 +37,11 @@ TBIG = readtable(fileNameBIG);
 %load('read_comsol_tables_ldm_2020MAY20gd_BIG.mat')
 
 % get the names of the variables
-varNames = TBIG.Properties.VariableNames
+varNames = TBIG.Properties.VariableNames;
 [nTrials,nVariables1] = size(TBIG);
 
 if nargin < 3
-    iCols = setdiff([1:nVariables1]',iobjcolumn)
+    iCols = setdiff([1:nVariables1]',iobjcolumn);
 end
 
 % default is to take log10 of objective function
@@ -58,7 +58,7 @@ end
 % sort by Objective function
 ObjectiveVals = table2array(TBIG(:,iobjcolumn));
 [ObjectiveVals,iSort] = unique(ObjectiveVals,'sorted');
-TBIG = TBIG(iSort,:)
+TBIG = TBIG(iSort,:);
 [nUniqueTrials,nVariables2] = size(TBIG);
 if nVariables1 == nVariables2
     nVariables = nVariables1;

@@ -1,6 +1,7 @@
+
 function status1 = start_mli(verbose)
 % start matlab live link with comsol on Mac
-% 20200622 Kurt Feigl
+% 20200526 Kurt Feigl
 
 narginchk(0,1);
 nargoutchk(0,1);
@@ -15,32 +16,17 @@ end
 %% Comsol server must be started
 switch computer
     case 'MACI64'
-        % To work, the preferences in COMSOL must be set properly. Try clicking on the Application. You should see a terminal window with the
-        % something like the following:
-%         /Applications/MATLAB_R2018b.app/bin/matlab -r "java.lang.System.setProperty('org.eclipse.jetty.LEVEL','WARN');
-%         cd /Applications/COMSOL54/Multiphysics/mli';
-%         mphstart('localhost', 2037)"
-
         [status0, output] = system('pgrep mphserver')
         %if status0 == 0 && isempty(output) ==
-        pid = str2num(output)
+        pid = str2num(output);
         if status0 == 0 && numel(find(isfinite(pid) == true)) > 0
             fprintf(1,'COMSOL mph server is running.\n');
             status1 = 0;
         else
-            fprintf(1,'COMSOL mph server is not running.\n');
+            fprintf(1,'COMSOL mph server is not started. Trying to start...\n');
             % 20200619 Must run in foreground. Do not add ampersand to this command.
             % 20200619 Name of option is different for Mac
-            %[status0, output]  = system('/Applications/COMSOL54/Multiphysics/bin/comsol server');
-            %             fprintf(1,'Killing all comsol processes...\n');
-            %             [status,output] = system('pkill -f comsol')
-            %[status0, output]  = system('/Applications/COMSOL54/Multiphysics/bin/comsol server &');
-            %[status0, output]  = system('/Applications/COMSOL54/Multiphysics/COMSOL with MATLAB.app');
-            fprintf(1,'Please click manually on the icon named:\n');
-            fprintf(1,'/Applications/COMSOL54/Multiphysics/COMSOL with MATLAB.app\n\n');
-            error('Comsol server is not running.')
-            
-           
+            [status0, output] = system('/Applications/COMSOL54/Multiphysics/bin/comsol server')
             if status0 == 0 && isempty(output) == true
                 fprintf(1,'COMSOL mph server successfully restarted.\n');
                 status1 = 0;
@@ -123,3 +109,7 @@ end
 
 return
 end
+
+
+
+
