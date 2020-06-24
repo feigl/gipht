@@ -1,4 +1,4 @@
-function status1 = start_mli(verbose)
+cfunction status1 = start_mli(verbose)
 % start matlab live link with comsol on Mac
 % 20200622 Kurt Feigl
 
@@ -55,6 +55,16 @@ switch computer
                 fprintf(1,'Starting comsol server...\n');
                 [status0, output] = system('module load comsol54; comsol server &; sleep 5')
                 mlipath = '/usr/local/comsol54/mli';
+                addpath(mlipath);
+                mphstart;
+                status1 = 0;
+            case 'aci-service-1.chtc.wisc.edu'
+                fprintf(1,'Killing all comsol processes...\n');
+                [status,output] = system('pkill -f comsol')
+                fprintf(1,'Starting comsol server...\n');
+                [status0, output] = system('/opt/software/comsol54/bin/comsol server -silent -login never &');
+                [status0, output] = system('sleep 5')
+                mlipath = '/opt/software/comsol54/mli'
                 addpath(mlipath);
                 mphstart;
                 status1 = 0;
