@@ -1,4 +1,4 @@
-cfunction status1 = start_mli(verbose)
+function status1 = start_mli(verbose)
 % start matlab live link with comsol on Mac
 % 20200622 Kurt Feigl
 
