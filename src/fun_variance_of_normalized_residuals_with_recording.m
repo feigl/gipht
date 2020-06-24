@@ -1,4 +1,4 @@
-function normalized_residual=fun_chi2_with_recording(params, PST, DST, TST)
+function variance_of_normalized_residuals =fun_variance_of_normalized_residuals_with_recording(params, PST, DST, TST)
 % return residuals
 % for use with LSQNONLIN
 % 20200609 Kurt Feigl
@@ -47,13 +47,13 @@ else
 end
 
 % copy current value of parameters and rescale to values with units
-PST.p1 =  PST.p00 + params .* PST.scale;
+PST.p1 =  PST.p0 + params .* PST.scale;
 
 % get a handle on fitting function
-Hfitfun = PST.fitfun;
+Hfitfun = PST.Hfitfun;
 if isa(Hfitfun,'function_handle') == false
     fprintf(1,'Making function handle\n');
-    Hfitfun = @PST.fitfun;
+    Hfitfun = @PST.Hfitfun;
 end
 
 % number of data
@@ -69,9 +69,11 @@ residual = DST.obs-modeled;
 % normalize residual by measurement uncertainty, neglecting correlation
 normalized_residual = residual ./ DST.sig;
 
-% chi-squared = sum of squares of normalized residuals
+% sum of squares of normalized residuals
 chi2 = normalized_residual' * normalized_residual;
 
+% variance of normalized residuals
+variance_of_normalized_residuals = var(normalized_residual);
 
 
 %% open file 
@@ -80,7 +82,7 @@ if ncallcount == 0
     funit = fopen(fnameout,'wt');
     if funit ~= -1
         fprintf(1,'Opened file named %s to record parameters.\n',fnameout);
-        fprintf(funit,'nCallCount, chi2');
+        fprintf(funit,'nCallCount, chi2, variance_of_normalized_residuals');
         for i=1:numel(PST.name)
             fprintf(funit,',%s',PST.name{i});
         end
@@ -94,9 +96,10 @@ else
     funit = fopen(fnameout,'At');
     if funit ~= -1
         %fprintf(1,'Opened file named %s to record parameters.\n',fnameout);
-        if numel(isfinite(PST.p1)) == mparams && isfinite(sumsqrnres) == true && isfinite(sqrtnchi2) == true
+        if numel(isfinite(PST.p1)) == mparams && isfinite(chi2) == true && isfinite(variance_of_normalized_residuals) == true
             fprintf(funit,'%09d',ncallcount);
             fprintf(funit,',%12.7E',chi2);
+            fprintf(funit,',%12.7E',variance_of_normalized_residuals);
             for i=1:numel(PST.p1)
                 fprintf(funit,',%12.7E',PST.p1(i));
             end

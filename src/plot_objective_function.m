@@ -1,15 +1,15 @@
-function Hfigs = plot_objective_function(fileNameBIG,iobjcolumn,iCols,ilogPlot,iSteps)
+function Hfigs = plot_objective_function(fileNameBIG,ndof,iobjcolumn,iCols,ilogPlot,iSteps)
 %% plot a table of objective functions
-% 20206009 Kurt Feigl
-
+% 20200624 Kurt Feigl
+% ndof == number of degrees of freedom (ndata - mparams)
 % read the tables
 % cd /Volumes/GoogleDrive/My Drive/comsol_trials4/LdM
 %read_comsol_tables
 
-narginchk(1,5);
+narginchk(2,6);
 
 % objective function is in first column
-if nargin < 2
+if nargin < 3
     iobjcolumn = 1;
 end
 
@@ -38,25 +38,31 @@ TBIG = readtable(fileNameBIG);
 
 % get the names of the variables
 varNames = TBIG.Properties.VariableNames;
-[nTrials,nVariables1] = size(TBIG);
+[nTrials,nVariables1] = size(TBIG)
 
-if nargin < 3
+if nargin < 4
     iCols = setdiff([1:nVariables1]',iobjcolumn);
 end
 
+iCols
+
 % default is to take log10 of objective function
-if nargin < 4
+if nargin < 5
     ilogPlot = 1;
 end
 
 % default is to make all plots
-if nargin < 5
+if nargin < 6
     iSteps = 1:4;
 end
+iSteps
 
+
+% Assume that first value is initial
+ObjectiveVals = table2array(TBIG(:,iobjcolumn));
+ObjectiveVal0 = ObjectiveVals(1)
 
 % sort by Objective function
-ObjectiveVals = table2array(TBIG(:,iobjcolumn));
 [ObjectiveVals,iSort] = unique(ObjectiveVals,'sorted');
 TBIG = TBIG(iSort,:);
 [nUniqueTrials,nVariables2] = size(TBIG);
@@ -71,15 +77,8 @@ end
 
 
 
-
-%
-% % Q1(y1), Q2(y2), Q3(tend) are volumetric flow rates in m^3/s
-% % for this run tend = 2019.8
-% % final run will be tend = 2020.3
-%
-%
-% % print the optimal solution
-%Toptimal=TBIG(1,:)
+%% print the optimal solution
+Toptimal=TBIG(1:10,:)
 %
 %
 %
@@ -111,8 +110,20 @@ Toptimal = [Toptimal, table(table2array(TBIG(1,:))','VariableNames',{'value'})];
 % multiply by optimal value of Objective function, assuming that it was based on a measurement uncertainty of 1.0 m?
 % This assumes that the objective function is an L2 norm (i.e., variance with units of data squared)
 %obj68 = icdf('chi2',0.683,8 ) * Tbest.Objective
-ndof = numel(iCols)
-obj68 = icdf('chi2',0.683,ndof) * ObjectiveVals(1)
+%ndof = numel(iCols)
+%obj68 = icdf('chi2',0.683,ndof) * ObjectiveVals(1)
+% 20200624 KF calculate ADDITIVE increase in chi2
+% Delta_chi2 = icdf('chi2',0.683,ndof)
+% obj68 =  Delta_chi2 + ObjectiveVals(1)
+
+%% Use F test rather than chi-squared
+alpha = 1. - 0.682 % significance level
+% take ratio of variances initial:best
+variance_ratio = ObjectiveVal0/ObjectiveVals(1)
+% find critical value of ratio
+variance_ratio_critical = ftest_critical(alpha,variance_ratio,ndof,ndof)
+% 
+obj68 = variance_ratio_critical * ObjectiveVals(1)
 
 %% find the indices of values below threshold
 i68 = find(ObjectiveVals <= obj68);
@@ -133,7 +144,7 @@ Toptimal = [Toptimal, table(x68maxs,'VariableNames',{'x68max'})];
 writetable(Toptimal,sprintf('%s_Toptimal_%s.csv',mfilename,datestr(now,30)));
 
 %% make grid of scatter plots
-if ismember(1,iSteps) == true && nUniqueTrials > 1
+if ismember(1,iSteps) == true && nUniqueTrials > 1 && exist('corrplot') == 2
     nf=nf+1;figure;
     %corrplot(TBIG,'varNames',TBIG.Properties.VariableNames);
     [Rcorr,Pvalue,Handles] =corrplot(TBIG(:,iCols),'varNames',varNames(iCols));
@@ -188,8 +199,7 @@ if ismember(3,iSteps) == true
         xvall = xvals(1)-Toptimal.x68min(i);
         % half-width of error bar to right
         xvalr = Toptimal.x68max(i)-xvals(1);
-        if xvalr - xvall > 0
-            
+        if xvalr - xvall > 0           
             % start figure
             nf=nf+1;figure;
             hold on;
