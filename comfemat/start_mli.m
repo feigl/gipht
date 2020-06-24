@@ -17,10 +17,10 @@ switch computer
     case 'MACI64'
         % To work, the preferences in COMSOL must be set properly. Try clicking on the Application. You should see a terminal window with the
         % something like the following:
-%         /Applications/MATLAB_R2018b.app/bin/matlab -r "java.lang.System.setProperty('org.eclipse.jetty.LEVEL','WARN');
-%         cd /Applications/COMSOL54/Multiphysics/mli';
-%         mphstart('localhost', 2037)"
-
+        %         /Applications/MATLAB_R2018b.app/bin/matlab -r "java.lang.System.setProperty('org.eclipse.jetty.LEVEL','WARN');
+        %         cd /Applications/COMSOL54/Multiphysics/mli';
+        %         mphstart('localhost', 2037)"
+        
         [status0, output] = system('pgrep mphserver')
         %if status0 == 0 && isempty(output) ==
         pid = str2num(output)
@@ -40,7 +40,7 @@ switch computer
             fprintf(1,'/Applications/COMSOL54/Multiphysics/COMSOL with MATLAB.app\n\n');
             error('Comsol server is not running.')
             
-           
+            
             if status0 == 0 && isempty(output) == true
                 fprintf(1,'COMSOL mph server successfully restarted.\n');
                 status1 = 0;
