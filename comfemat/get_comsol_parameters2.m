@@ -28,9 +28,9 @@ parameterNames = model.param.varnames;
 idNumbers = zeros(mParameters,1);
 pnames = cell(mParameters,1);
 pnames32 = cell(mParameters,1);
-descrs = cell(mParameters,1);
+descr = cell(mParameters,1);
 values = nan(mParameters,1);
-units   = cell(mParameters,1);
+unit   = cell(mParameters,1);
 
 
 if numel(parameterNames) ~= mParameters
@@ -71,7 +71,7 @@ for i = 1:mParameters
     
     % description
     descr1 = char(model.param.descr(param_names(i)));
-    descrs{i} = sprintf('%s',char(descr1));
+    descr{i} = sprintf('%s',char(descr1));
     
     % units
     try
@@ -88,7 +88,7 @@ for i = 1:mParameters
     end
     unit1 = strrep(unit1,'[','');
     unit1 = strrep(unit1,']','');
-    units{i} = unit1;
+    unit{i} = unit1;
 
     % make long name
     pname32 = sprintf('%-32s',sprintf('CS%03d_%s_%s_%s',i,pname1,unit1,descr1));
@@ -110,8 +110,8 @@ Tparams = table(idNumbers,'VariableNames',{'idnumber'});
 Tparams = [Tparams,table(pnames32,'VariableNames',{'name32'})];
 Tparams = [Tparams,table(pnames,'VariableNames',{'name'})];
 Tparams = [Tparams,table(values,'VariableNames',{'value'})];
-Tparams = [Tparams,table(units,'VariableNames',{'units'})];
-Tparams = [Tparams,table(descrs,'VariableNames',{'description'})];
+Tparams = [Tparams,table(unit,'VariableNames',{'unit'})];
+Tparams = [Tparams,table(descr,'VariableNames',{'description'})];
 
 if verbose == 1
     Tparams
