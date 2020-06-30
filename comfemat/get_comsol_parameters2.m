@@ -1,4 +1,4 @@
-function Tparams = get_comsol_parameters2(fileNameMPH,verbose)
+function Tparams = get_comsol_parameters2(mname,verbose)
 %function Tparams = get_comsol_parameters(model,verbose)
 % given a comsol model object, return a table of parameters
 % 20200507 - supercedes version in gipht
@@ -16,7 +16,19 @@ if nargin < 2
     verbose = 1;
 end
 
-model = mphload(fileNameMPH);
+
+%% is mname a model or an MPH file?
+if isa(mname,'com.comsol.clientapi.impl.ModelClient')  == true   
+    model = mname;
+    info0 = mphsolutioninfo(model)
+else   
+    if exist(mname,'file') == 2
+        model = mphload(mname);
+    else
+        warning(sprintf('Could not find MPH file named %s\n',mname));
+    end
+end
+
 param_names = model.param.varnames;
 
 expr = mphgetexpressions(model.param);

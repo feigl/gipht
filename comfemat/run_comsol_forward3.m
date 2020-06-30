@@ -30,7 +30,7 @@ for ip=1:mparams  % loop over indices to comsol parameters
     current1 = PST.p1(ip);  % current value 
     if isfinite(current1) == 1
         db = PST.ub(ip)-PST.lb(ip); % range of bounds in gipht parameter
-        scale1 = PST.scale(ip);
+        %scale1 = PST.scale(ip);
         if  db > 0
             %model.param.set('PRES', sprintf('%e[Pa]',PST.p1(ip)),descrs{ic});
             pname1 = sprintf('%s',PST.name{ip});
