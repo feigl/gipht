@@ -63,8 +63,12 @@ if nargin < 7
 end
 iSteps
 
-%% print the initial solution
-Tinitial=TBIG(1,:)
+
+%% make new table with initial values
+Tinitial = table(TBIG.Properties.VariableNames','VariableNames',{'name'});
+Tinitial = [Tinitial, table(table2array(TBIG(1,:))','VariableNames',{'value'})];
+Tinitial
+
 
 %% collect values of objective function
 if isfinite(iColVarNormRes) == true
@@ -72,11 +76,17 @@ if isfinite(iColVarNormRes) == true
     objectiveTag = 'Ftest';
 elseif isfinite(iColChi2) == true
     ObjectiveVals = table2array(TBIG(:,iColChi2));
-    objectiveTag = 'chi2';
+    %objectiveTag = 'chi2';
+    objectiveTag = 'FtestOnChi2';
 else
     error('Column for objective function is not specified.');
 end
 ObjectiveVal0 = ObjectiveVals(1)
+
+%% prune zeros
+TBIG = TBIG((ObjectiveVals > 0.),:);
+
+
 
 %% sort by Objective function
 [ObjectiveVals,iSort] = unique(ObjectiveVals,'sorted');
@@ -92,29 +102,39 @@ end
 
 
 
-%% print the optimal solution
-Toptimal=TBIG(1,:)
-%
-%
-%
-%
-%% make new table
-%
-% %TBIG.Properties.VariableNames{i},TBIG.Properties.VariableDescriptions{i},TBIG.Properties.VariableUnits{i});
-%
+
+
+%% make new table with optimal values
+%Toptimal=TBIG(1,:);
 Toptimal = table(TBIG.Properties.VariableNames','VariableNames',{'name'});
 Toptimal = [Toptimal, table(table2array(TBIG(1,:))','VariableNames',{'value'})];
+Toptimal
 
 
 %% find statistics
 switch objectiveTag
     case 'Ftest'
         %% Use F test
+        % Gordon, R. G., S. Stein, C. DeMets, and D. F. Argus (1987), Statistical tests for closure of plate motion
+        % circuits, Geophysical Research Letters, 14, 587-590. https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/GL014i006p00587
+        %         The F-ratio test is a standard statistical test used to compare variances of distributions. Whereas the chi-square test of plate circuit
+        %         closure described above focuses on the consistency of the final best-fit estimates of relative Euler vectors with the a priori assigned
+        %         errors, the F-ratio test of plate circuit closure described here focuses on the differences in the overall fit of two different models
+        %         (Figure 1) to the data.
+        %         The test is formulated using chi2s and is analogous to the test of additional terms widely used in curve fitting. If the values of
+        %         sigma are consistently overestimated by a constant multiplicative factor, the value of F is unaffected, which is a potential
+        %         advantage over the chi-square test.
+
         alpha = 1. - 0.682 % significance level
         % take ratio of variances initial:best
         variance_ratio = ObjectiveVal0/ObjectiveVals(1)
-        % find critical value of ratio
-        variance_ratio_critical = ftest_critical(alpha,variance_ratio,ndof,ndof)
+        % find critical value of ratio 
+        %variance_ratio_critical = ftest_critical(alpha,variance_ratio,ndof,ndof)  % will make a plot
+        % number of degrees of freedom is the same for both samples
+        ndof1 = ndof;
+        ndof2 = ndof;
+        % this is a one-sided test
+        variance_ratio_critical = icdf('F',1-alpha,ndof1,ndof2)   % just return the critical value
         obj68 = variance_ratio_critical * ObjectiveVals(1)
     case 'chi2'
         % For six degrees of freedom (Q1, Q2, Q3, t1, t2, num) then we should set the 68.3% confidence level at sqrt(7.04) = 2.65,
@@ -129,10 +149,22 @@ switch objectiveTag
         % the fixed (actual) values of the data set D0. This theorem makes the connection between particular values of DeltaChi2 and the fraction of the
         % probability distribution that they enclose as an M-dimensional region, i.e., the confidence level of the M-dimensional region.
         Delta_chi2 = icdf('chi2',0.683,mparams)
-        obj68 =  Delta_chi2 + ObjectiveVals(1) 
+        obj68 =  Delta_chi2 + ObjectiveVals(1)
+    case 'FtestOnChi2'
+        %% Use F test on Chi2        
+        alpha = 1. - 0.682 % significance level
+        % number of degrees of freedom is the same for both samples
+        ndof1 = ndof;
+        ndof2 = ndof;
+        % this is a one-sided test 
+        chiSquare1 = ObjectiveVals(1);% optimum estimate
+        chiSquare2 = ObjectiveVal0;  % initial estimate, presumably larger
+        [fcritical,H,test_string] = ftest_chi2(alpha,chiSquare1,chiSquare2,ndof1,ndof2) 
+        obj68 = fcritical * ObjectiveVals(1)
     otherwise
         error('unknown objectiveTag');
 end
+
 
 
 %% find the indices of values below threshold
@@ -180,13 +212,13 @@ end
 %% plot objective function for each parameter
 switch ilogPlot
     case 0
-        zvals = ObjectiveVals;
+        zvalsAll = ObjectiveVals;
         zlab = 'Objective function [dimensionless]';
         z68min = ObjectiveVals(1);
         z68max = obj68;
         zval0 = ObjectiveVal0;
     case 1
-        zvals = log10(ObjectiveVals);
+        zvalsAll = log10(ObjectiveVals);
         zlab = 'log10(Objective)';
         z68min = log10(ObjectiveVals(1));
         z68max = log10(obj68);
@@ -208,75 +240,116 @@ end
 
 
 %% plot objective function for each parameter
+ipanel=0;
 if ismember(3,iSteps) == true
     for i=iCols
+        ipanel=ipanel+1;
         % values of estimated parameter
         xvals = table2array(TBIG(:,i));
+        % prune to avoid error message from polyshape
+        iprunez = find(isfinite(zvalsAll));
+        xvals = xvals(iprunez);
+        zvals = zvalsAll(iprunez);
+
+        % start figure
+        nf=nf+1;
+        if mparams < 13
+            doPanels = true;
+            subplot(ceil(sqrt(mparams)),floor(sqrt(mparams)),ipanel);%,'align');
+            plotTag = 'ALL';
+            MarkerSize = 9;
+            FontSize = 9;
+            FontWeight = 'normal';
+        else
+            doPanels = false;
+            figure;
+            plotTag = TBIG.Properties.VariableNames{i};
+            MarkerSize = 12;
+            FontSize = 12;
+            FontWeight = 'bold';
+        end
+        hold on;
+        % plot all trials
+        plot(xvals,zvals,'bx');
+        % plot optimal value
+        plot(Toptimal.value(i),z68min,'kp','MarkerSize',MarkerSize,'MarkerFaceColor','r');
+        % plot initial value
+        plot(Tinitial.value(i),zval0,'ko','MarkerSize',MarkerSize,'MarkerFaceColor','g');
+        
+        %% find convex hull
+        %       include all points
+        DT = delaunayTriangulation(xvals,zvals);       
+        khull = convexHull(DT);
+        % PolyHull = polyshape(xvals(khull), zvals(khull); % BAD, BAD, by default polyshape attempts to simplify. 
+        % It fails for some parameters and produces the following warning. 
+        %         Warning: Polyshape has duplicate vertices, intersections, or other inconsistencies that may produce
+        %         inaccurate or unexpected results. Input data has been modified to create a well-defined polyshape.        
+        PolyHull = polyshape(xvals(khull), zvals(khull),'Simplify',false);
+        % if all is well, then the next 2 lines should plot the same hull.
+        plot(PolyHull,'FaceColor','b','FaceAlpha',0.1,'EdgeColor','b','EdgeAlpha',1.0);
+        plot(xvals(khull), zvals(khull),'k--','LineWidth',2);
+
+        
+        %% make a rectangular box outlining the region of 68 percent confidence
+        % plot horizontal line at 68 percent confidence
+        plot([nanmin(xvals), nanmax(xvals)], [z68max, z68max],'r:','LineWidth',2);
+        PolyBox68=polyshape([nanmin(xvals), nanmax(xvals), nanmax(xvals), nanmin(xvals)]...
+                           ,[z68min,        z68min,        z68max,        z68max]);
+        plot(PolyBox68,'FaceColor','r','FaceAlpha',0.1,'EdgeColor','r','EdgeAlpha',1.0);
+      
+        %% find the intersection of the hull and the box
+        [PolyIntersection,out] = intersect(PolyHull,PolyBox68);
+        plot(PolyIntersection,'FaceColor',[1,0,1],'FaceAlpha',0.1,'EdgeColor',[1,0,1],'EdgeAlpha',1.0);
+      
+        % the 68 percent confidence interval is bounded by the left-most and right-most points in the intersection
+        Toptimal.x68min(i) = nanmin(PolyIntersection.Vertices(:,1));
+        Toptimal.x68max(i) = nanmax(PolyIntersection.Vertices(:,1));
         % half-width of error bar to left
         xvall = xvals(1)-Toptimal.x68min(i);
         % half-width of error bar to right
         xvalr = Toptimal.x68max(i)-xvals(1);
-        %         if xvalr - xvall <= eps
-        %             warning(sprintf('No solutions other than optimal found below threshold for parameter %s . Setting confidence interval to [min,max]\n',Toptimal.name{i}));
-        %             xvall = nanmin(xvals)
-        %             xvalr = nanmax(xvals)
-        %         end
-        % start figure
-        nf=nf+1;figure;
-        hold on;
-        % plot all trials
-        plot(xvals,zvals,'kx');
-        % plot optimal
-        plot(xvals(1),zvals(1),'kp','MarkerSize',16,'MarkerFaceColor','r');
-        % plot initial
-        val0s = table2array(Tinitial);
-        plot(val0s(i),zval0,'ko','MarkerSize',16,'MarkerFaceColor','g');
-        
+      
         % plot error bars
         if (isfinite(xvall) == true) && (isfinite(xvalr) == true)
             if (abs(xvall-xvalr) > eps)   && (xvall > 0)  && (xvalr > 0)
                 errorbar(xvals(1),zvals(1),[],[],xvall,xvalr,'r');
             end
         end
-        
-        %% find convex hull
-        % plot all points below threshold
-        x68vals = [xvals(i68); x68mins(i); x68maxs(i)];
-        y68vals = [zvals(i68); z68max;     z68max];
-%         Plot only three points
-%         x68vals = [nanmin(xvals(i68)); Toptimal.value(i); nanmax(xvals(i68)); ];
-%         y68vals = [z68max;             z68min;            z68max];
 
-        DT = delaunayTriangulation(x68vals,y68vals);
-        khull = convexHull(DT);
-        plot(x68vals(khull), y68vals(khull),'b-');
-        
-         % plot horizontal line at 68 percent confidence
-        plot([nanmin(xvals), nanmax(xvals)], [z68max, z68max],'m:','LineWidth',2);
        
-                
+       set(gca,'FontWeight',FontWeight,'FontSize',FontSize);
+
+        
         %xlabel(sprintf('%s [%s]',TBIG.Properties.VariableNames{i}, TBIG.Properties.VariableUnits{i}));
         xlim([nanmin(xvals),nanmax(xvals)]);
-        xlabel(sprintf('%s',TBIG.Properties.VariableNames{i}));
-        ylabel(zlab,'Interpreter','none');
-        if max(abs(xvals)) > 1.e4
-            fmt = '%s %s %12.2E (%12.2E, %12.2E)';
+        xlabel(sprintf('%s',TBIG.Properties.VariableNames{i}),'FontWeight',FontWeight,'FontSize',FontSize);
+        ylabel(zlab,'Interpreter','none','FontWeight',FontWeight,'FontSize',FontSize);
+        if Toptimal.value(i) > 1.E3
+            fmt = '%s %10.2E\n(%10.2E, %10.2E)';
         else
-            fmt = '%s %s %12.4f (%12.4f, %12.4f)';
+            fmt = '%s %10.4f\n(%10.4f, %10.4f)';
         end
         title(sprintf(fmt...
-            ,objectiveTag ...
             ,TBIG.Properties.VariableNames{i} ...
-            ,xvals(1)...
-            ,Toptimal.x68min(i)...
-            ,Toptimal.x68max(i)));
+            ,Toptimal.value(i) ...
+            ,Toptimal.x68min(i) ...
+            ,Toptimal.x68max(i) ...
+            )...
+            ,'FontWeight',FontWeight,'FontSize',FontSize);
+        %           ,objectiveTag ...
         %         ,TBIG.Properties.VariableUnits{i}));
         %     ,TBIG.Properties.VariableDescriptions{i}));
         %savefig(sprintf('%sFig%03d.fig',mfilename,nf));
-        Hfigs(nf) = gcf;
-        print(gcf,'-dpdf'...
-            ,sprintf('%s_%s_Fig%03d%s.pdf',mfilename,objectiveTag,nf,TBIG.Properties.VariableNames{i})...
-            ,'-r600','-fillpage','-painters');
+        
+ 
+        
+        if ipanel == mparams || doPanels == false
+            Hfigs(nf) = gcf;
+            print(gcf,'-dpdf'...
+                ,sprintf('%s_%s_Fig%03d%s.pdf',mfilename,objectiveTag,nf,plotTag)...
+                ,'-r600','-fillpage','-painters');
+        end
+        
     end
 end
 
