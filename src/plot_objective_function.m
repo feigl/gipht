@@ -270,12 +270,8 @@ if ismember(3,iSteps) == true
         end
         hold on;
         % plot all trials
-        plot(xvals,zvals,'bx');
-        % plot optimal value
-        plot(Toptimal.value(i),z68min,'kp','MarkerSize',MarkerSize,'MarkerFaceColor','r');
-        % plot initial value
-        plot(Tinitial.value(i),zval0,'ko','MarkerSize',MarkerSize,'MarkerFaceColor','g');
-        
+        plot(xvals,zvals,'b.');
+         
         %% find convex hull
         %       include all points
         DT = delaunayTriangulation(xvals,zvals);       
@@ -316,12 +312,18 @@ if ismember(3,iSteps) == true
             end
         end
 
-       
-       set(gca,'FontWeight',FontWeight,'FontSize',FontSize);
+        % plot optimal value
+        plot(Toptimal.value(i),z68min,'kp','MarkerSize',MarkerSize,'MarkerFaceColor','r');
+        % plot initial value
+        plot(Tinitial.value(i),zval0,'ko','MarkerSize',MarkerSize,'MarkerFaceColor','g');
+        
+        % set font for numerical values on labels
+        set(gca,'FontWeight',FontWeight,'FontSize',FontSize);
 
         
-        %xlabel(sprintf('%s [%s]',TBIG.Properties.VariableNames{i}, TBIG.Properties.VariableUnits{i}));
         xlim([nanmin(xvals),nanmax(xvals)]);
+        %xlabel(sprintf('%s [%s]',TBIG.Properties.VariableNames{i}, TBIG.Properties.VariableUnits{i}));
+
         xlabel(sprintf('%s',TBIG.Properties.VariableNames{i}),'FontWeight',FontWeight,'FontSize',FontSize);
         ylabel(zlab,'Interpreter','none','FontWeight',FontWeight,'FontSize',FontSize);
         if Toptimal.value(i) > 1.E3
@@ -340,9 +342,7 @@ if ismember(3,iSteps) == true
         %         ,TBIG.Properties.VariableUnits{i}));
         %     ,TBIG.Properties.VariableDescriptions{i}));
         %savefig(sprintf('%sFig%03d.fig',mfilename,nf));
-        
- 
-        
+                
         if ipanel == mparams || doPanels == false
             Hfigs(nf) = gcf;
             print(gcf,'-dpdf'...
