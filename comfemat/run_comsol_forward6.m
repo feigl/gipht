@@ -56,9 +56,9 @@ for ip=1:mparams  % loop over indices to comsol parameters
 end
 
 % get some information
-model_struct = mphmodel(model)
-studys = model_struct.study
-nstudy=numel(studys)
+model_struct = mphmodel(model);
+studys = model_struct.study;
+nstudy=numel(studys);
 
 %model=mphload(fileNameMPH)
 
@@ -67,8 +67,8 @@ nstudy=numel(studys)
 trun0 = tic;
 fprintf(1,'%s: starting COMSOL solution with mph file named %s\n',mfilename,PST.fileNameMPH);
 for i=1:nstudy
-    study1 = studys{i}
-    model.study(study1).run
+    study1 = studys{i};
+    model.study(study1).run;
 end
 mphsave(model);
 fprintf(1,'%s: finished COMSOL solution in %10.1f seconds\n',mfilename,toc(trun0));
@@ -80,7 +80,7 @@ ndata = numel(DST.obs);
 % find unique locations by distance from orgin
 rdist=sqrt(DST.x.^2 + DST.y.^2 + DST.z.^2);
 [runique,iunique] = unique(rdist);
-nObsPoints = numel(runique)
+nObsPoints = numel(runique);
 XYZobspts=zeros(3,nObsPoints);
 
 XYZobspts(1,:) = reshape(DST.x(iunique),1,nObsPoints);
