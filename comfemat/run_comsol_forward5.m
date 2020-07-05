@@ -5,7 +5,7 @@
 % 20200627 Kurt Feigl - handle-time dependent solution
 import com.comsol.model.util.*
 
-clear all
+%clear all
 % narginchk(3,3);
 
 %% Read GPS velocity data
@@ -45,12 +45,12 @@ verbose = 2;
 %% load the mph file
 %PST.fileNameMPH = 'LdM_3DFSI_spheroid_Tvisco_P_forward2020JUN25save3.mph'
 %PST.fileNameMPH = '/Users/feigl/BoxSync/LDMcomsol/LdM_3DFSI_spheroid_Tvisco_FORWARD2020MAY06nosweep.mph'
-PST.fileNameMPH = 'LdM_3D_ellipsoid_FORWARD_shape_2020JUNE5.mph'
+%PST.fileNameMPH = 'LdM_3D_ellipsoid_FORWARD_shape_2020JUNE5.mph'
 % PST.soltag='sol4'
 % PST.dset = 'dset9'
 % PST.solnum = 2
 
-model = mphload(PST.fileNameMPH);
+%model = mphload(PST.fileNameMPH);
 %https://www.comsol.com/forum/thread/128742/avoid-mphload-every-iteration-in-matlab-livelink
 % Inside you objective function you can now do of one these:
 % 1)

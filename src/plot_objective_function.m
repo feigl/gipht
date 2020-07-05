@@ -1,4 +1,4 @@
-function Hfigs = plot_objective_function(fileNameBIG,ndof,iColVarNormRes,iColChi2,iCols,ilogPlot,iSteps)
+function Hfigs = plot_objective_function(fileNameBIG,ndof,iColObj,iCols,ilogPlot,iSteps)
 %% plot a table of objective functions
 % 20200624 Kurt Feigl
 % ndof == number of degrees of freedom (ndata - mparams)
@@ -6,18 +6,12 @@ function Hfigs = plot_objective_function(fileNameBIG,ndof,iColVarNormRes,iColChi
 % cd /Volumes/GoogleDrive/My Drive/comsol_trials4/LdM
 %read_comsol_tables
 
-narginchk(3,7);
+narginchk(4,6);
 
-% variance of sum of squares of normalized residuals is in first column
-if nargin < 4
-    iColVarNormRes = 1;
+% reduced chi2 is in second column
+if nargin < 3
+    iColObj = 2;
 end
-
-% chi2 is in second column
-if nargin < 5
-    iColChi2 = 2;
-end
-
 
 %close all
 nf=0;
@@ -42,23 +36,20 @@ TBIG = readtable(fileNameBIG);
 %load('read_comsol_tables_ldm_2020MAY20gd_BIG.mat')
 
 % get the names of the variables
-varNames = TBIG.Properties.VariableNames;
+varNames = TBIG.Properties.VariableNames
 [nTrials,nVariables1] = size(TBIG)
 
-if nargin < 5
-    iCols = setdiff([1:nVariables1]',iColVarNormRes);
-end
 
 % number of free parameters
 mparams = numel(iCols)
 
 % default is to take log10 of objective function
-if nargin < 6
+if nargin < 5
     ilogPlot = 1;
 end
 
 % default is to make all plots
-if nargin < 7
+if nargin < 6
     iSteps = 1:4;
 end
 iSteps
@@ -71,22 +62,14 @@ Tinitial
 
 
 %% collect values of objective function
-if isfinite(iColVarNormRes) == true
-    ObjectiveVals = table2array(TBIG(:,iColVarNormRes));
-    objectiveTag = 'Ftest';
-elseif isfinite(iColChi2) == true
-    ObjectiveVals = table2array(TBIG(:,iColChi2));
-    %objectiveTag = 'chi2';
-    objectiveTag = 'FtestOnChi2';
-else
-    error('Column for objective function is not specified.');
-end
-ObjectiveVal0 = ObjectiveVals(1)
+ObjectiveVals = table2array(TBIG(:,iColObj));
+objectiveTag = 'FtestOnChi2';
 
 %% prune zeros
 TBIG = TBIG((ObjectiveVals > 0.),:);
 
-
+% keep first value
+ObjectiveVal0 = ObjectiveVals(1)
 
 %% sort by Objective function
 [ObjectiveVals,iSort] = unique(ObjectiveVals,'sorted');
@@ -124,11 +107,11 @@ switch objectiveTag
         %         The test is formulated using chi2s and is analogous to the test of additional terms widely used in curve fitting. If the values of
         %         sigma are consistently overestimated by a constant multiplicative factor, the value of F is unaffected, which is a potential
         %         advantage over the chi-square test.
-
+        
         alpha = 1. - 0.682 % significance level
         % take ratio of variances initial:best
         variance_ratio = ObjectiveVal0/ObjectiveVals(1)
-        % find critical value of ratio 
+        % find critical value of ratio
         %variance_ratio_critical = ftest_critical(alpha,variance_ratio,ndof,ndof)  % will make a plot
         % number of degrees of freedom is the same for both samples
         ndof1 = ndof;
@@ -142,7 +125,7 @@ switch objectiveTag
         % Fortran numerical recipes: the art of scientific computing, Cambridge university press.  052143064X).
         %  Chi-2 table on page table on page 692
         % icdf('chi2',0.954,6) = 12.8191 (12.8 in table)
-
+        
         %% 20200701 KF calculate ADDITIVE increase in chi2
         % Press et al. (1992) page 690, Theorem C: If a(j) is drawn from the universe of simulated data sets with actual parameters a0, then the
         % quantity DeltaChi2 = chi2(a(j)) - chi2(a0) is distributed as a chi2 distribution with M degrees of freedom. Here the chi2 are all evaluated using
@@ -151,16 +134,21 @@ switch objectiveTag
         Delta_chi2 = icdf('chi2',0.683,mparams)
         obj68 =  Delta_chi2 + ObjectiveVals(1)
     case 'FtestOnChi2'
-        %% Use F test on Chi2        
+        %% Use F test on Chi2
         alpha = 1. - 0.682 % significance level
         % number of degrees of freedom is the same for both samples
         ndof1 = ndof;
         ndof2 = ndof;
-        % this is a one-sided test 
-        chiSquare1 = ObjectiveVals(1);% optimum estimate
-        chiSquare2 = ObjectiveVal0;  % initial estimate, presumably larger
-        [fcritical,H,test_string] = ftest_chi2(alpha,chiSquare1,chiSquare2,ndof1,ndof2) 
-        obj68 = fcritical * ObjectiveVals(1)
+        % this is a one-sided test
+        %        chiSquare1 = ObjectiveVals(1);% optimum estimate
+        %         chiSquare2 = ObjectiveVal0;  % initial estimate, presumably larger
+        %         obj68 = fcritical * ObjectiveVals(1)
+        
+        % 20200705 test requires chi-square, not reduced chi-square
+        chiSquare1 = ObjectiveVals(1) * ndof;% optimum estimate
+        chiSquare2 = ObjectiveVal0    * ndof;  % initial estimate, presumably larger
+        [fcritical,H,test_string] = ftest_chi2(alpha,chiSquare1,chiSquare2,ndof1,ndof2)
+        obj68 = fcritical * ObjectiveVals(1) * ndof
     otherwise
         error('unknown objectiveTag');
 end
@@ -192,24 +180,9 @@ Toptimal = [Toptimal, table(x68maxs,'VariableNames',{'x68max'})];
 Toptimal
 writetable(Toptimal,sprintf('%s_Toptimal_%s.csv',mfilename,datestr(now,30)));
 
-%% make grid of scatter plots
-if ismember(1,iSteps) == true && nUniqueTrials > 1 && exist('corrplot') == 2
-    nf=nf+1;figure;
-    %corrplot(TBIG,'varNames',TBIG.Properties.VariableNames);
-    [Rcorr,Pvalue,Handles] =corrplot(TBIG(:,iCols),'varNames',varNames(iCols));
-    % Try not to interpret underscores as Latex subscripts. Fails.
-    % for i=1:numel(iCols)
-    %     for j=1:numel(iCols)
-    %         ax1 = get(Handles(i,j),'Parent');
-    %         ax1.XLabel.Interpreter='none';
-    %     end
-    % end
-    %savefig(sprintf('%sFig%03d.fig',mfilename,nf));
-    Hfigs(nf) = gcf;
-    print(gcf,'-dpdf',sprintf('%sFig%03d.pdf',mfilename,nf),'-r600','-fillpage','-painters');
-end
 
 %% plot objective function for each parameter
+ilogPlot
 switch ilogPlot
     case 0
         zvalsAll = ObjectiveVals;
@@ -227,11 +200,40 @@ switch ilogPlot
         error('unknown ilogPlot')
 end
 
+%% plot the trajectory of improvement
+%% make grid of scatter plots
+if ismember(0,iSteps) == true && nUniqueTrials > 1
+    TBIG(1:10,:)
+    nf=nf+1;figure;
+    % sort by call count
+    [nCallCount,isort] = sort(table2array(TBIG(:,1),'ascend'));
+    plot(nCallCount,zvalsAll(isort),'r+-');
+    xlabel('number of evaluations');
+    ylabel(zlab);
+    Hfigs(nf) = gcf;
+    print(gcf,'-dpdf',sprintf('%sFig%03d.pdf',mfilename,nf),'-r600','-fillpage','-painters');
+end
+
+if ismember(1,iSteps) == true && nUniqueTrials > 1 && exist('corrplot') == 2 && numel(iCols) > 1
+    nf=nf+1;figure;
+    %corrplot(TBIG,'varNames',TBIG.Properties.VariableNames);
+    [Rcorr,Pvalue,Handles] =corrplot(TBIG(:,iCols),'varNames',varNames(iCols));
+    % Try not to interpret underscores as Latex subscripts. Fails.
+    % for i=1:numel(iCols)
+    %     for j=1:numel(iCols)
+    %         ax1 = get(Handles(i,j),'Parent');
+    %         ax1.XLabel.Interpreter='none';
+    %     end
+    % end
+    %savefig(sprintf('%sFig%03d.fig',mfilename,nf));
+    Hfigs(nf) = gcf;
+    print(gcf,'-dpdf',sprintf('%sFig%03d.pdf',mfilename,nf),'-r600','-fillpage','-painters');
+end
 
 %% make a histogram of objective function
 if ismember(2,iSteps) == true
     nf=nf+1;
-    histogram(zvals);
+    histogram(zvalsAll);
     xlabel(zlab);
     ylabel('count');
     Hfigs(nf) = gcf;
@@ -250,7 +252,7 @@ if ismember(3,iSteps) == true
         iprunez = find(isfinite(zvalsAll));
         xvals = xvals(iprunez);
         zvals = zvalsAll(iprunez);
-
+        
         % start figure
         nf=nf+1;
         if mparams < 13
@@ -271,47 +273,60 @@ if ismember(3,iSteps) == true
         hold on;
         % plot all trials
         plot(xvals,zvals,'b.');
-         
+        
         %% find convex hull
         %       include all points
-        DT = delaunayTriangulation(xvals,zvals);       
+        DT = delaunayTriangulation(xvals,zvals);
         khull = convexHull(DT);
-        % PolyHull = polyshape(xvals(khull), zvals(khull); % BAD, BAD, by default polyshape attempts to simplify. 
-        % It fails for some parameters and produces the following warning. 
+        % PolyHull = polyshape(xvals(khull), zvals(khull); % BAD, BAD, by default polyshape attempts to simplify.
+        % It fails for some parameters and produces the following warning.
         %         Warning: Polyshape has duplicate vertices, intersections, or other inconsistencies that may produce
-        %         inaccurate or unexpected results. Input data has been modified to create a well-defined polyshape.        
+        %         inaccurate or unexpected results. Input data has been modified to create a well-defined polyshape.
         PolyHull = polyshape(xvals(khull), zvals(khull),'Simplify',false);
         % if all is well, then the next 2 lines should plot the same hull.
         plot(PolyHull,'FaceColor','b','FaceAlpha',0.1,'EdgeColor','b','EdgeAlpha',1.0);
         plot(xvals(khull), zvals(khull),'k--','LineWidth',2);
-
+        
         
         %% make a rectangular box outlining the region of 68 percent confidence
         % plot horizontal line at 68 percent confidence
         plot([nanmin(xvals), nanmax(xvals)], [z68max, z68max],'r:','LineWidth',2);
         PolyBox68=polyshape([nanmin(xvals), nanmax(xvals), nanmax(xvals), nanmin(xvals)]...
-                           ,[z68min,        z68min,        z68max,        z68max]);
+            ,[z68min,        z68min,        z68max,        z68max]);
         plot(PolyBox68,'FaceColor','r','FaceAlpha',0.1,'EdgeColor','r','EdgeAlpha',1.0);
-      
+        
         %% find the intersection of the hull and the box
         [PolyIntersection,out] = intersect(PolyHull,PolyBox68);
         plot(PolyIntersection,'FaceColor',[1,0,1],'FaceAlpha',0.1,'EdgeColor',[1,0,1],'EdgeAlpha',1.0);
-      
+        
         % the 68 percent confidence interval is bounded by the left-most and right-most points in the intersection
-        Toptimal.x68min(i) = nanmin(PolyIntersection.Vertices(:,1));
-        Toptimal.x68max(i) = nanmax(PolyIntersection.Vertices(:,1));
-        % half-width of error bar to left
-        xvall = xvals(1)-Toptimal.x68min(i);
-        % half-width of error bar to right
-        xvalr = Toptimal.x68max(i)-xvals(1);
-      
-        % plot error bars
-        if (isfinite(xvall) == true) && (isfinite(xvalr) == true)
-            if (abs(xvall-xvalr) > eps)   && (xvall > 0)  && (xvalr > 0)
-                errorbar(xvals(1),zvals(1),[],[],xvall,xvalr,'r');
+        if numel(PolyIntersection.Vertices) > 0
+            Toptimal.x68min(i) = nanmin(PolyIntersection.Vertices(:,1));
+            Toptimal.x68max(i) = nanmax(PolyIntersection.Vertices(:,1));
+            % half-width of error bar to left
+            if isfinite(Toptimal.x68min(i))
+                xvall = xvals(1)-Toptimal.x68min(i);
+            else
+                xvall = xvals(1)-nanmin(xvals);
             end
+            % half-width of error bar to right
+            if isfinite(Toptimal.x68max(i))
+                xvalr = Toptimal.x68max(i)-xvals(1);
+            else
+                xvalr = nanmax(xvals)-xvals(1);
+            end
+            
+            % plot error bars
+            if (isfinite(xvall) == true) && (isfinite(xvalr) == true)
+                if (abs(xvall-xvalr) > eps)   && (xvall > 0)  && (xvalr > 0)
+                    errorbar(xvals(1),zvals(1),[],[],xvall,xvalr,'r');
+                end
+            end
+        else
+            Toptimal.x68min(i) = nan;
+            Toptimal.x68max(i) = nan;         
         end
-
+        
         % plot optimal value
         plot(Toptimal.value(i),z68min,'kp','MarkerSize',MarkerSize,'MarkerFaceColor','r');
         % plot initial value
@@ -319,11 +334,11 @@ if ismember(3,iSteps) == true
         
         % set font for numerical values on labels
         set(gca,'FontWeight',FontWeight,'FontSize',FontSize);
-
+        
         
         xlim([nanmin(xvals),nanmax(xvals)]);
         %xlabel(sprintf('%s [%s]',TBIG.Properties.VariableNames{i}, TBIG.Properties.VariableUnits{i}));
-
+        
         xlabel(sprintf('%s',TBIG.Properties.VariableNames{i}),'FontWeight',FontWeight,'FontSize',FontSize);
         ylabel(zlab,'Interpreter','none','FontWeight',FontWeight,'FontSize',FontSize);
         if Toptimal.value(i) > 1.E3
@@ -342,7 +357,7 @@ if ismember(3,iSteps) == true
         %         ,TBIG.Properties.VariableUnits{i}));
         %     ,TBIG.Properties.VariableDescriptions{i}));
         %savefig(sprintf('%sFig%03d.fig',mfilename,nf));
-                
+        
         if ipanel == mparams || doPanels == false
             Hfigs(nf) = gcf;
             print(gcf,'-dpdf'...
@@ -370,23 +385,23 @@ if ismember(4,iSteps) == true
                 xvals = table2array(TBIG(:,i));
                 yvals = table2array(TBIG(:,j));
                 
-%                 % build interpolation function
-%                 Fi = scatteredInterpolant(colvec(xvals),colvec(yvals),colvec(zvals)...
-%                     ,'nearest','nearest');
-%                 
-%                 
-%                 % build grid
-%                 xvec = linspace(nanmin(xvals),nanmax(xvals),100);
-%                 yvec = linspace(nanmin(zvals),nanmax(yvals),100);
-%                 [XGRD,YGRD] = meshgrid(xvec,yvec);
-%                 
-%                 % interpolate values onto grid
-%                 ZGRD = Fi(XGRD,YGRD);
-%                 % draw grid as image
-%                 % set the transparency for values with NaN
-%                 ALPHA=ones(size(ZGRD));
-%                 ALPHA(isnan(ZGRD))=0.0;
-%                 imagesc(xvec,yvec,ZGRD,'AlphaData',ALPHA);
+                %                 % build interpolation function
+                %                 Fi = scatteredInterpolant(colvec(xvals),colvec(yvals),colvec(zvals)...
+                %                     ,'nearest','nearest');
+                %
+                %
+                %                 % build grid
+                %                 xvec = linspace(nanmin(xvals),nanmax(xvals),100);
+                %                 yvec = linspace(nanmin(zvals),nanmax(yvals),100);
+                %                 [XGRD,YGRD] = meshgrid(xvec,yvec);
+                %
+                %                 % interpolate values onto grid
+                %                 ZGRD = Fi(XGRD,YGRD);
+                %                 % draw grid as image
+                %                 % set the transparency for values with NaN
+                %                 ALPHA=ones(size(ZGRD));
+                %                 ALPHA(isnan(ZGRD))=0.0;
+                %                 imagesc(xvec,yvec,ZGRD,'AlphaData',ALPHA);
                 
                 % draw contours
                 %            contour(XGRD,YGRD,ZGRD,2+[log10(obj68),log10(obj68)],'k-','LineWidth',1);
@@ -406,11 +421,11 @@ if ismember(4,iSteps) == true
                 
                 
                 % plot optimal value with error bars
-%                 errorbar(xvals(1),zvals(1)...
-%                     ,zvals(1)-Toptimal.x68min(j),Toptimal.x68max(j)-zvals(1)...
-%                     ,xvals(1)-Toptimal.x68min(i),Toptimal.x68max(i)-xvals(1)...
-%                     ,'kh','MarkerSize',16,'MarkerFaceColor','k','LineWidth',2);
-%               corrected 20200701
+                %                 errorbar(xvals(1),zvals(1)...
+                %                     ,zvals(1)-Toptimal.x68min(j),Toptimal.x68max(j)-zvals(1)...
+                %                     ,xvals(1)-Toptimal.x68min(i),Toptimal.x68max(i)-xvals(1)...
+                %                     ,'kh','MarkerSize',16,'MarkerFaceColor','k','LineWidth',2);
+                %               corrected 20200701
                 errorbar(xvals(1),yvals(1)...
                     ,yvals(1)-Toptimal.x68min(j),Toptimal.x68max(j)-yvals(1)...
                     ,xvals(1)-Toptimal.x68min(i),Toptimal.x68max(i)-xvals(1)...

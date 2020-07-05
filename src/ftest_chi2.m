@@ -89,7 +89,7 @@ end
 
 fprintf(1,'Performing one-sided, two-sample F-test of null hypothesis:\n');
 fprintf(1,'   H0:          chiSquare1 %10.2g equals         chiSquare2 %10.2g\n',chiSquare1,chiSquare2);
-fprintf(1,'   H0: redcuced chiSquare1 %10.2g equals reduced chiSquare2 %10.2g\n',chiSquare1/ndof1,chiSquare2/ndof2);
+fprintf(1,'   H0: reduced  chiSquare1 %10.2g equals reduced chiSquare2 %10.2g\n',chiSquare1/ndof1,chiSquare2/ndof2);
 fprintf(1,'versus alternative hypothesis:\n');
 fprintf(1,'   H1: chisquare1 < chiSquare2\n');
 
