@@ -26,8 +26,18 @@ function rchi2 = fun_reduced_chi_squared_with_recording(params, PST, DST, TST)
 % 20200705 Kurt Feigl
 % keep values in memory
 persistent ncallcount
+persistent ticTotal;
 
 fnameout = PST.fnameout;
+
+% remember when we started
+if isempty(ticTotal) == true
+    ticTotal = tic;
+else
+    tElapsed = toc(ticTotal);
+    tElapsedFormatted = seconds(tElapsed);
+    tElapsedFormatted.Format = 'dd:hh:mm:ss.SSS';
+end
 
 % count the number of calls to this function
 if isempty(ncallcount) == true
@@ -48,19 +58,19 @@ else
     
 end
 
-if ncallcount == 0   
-    for ip=1:mparams
-        fprintf(1,' %-8s',PST.name{ip});
-    end
-    fprintf(1,'\n');
-else
-    for ip=1:mparams
-        %fprintf(1,'    Re-setting %d %-8s from %12.4e to %12.4e %s\n',ip,PST.name{ip},PST.p1(ip),params(ip),PST.description{ip});
-        %fprintf(1,'    Re-setting %d %-8s from %12.4e to %12.4e\n',ip,PST.name{ip},PST.p1(ip),params(ip));
-        fprintf(1,' %12.4e',params(ip));
-    end
-        fprintf(1,'\n');
-end
+% if ncallcount == 0
+%     for ip=1:mparams
+%         fprintf(1,' %-8s',PST.name{ip});
+%     end
+%     fprintf(1,'\n');
+% else
+%     for ip=1:mparams
+%         %fprintf(1,'    Re-setting %d %-8s from %12.4e to %12.4e %s\n',ip,PST.name{ip},PST.p1(ip),params(ip),PST.description{ip});
+%         %fprintf(1,'    Re-setting %d %-8s from %12.4e to %12.4e\n',ip,PST.name{ip},PST.p1(ip),params(ip));
+%         fprintf(1,' %12.4e',params(ip));
+%     end
+%         fprintf(1,'\n');
+% end
 
 % copy current value of parameters and rescale to values with units
 PST.p1 =  PST.p0 + params .* PST.scale;
@@ -100,7 +110,7 @@ if ncallcount == 0
     funit = fopen(fnameout,'wt');
     if funit ~= -1
         fprintf(1,'Opened file named %s to record parameters.\n',fnameout);
-        fprintf(funit,'nCallCount, rchi2');
+        fprintf(funit,'ElapsedSeconds, nCallCount, rchi2');
         for i=1:numel(PST.name)
             fprintf(funit,',%s',PST.name{i});
         end
@@ -113,14 +123,21 @@ else
     % open file to append
     funit = fopen(fnameout,'At');
     if funit ~= -1
+        funits = [1, funit];
         %fprintf(1,'Opened file named %s to record parameters.\n',fnameout);
         if numel(isfinite(PST.p1)) == mparams && isfinite(rchi2) == true
-            fprintf(funit,'%09d',ncallcount);
-            fprintf(funit,',%12.7E',chi2);
-            for i=1:numel(PST.p1)
-                fprintf(funit,',%12.7E',PST.p1(i));
+            for j=1:numel(funits)
+                funit1 = funits(j);
+                %fprintf(funit,'%s',datestr(now,30));
+                %fprintf(funit,',%s',tElapsedFormatted);
+                fprintf(funit1,'%12.3E',tElapsed);
+                fprintf(funit1,',%09d',ncallcount);
+                fprintf(funit1,',%12.7E',chi2);
+                for i=1:numel(PST.p1)
+                    fprintf(funit1,',%12.7E',PST.p1(i));
+                end
+                fprintf(funit1,'\n');
             end
-            fprintf(funit,'\n');
         end
         fclose(funit);    
     else

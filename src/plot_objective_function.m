@@ -38,6 +38,8 @@ TBIG = readtable(fileNameBIG);
 % get the names of the variables
 varNames = TBIG.Properties.VariableNames
 [nTrials,nVariables1] = size(TBIG)
+% show first five rows
+TBIG(1:5,:)
 
 
 % number of free parameters
@@ -56,9 +58,10 @@ iSteps
 
 
 %% make new table with initial values
-Tinitial = table(TBIG.Properties.VariableNames','VariableNames',{'name'});
+Tinitial = table(TBIG.Properties.VariableNames','VariableNames',{'name'})
 Tinitial = [Tinitial, table(table2array(TBIG(1,:))','VariableNames',{'value'})];
 Tinitial
+writetable(Tinitial,sprintf('%s_Tinitial.csv',strrep(fileNameBIG,'.csv','')));
 
 
 %% collect values of objective function
@@ -178,7 +181,7 @@ Toptimal = [Toptimal, table(x68maxs,'VariableNames',{'x68max'})];
 %Toptimal = [Toptimal, table(TBIG.Properties.VariableUnits','VariableNames',{'units'})];
 %Toptimal = [Toptimal, table(TBIG.Properties.VariableDescriptions','VariableNames',{'description'})];
 Toptimal
-writetable(Toptimal,sprintf('%s_Toptimal_%s.csv',mfilename,datestr(now,30)));
+writetable(Toptimal,sprintf('%s_Toptimal.csv',strrep(fileNameBIG,'.csv','')));
 
 
 %% plot objective function for each parameter
@@ -206,28 +209,24 @@ if ismember(0,iSteps) == true && nUniqueTrials > 1
     TBIG(1:10,:)
     nf=nf+1;figure;
     % sort by call count
-    [nCallCount,isort] = sort(table2array(TBIG(:,1),'ascend'));
+    [nCallCount,isort] = sort(table2array(TBIG(:,2),'ascend'));
     plot(nCallCount,zvalsAll(isort),'r+-');
     xlabel('number of evaluations');
     ylabel(zlab);
     Hfigs(nf) = gcf;
-    print(gcf,'-dpdf',sprintf('%sFig%03d.pdf',mfilename,nf),'-r600','-fillpage','-painters');
+    print(gcf,'-dpdf',sprintf('%s_Fig%02d.pdf',strrep(fileNameBIG,'.csv',''),nf),'-r600','-fillpage','-painters');
 end
 
 if ismember(1,iSteps) == true && nUniqueTrials > 1 && exist('corrplot') == 2 && numel(iCols) > 1
-    nf=nf+1;figure;
-    %corrplot(TBIG,'varNames',TBIG.Properties.VariableNames);
-    [Rcorr,Pvalue,Handles] =corrplot(TBIG(:,iCols),'varNames',varNames(iCols));
-    % Try not to interpret underscores as Latex subscripts. Fails.
-    % for i=1:numel(iCols)
-    %     for j=1:numel(iCols)
-    %         ax1 = get(Handles(i,j),'Parent');
-    %         ax1.XLabel.Interpreter='none';
-    %     end
-    % end
-    %savefig(sprintf('%sFig%03d.fig',mfilename,nf));
-    Hfigs(nf) = gcf;
-    print(gcf,'-dpdf',sprintf('%sFig%03d.pdf',mfilename,nf),'-r600','-fillpage','-painters');
+    nf=nf+1;
+    try
+        [Rcorr,Pvalue,Handles] =corrplot(TBIG(:,iCols),'varNames',varNames(iCols));
+        Hfigs(nf) = gcf;
+        print(gcf,'-dpdf',sprintf('%s_Fig%02d.pdf',strrep(fileNameBIG,'.csv',''),nf),'-r600','-fillpage','-painters');      
+    catch ME
+        ME
+        warning('corrplot failed');
+    end
 end
 
 %% make a histogram of objective function
@@ -237,7 +236,7 @@ if ismember(2,iSteps) == true
     xlabel(zlab);
     ylabel('count');
     Hfigs(nf) = gcf;
-    print(gcf,'-dpdf',sprintf('%sHistObj.pdf',mfilename),'-r600','-fillpage','-painters');
+    print(gcf,'-dpdf',sprintf('%s_Fig%02d.pdf',strrep(fileNameBIG,'.csv',''),nf),'-r600','-fillpage','-painters');
 end
 
 
@@ -245,6 +244,7 @@ end
 ipanel=0;
 if ismember(3,iSteps) == true
     for i=iCols
+        fprintf(1,'\n\n***Plotting parameter %s\n',TBIG.Properties.VariableNames{i});       
         ipanel=ipanel+1;
         % values of estimated parameter
         xvals = table2array(TBIG(:,i));
@@ -272,7 +272,7 @@ if ismember(3,iSteps) == true
         end
         hold on;
         % plot all trials
-        plot(xvals,zvals,'b.');
+        plot(xvals,zvals,'b+');
         
         %% find convex hull
         %       include all points
@@ -284,54 +284,79 @@ if ismember(3,iSteps) == true
         %         inaccurate or unexpected results. Input data has been modified to create a well-defined polyshape.
         PolyHull = polyshape(xvals(khull), zvals(khull),'Simplify',false);
         % if all is well, then the next 2 lines should plot the same hull.
-        plot(PolyHull,'FaceColor','b','FaceAlpha',0.1,'EdgeColor','b','EdgeAlpha',1.0);
+        plot(PolyHull,'FaceColor',[0,0,1],'FaceAlpha',0.1,'EdgeColor',[0,0,1],'EdgeAlpha',1.0);
         plot(xvals(khull), zvals(khull),'k--','LineWidth',2);
         
         
-        %% make a rectangular box outlining the region of 68 percent confidence
+        %% Find uncertainties
+        Toptimal.x68min(i) = nan;
+        Toptimal.x68max(i) = nan;
+
+        %% find intersection between threshold line and hull
+        % make a horizontal line segment on the top of the region of 68 percent confidence
+        LineSeg68 = [nanmin(xvals), z68max; nanmax(xvals), z68max];
         % plot horizontal line at 68 percent confidence
-        plot([nanmin(xvals), nanmax(xvals)], [z68max, z68max],'r:','LineWidth',2);
-        PolyBox68=polyshape([nanmin(xvals), nanmax(xvals), nanmax(xvals), nanmin(xvals)]...
-            ,[z68min,        z68min,        z68max,        z68max]);
-        plot(PolyBox68,'FaceColor','r','FaceAlpha',0.1,'EdgeColor','r','EdgeAlpha',1.0);
-        
-        %% find the intersection of the hull and the box
-        [PolyIntersection,out] = intersect(PolyHull,PolyBox68);
-        plot(PolyIntersection,'FaceColor',[1,0,1],'FaceAlpha',0.1,'EdgeColor',[1,0,1],'EdgeAlpha',1.0);
-        
-        % the 68 percent confidence interval is bounded by the left-most and right-most points in the intersection
-        if numel(PolyIntersection.Vertices) > 0
-            Toptimal.x68min(i) = nanmin(PolyIntersection.Vertices(:,1));
-            Toptimal.x68max(i) = nanmax(PolyIntersection.Vertices(:,1));
-            % half-width of error bar to left
-            if isfinite(Toptimal.x68min(i))
-                xvall = xvals(1)-Toptimal.x68min(i);
-            else
-                xvall = xvals(1)-nanmin(xvals);
-            end
-            % half-width of error bar to right
-            if isfinite(Toptimal.x68max(i))
-                xvalr = Toptimal.x68max(i)-xvals(1);
-            else
-                xvalr = nanmax(xvals)-xvals(1);
-            end
-            
-            % plot error bars
-            if (isfinite(xvall) == true) && (isfinite(xvalr) == true)
-                if (abs(xvall-xvalr) > eps)   && (xvall > 0)  && (xvalr > 0)
-                    errorbar(xvals(1),zvals(1),[],[],xvall,xvalr,'r');
-                end
-            end
+        plot(LineSeg68(:,1),LineSeg68(:,2),'r:','LineWidth',2);
+        %% find the intersection of the hull and segment
+        SegmentIntersection = intersect(PolyHull,LineSeg68);
+              
+        %% the 68 percent confidence interval is bounded by the left-most and right-most points in the intersection
+        if ~isempty(SegmentIntersection) 
+            plot(SegmentIntersection(:,1),SegmentIntersection(:,2),'-','Color',[1,0,1]);
+            Toptimal.x68min(i) = nanmin(SegmentIntersection(:,1));
+            Toptimal.x68max(i) = nanmax(SegmentIntersection(:,1));
         else
-            Toptimal.x68min(i) = nan;
-            Toptimal.x68max(i) = nan;         
+            fprintf(1,'WARNING: Hull and line segment do not intersect for parameter %s\n',TBIG.Properties.VariableNames{i});
+            % make a rectangular box outlining the region of 68 percent confidence
+            PolyBox68=polyshape([nanmin(xvals), nanmax(xvals), nanmax(xvals), nanmin(xvals)]...
+                ,[z68min,        z68min,        z68max,        z68max],'Simplify',false);
+            plot(PolyBox68,'FaceColor','r','FaceAlpha',0.1,'EdgeColor','r','EdgeAlpha',1.0);
+            
+            %% find the intersection of the hull and the box
+            % [PolyIntersection,out] = intersect(PolyHull,PolyBox68)
+            % GOTCHA: intersection does not include the edges. To avoid this issue, use 'KeepCollinearPoints' switch 
+            PolyIntersection = intersect(PolyHull,PolyBox68,'KeepCollinearPoints',true);
+            % the 68 percent confidence interval is bounded by the left-most and right-most points in the intersection
+            if ~isempty(PolyIntersection.Vertices)
+                plot(PolyIntersection,'FaceColor',[1,0,1],'FaceAlpha',0.1,'EdgeColor',[1,0,1],'EdgeAlpha',1.0);
+                Toptimal.x68min(i) = nanmin(PolyIntersection.Vertices(:,1));
+                Toptimal.x68max(i) = nanmax(PolyIntersection.Vertices(:,1));
+            else
+              fprintf(1,'WARNING: Hull and box do not intersect for parameter %s\n',TBIG.Properties.VariableNames{i});            
+            end
+
+            
+            %% find the difference of the box and the hull
+%             PolySubtraction = subtract(PolyBox68,PolyHull);
+%             % the 68 percent confidence interval is bounded by the left-most and right-most points in the difference
+%             if ~isempty(PolySubtraction.Vertices)
+%                 plot(PolySubtraction,'FaceColor',[1,0,1],'FaceAlpha',0.1,'EdgeColor',[1,0,1],'EdgeAlpha',1.0);
+%                 Toptimal.x68min(i) = nanmin(PolySubtraction.Vertices(:,1));
+%                 Toptimal.x68max(i) = nanmax(PolySubtraction.Vertices(:,1));
+%             else
+%                 fprintf(1,'WARNING: Hull and box do not intersect for parameter %s\n',TBIG.Properties.VariableNames{i});
+%             end
         end
+
+        % half-width of error bar to left
+        xvall = abs(xvals(1)-Toptimal.x68min(i));
         
-        % plot optimal value
-        plot(Toptimal.value(i),z68min,'kp','MarkerSize',MarkerSize,'MarkerFaceColor','r');
+        % half-width of error bar to right
+        xvalr = abs(Toptimal.x68max(i)-xvals(1));
+             
+        % plot error bars
+        if (isfinite(xvall) == true) && (isfinite(xvalr) == true)
+            if (abs(xvall-xvalr) > eps)   && (xvall > 0)  && (xvalr > 0)
+                errorbar(xvals(1),zvals(1),[],[],xvall,xvalr,'r');
+            end
+        end
+
         % plot initial value
         plot(Tinitial.value(i),zval0,'ko','MarkerSize',MarkerSize,'MarkerFaceColor','g');
         
+        % plot optimal value
+        plot(Toptimal.value(i),z68min,'kp','MarkerSize',MarkerSize,'MarkerFaceColor','r');
+         
         % set font for numerical values on labels
         set(gca,'FontWeight',FontWeight,'FontSize',FontSize);
         
@@ -361,7 +386,7 @@ if ismember(3,iSteps) == true
         if ipanel == mparams || doPanels == false
             Hfigs(nf) = gcf;
             print(gcf,'-dpdf'...
-                ,sprintf('%s_%s_Fig%03d%s.pdf',mfilename,objectiveTag,nf,plotTag)...
+                ,sprintf('%s_%s_Fig%03d%s.pdf',sprintf('%s_Fig%02d.csv',strrep(fileNameBIG,'.csv','')),objectiveTag,nf,plotTag)...
                 ,'-r600','-fillpage','-painters');
         end
         
@@ -448,7 +473,7 @@ if ismember(4,iSteps) == true
                 
                 %savefig(sprintf('%sTrade%03dvs%03d.fig',mfilename,ii,jj));
                 print(gcf,'-dpdf'...
-                    ,sprintf('%s_%s_Trade%03dvs%03d.pdf',mfilename,objectiveTag,i,j)...
+                    ,sprintf('%s_%s_Trade%03dvs%03d.pdf',sprintf('%s_Fig%02d.csv',strrep(fileNameBIG,'.csv','')),objectiveTag,i,j)...
                     ,'-r600','-fillpage','-painters');
                 Hfigs(nf) = gcf;
             end

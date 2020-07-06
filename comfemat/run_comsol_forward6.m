@@ -88,7 +88,7 @@ XYZobspts(2,:) = reshape(DST.y(iunique),1,nObsPoints);
 XYZobspts(3,:) = reshape(DST.z(iunique),1,nObsPoints);
 
 % times when data occur in seconds elapsed from start of model
-nEpochs = numel(DST.t)
+nEpochs = numel(DST.t);
 %tEpochs = reshape(DST.t - PST.t0,1,nEpochs);
 tEpochs = reshape(DST.t,1,nEpochs);
 
