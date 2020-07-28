@@ -38,9 +38,11 @@ for ip=1:mparams  % loop over indices to comsol parameters
             pname1 = sprintf('%s',PST.name{ip});
             unit1 = char(model.param.evaluateUnit(pname1));
             
-            if strcmp(unit1,PST.unit(ip)) == false
-                fprintf(1,'Unit in MPH file (%s) does not match unit in PST structure (%s) for parameter named %s\n'...
-                    ,unit1,PST.unit(ip),pname1);
+            if isfield(PST,'unit')
+                if strcmp(unit1,PST.unit(ip)) == false
+                    fprintf(1,'Unit in MPH file (%s) does not match unit in PST structure (%s) for parameter named %s\n'...
+                        ,unit1,PST.unit(ip),pname1);
+                end
             end
             desc1 = char(model.param.descr(pname1));
             if verbose >= 2

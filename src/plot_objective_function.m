@@ -147,11 +147,14 @@ switch objectiveTag
         %         chiSquare2 = ObjectiveVal0;  % initial estimate, presumably larger
         %         obj68 = fcritical * ObjectiveVals(1)
         
-        % 20200705 test requires chi-square, not reduced chi-square
-        chiSquare1 = ObjectiveVals(1) * ndof;% optimum estimate
-        chiSquare2 = ObjectiveVal0    * ndof;  % initial estimate, presumably larger
+%         % 20200705 test requires chi-square, not reduced chi-square
+%         chiSquare1 = ObjectiveVals(1) * ndof;% optimum estimate
+%         chiSquare2 = ObjectiveVal0    * ndof;  % initial estimate, presumably larger
+%       % 20200709 shape optimization returns chi-square
+        chiSquare1 = ObjectiveVals(1);% optimum estimate
+        chiSquare2 = ObjectiveVal0   ;  % initial estimate, presumably larger
         [fcritical,H,test_string] = ftest_chi2(alpha,chiSquare1,chiSquare2,ndof1,ndof2)
-        obj68 = fcritical * ObjectiveVals(1) * ndof
+        obj68 = fcritical * ObjectiveVals(1)
     otherwise
         error('unknown objectiveTag');
 end
@@ -209,7 +212,8 @@ if ismember(0,iSteps) == true && nUniqueTrials > 1
     TBIG(1:10,:)
     nf=nf+1;figure;
     % sort by call count
-    [nCallCount,isort] = sort(table2array(TBIG(:,2),'ascend'));
+    %[nCallCount,isort] = sort(table2array(TBIG(:,2),'ascend'));
+    [nCallCount,isort] = sort(table2array(TBIG(:,iColObj-1),'ascend'));
     plot(nCallCount,zvalsAll(isort),'r+-');
     xlabel('number of evaluations');
     ylabel(zlab);
@@ -218,7 +222,7 @@ if ismember(0,iSteps) == true && nUniqueTrials > 1
 end
 
 if ismember(1,iSteps) == true && nUniqueTrials > 1 && exist('corrplot') == 2 && numel(iCols) > 1
-    nf=nf+1;
+    nf=nf+1;figure;
     try
         [Rcorr,Pvalue,Handles] =corrplot(TBIG(:,iCols),'varNames',varNames(iCols));
         Hfigs(nf) = gcf;
@@ -231,7 +235,7 @@ end
 
 %% make a histogram of objective function
 if ismember(2,iSteps) == true
-    nf=nf+1;
+    nf=nf+1;figure;
     histogram(zvalsAll);
     xlabel(zlab);
     ylabel('count');
@@ -253,11 +257,11 @@ if ismember(3,iSteps) == true
         xvals = xvals(iprunez);
         zvals = zvalsAll(iprunez);
         
-        % start figure
+        %% start figure
         nf=nf+1;
         if mparams < 13
             doPanels = true;
-            subplot(ceil(sqrt(mparams)),floor(sqrt(mparams)),ipanel);%,'align');
+            subplot(ceil(sqrt(mparams)),ceil(mparams/sqrt(mparams)),ipanel);%,'align');
             plotTag = 'ALL';
             MarkerSize = 9;
             FontSize = 9;
@@ -271,8 +275,14 @@ if ismember(3,iSteps) == true
             FontWeight = 'bold';
         end
         hold on;
-        % plot all trials
-        plot(xvals,zvals,'b+');
+        
+        %% plot all trials
+        if numel(xvals) < 100
+            Marker = '+';
+        else
+            Marker = '.';
+        end
+        plot(xvals,zvals,Marker,'Color',[0,0,1]);
         
         %% find convex hull
         %       include all points
@@ -305,38 +315,44 @@ if ismember(3,iSteps) == true
             plot(SegmentIntersection(:,1),SegmentIntersection(:,2),'-','Color',[1,0,1]);
             Toptimal.x68min(i) = nanmin(SegmentIntersection(:,1));
             Toptimal.x68max(i) = nanmax(SegmentIntersection(:,1));
-        else
+        else       
             fprintf(1,'WARNING: Hull and line segment do not intersect for parameter %s\n',TBIG.Properties.VariableNames{i});
-            % make a rectangular box outlining the region of 68 percent confidence
-            PolyBox68=polyshape([nanmin(xvals), nanmax(xvals), nanmax(xvals), nanmin(xvals)]...
-                ,[z68min,        z68min,        z68max,        z68max],'Simplify',false);
-            plot(PolyBox68,'FaceColor','r','FaceAlpha',0.1,'EdgeColor','r','EdgeAlpha',1.0);
-            
-            %% find the intersection of the hull and the box
-            % [PolyIntersection,out] = intersect(PolyHull,PolyBox68)
-            % GOTCHA: intersection does not include the edges. To avoid this issue, use 'KeepCollinearPoints' switch 
-            PolyIntersection = intersect(PolyHull,PolyBox68,'KeepCollinearPoints',true);
-            % the 68 percent confidence interval is bounded by the left-most and right-most points in the intersection
-            if ~isempty(PolyIntersection.Vertices)
-                plot(PolyIntersection,'FaceColor',[1,0,1],'FaceAlpha',0.1,'EdgeColor',[1,0,1],'EdgeAlpha',1.0);
-                Toptimal.x68min(i) = nanmin(PolyIntersection.Vertices(:,1));
-                Toptimal.x68max(i) = nanmax(PolyIntersection.Vertices(:,1));
-            else
-              fprintf(1,'WARNING: Hull and box do not intersect for parameter %s\n',TBIG.Properties.VariableNames{i});            
-            end
-
-            
-            %% find the difference of the box and the hull
-%             PolySubtraction = subtract(PolyBox68,PolyHull);
-%             % the 68 percent confidence interval is bounded by the left-most and right-most points in the difference
-%             if ~isempty(PolySubtraction.Vertices)
-%                 plot(PolySubtraction,'FaceColor',[1,0,1],'FaceAlpha',0.1,'EdgeColor',[1,0,1],'EdgeAlpha',1.0);
-%                 Toptimal.x68min(i) = nanmin(PolySubtraction.Vertices(:,1));
-%                 Toptimal.x68max(i) = nanmax(PolySubtraction.Vertices(:,1));
-%             else
-%                 fprintf(1,'WARNING: Hull and box do not intersect for parameter %s\n',TBIG.Properties.VariableNames{i});
-%             end
         end
+        
+        %% make a rectangular box outlining the region of 68 percent confidence
+        PolyBox68=polyshape([nanmin(xvals), nanmax(xvals), nanmax(xvals), nanmin(xvals)]...
+            ,[z68min,        z68min,        z68max,        z68max],'Simplify',false);
+        plot(PolyBox68,'FaceColor','r','FaceAlpha',0.1,'EdgeColor','r','EdgeAlpha',1.0);
+        
+        %% find the intersection of the hull and the box
+        % [PolyIntersection,out] = intersect(PolyHull,PolyBox68)
+        % GOTCHA: intersection does not include the edges. To avoid this issue, use 'KeepCollinearPoints' switch
+        PolyIntersection = intersect(PolyHull,PolyBox68,'KeepCollinearPoints',true);
+        % the 68 percent confidence interval is bounded by the left-most and right-most points in the intersection
+        if ~isempty(PolyIntersection.Vertices)
+            plot(PolyIntersection,'FaceColor',[1,0,1],'FaceAlpha',0.1,'EdgeColor',[1,0,1],'EdgeAlpha',1.0);
+            if ~isfinite(Toptimal.x68min(i))
+                Toptimal.x68min(i) = nanmin(PolyIntersection.Vertices(:,1));
+            end
+            if ~isfinite(Toptimal.x68max(i))
+                Toptimal.x68max(i) = nanmax(PolyIntersection.Vertices(:,1));
+            end
+        else
+            fprintf(1,'WARNING: Hull and box do not intersect for parameter %s\n',TBIG.Properties.VariableNames{i});
+        end
+        
+        
+        %% find the difference of the box and the hull
+        %             PolySubtraction = subtract(PolyBox68,PolyHull);
+        %             % the 68 percent confidence interval is bounded by the left-most and right-most points in the difference
+        %             if ~isempty(PolySubtraction.Vertices)
+        %                 plot(PolySubtraction,'FaceColor',[1,0,1],'FaceAlpha',0.1,'EdgeColor',[1,0,1],'EdgeAlpha',1.0);
+        %                 Toptimal.x68min(i) = nanmin(PolySubtraction.Vertices(:,1));
+        %                 Toptimal.x68max(i) = nanmax(PolySubtraction.Vertices(:,1));
+        %             else
+        %                 fprintf(1,'WARNING: Hull and box do not intersect for parameter %s\n',TBIG.Properties.VariableNames{i});
+        %             end
+       
 
         % half-width of error bar to left
         xvall = abs(xvals(1)-Toptimal.x68min(i));
@@ -400,6 +416,10 @@ Toptimal(iCols,:)
 
 
 if ismember(4,iSteps) == true
+    % prune to avoid error message from polyshape
+    iprunez = find(isfinite(zvalsAll));
+    %zvals = zvalsAll(iprunez);
+
     for ii=1:numel(iCols)
         for jj=1:numel(iCols)
             i = iCols(ii);
@@ -409,6 +429,10 @@ if ismember(4,iSteps) == true
                 hold on;
                 xvals = table2array(TBIG(:,i));
                 yvals = table2array(TBIG(:,j));
+%                 xvals = table2array(TBIG(iprunez,i));
+%                 yvals = table2array(TBIG(iprunez,j));
+                
+
                 
                 %                 % build interpolation function
                 %                 Fi = scatteredInterpolant(colvec(xvals),colvec(yvals),colvec(zvals)...
@@ -438,7 +462,8 @@ if ismember(4,iSteps) == true
                 
                 % draw color coded circles, filled for significant ones
                 pointSize = 128;
-                scatter(xvals,yvals,pointSize,zvals);
+                scatter(xvals(iprunez),yvals(iprunez),pointSize,zvalsAll(iprunez));
+                scatter(xvals(intersect(iprunez,i68)),yvals(intersect(iprunez,i68)),pointSize,zvalsAll(intersect(iprunez,i68)));
                 scatter(xvals(i68),yvals(i68),pointSize,zvals(i68),'filled');
                 axis xy;
                 axis tight;
