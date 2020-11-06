@@ -26,9 +26,9 @@ nvars = numel(varnames);
 
 
 % read table
-Tflat = readtable(FileName, 'FileType','text','ReadVariableNames', 0 ...
+Tflat = readtable(FileName, 'FileType','text','ReadVariableNames', false ...
     ,'HeaderLines',nHeaderLines ...
-    ,'MultipleDelimsAsOne',1);
+    ,'MultipleDelimsAsOne',true);
 
 % if delimiter is not specified, then guess
 % , 'Delimiter', {'space','tab'},
