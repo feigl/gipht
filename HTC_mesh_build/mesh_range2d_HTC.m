@@ -284,7 +284,7 @@ include_AR = 1
 if include_AR == 1
 %% build A'*R where R is data spatial covariance matrix (too large to store)
 if fexist(sprintf('AR%3d.mat', topz)) == 0
-c = (0.005/dt)^2; %3e-6; %5e-8;
+c = 0.01*(0.005/dt)^2; %3e-6; %5e-8;
 a = 230; %m
 [arrows, arcols] = size(A');
 arcols = sizeb;
@@ -301,7 +301,7 @@ rind = [(0:3000:arcols), arcols];
 for i = 1:numel(rind)-1
    AR(:, rind(i)+1:rind(i+1)) = A'*[c*exp(-3.*(abs(sqrt((repmat(datx_vec(rind(i)+1:rind(i+1))', [arcols, 1]) - repmat(datx_vec(:), [1, numel(rind(i)+1:rind(i+1))])).^2+(repmat(daty_vec(rind(i)+1:rind(i+1))', [arcols, 1]) - repmat(daty_vec(:), [1, numel(rind(i)+1:rind(i+1))])).^2))./a))];
 end
-ARfac = 0.01;
+ARfac = 1;
 AR = AR*ARfac;
 end_time = etime(clock, start_time)
 clear datacov_col
