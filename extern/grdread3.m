@@ -47,6 +47,7 @@ function varargout =grdread3(file)
 % Version 1.0, 29-Oct-2009
 % first posted on MATLAB Central
 % attempt to adapt to GMT 5 Kurt Feigl 20160813
+% 2021/03/10 Kurt Feigl handle error about attributes
 
 if nargin < 1,
     help(mfilename);
@@ -85,8 +86,12 @@ switch nvars
             yrange=netcdf.getVar(ncid,1)';
             z=netcdf.getVar(ncid,5);
             dim=netcdf.getVar(ncid,4)';
-            pixel=netcdf.getAtt(ncid,5,'node_offset');
-            if pixel,                         % pixel node registered
+            %             Error using netcdflib
+            %The NetCDF library encountered an error during execution of 'inqAtt'
+            %function - 'Attribute not found (NC_ENOTATT)'.
+
+            pixel=netcdf.getAtt(ncid,5,'node_offset')
+            if pixel                         % pixel node registered
                 dx=diff(xrange)/double(dim(1)); % convert int to double for division
                 dy=diff(yrange)/double(dim(2));
                 x=xrange(1)+dx/2:dx:xrange(2)-dx/2; % convert to gridline registered
