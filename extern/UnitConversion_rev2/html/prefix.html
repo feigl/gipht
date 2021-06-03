@@ -1,0 +1,140 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Prefixes</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-09-14"><meta name="DC.source" content="prefix.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Prefixes</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Using Prefixes with Unit Names</a></li><li><a href="#5">Available Prefixes and Their Values</a></li></ul></div><h2>Using Prefixes with Unit Names<a name="1"></a></h2><p>Prefixes can be used with defined unit names to expand the scope of unit names. You can, for example, create kilometers from meters by adding the prefix "kilo".</p><pre class="codeinput">unit(1,<span class="string">'kilometer'</span>)
+</pre><pre class="codeoutput"> 
+ans = 
+     1000 m
+</pre><p>The answer is returned as 1000 meters. The term "kilometer" is a standard and well recognized term. Prefixes can also be used used in conjunction with terms that are not as well recognized. For example, the diameter of the earth at the equator is</p><pre class="codeinput">Diameter=unit(7626.28,<span class="string">'miles'</span>);
+</pre><p>If the earth were perfectly spherical, the volume of the earth would be</p><pre class="codeinput">Volume=4/3*pi*(Diameter/2)^3;
+</pre><p>Just for fun, the volume of the earth can be expressed in "megateaspoons".</p><pre class="codeinput">convert(Volume,<span class="string">'megateaspoons'</span>)
+</pre><pre class="codeoutput"> 
+ans = 
+     1.96396e+020 megateaspoons
+</pre><h2>Available Prefixes and Their Values<a name="5"></a></h2><pre>  yatto          1e24
+  zetta          1e21
+  exa            1e18
+  peta           1e15
+  tera           1e12
+  giga           1e9
+  mega           1e6
+  kilo           1e3
+  hecto          1e2
+  deka           10
+  deci           0.1
+  centi          1e-2
+  milli          1e-3
+  micro          1e-6
+  nano           1e-9
+  pico           1e-12
+  femto          1e-15
+  atto           1e-18
+  zepto          1e-21
+  yacto          1e-24</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Prefixes
+%% Using Prefixes with Unit Names
+% Prefixes can be used with defined unit names to expand the scope of unit
+% names. You can, for example, create kilometers from meters by adding the
+% prefix "kilo".
+unit(1,'kilometer')
+%%
+% The answer is returned as 1000 meters. The term "kilometer" is a standard
+% and well recognized term. Prefixes can also be used used in conjunction
+% with terms that are not as well recognized. For example, the diameter of
+% the earth at the equator is
+Diameter=unit(7626.28,'miles');
+%%
+% If the earth were perfectly spherical, the volume of the earth would be
+Volume=4/3*pi*(Diameter/2)^3;
+%%
+% Just for fun, the volume of the earth can be expressed in
+% "megateaspoons".
+convert(Volume,'megateaspoons')
+%% Available Prefixes and Their Values
+%
+%    yatto          1e24
+%    zetta          1e21
+%    exa            1e18
+%    peta           1e15
+%    tera           1e12
+%    giga           1e9
+%    mega           1e6
+%    kilo           1e3
+%    hecto          1e2
+%    deka           10
+%    deci           0.1
+%    centi          1e-2
+%    milli          1e-3
+%    micro          1e-6
+%    nano           1e-9
+%    pico           1e-12
+%    femto          1e-15
+%    atto           1e-18
+%    zepto          1e-21
+%    yacto          1e-24
+%
+##### SOURCE END #####
+--></body></html>

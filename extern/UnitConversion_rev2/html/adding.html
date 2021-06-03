@@ -1,0 +1,153 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Adding Your Own Conversion Constants</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-09-15"><meta name="DC.source" content="adding.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Adding Your Own Conversion Constants</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Where to Add</a></li><li><a href="#2">Syntax</a></li><li><a href="#3">Procedure</a></li></ul></div><h2>Where to Add<a name="1"></a></h2><p>The conversion constants are contained within the "define" method in the "convConstant" object. Each constant is part of a series of case statements from one large switch statement. Here is an example case statement.</p><pre>case {'yard','yards','yd','yds'}             % length in yards
+  y.unitName='yd';y.convValue=[3 0];y.convUnit='feet';y.fundamental=false;</pre><p>New conversion constants are added by duplicating the structure above.</p><h2>Syntax<a name="2"></a></h2><p>The strings within the curly brackets are the permissible names of the units. The convention is to add the full name in both singular and plural forms and abbreviations for the units if they exist.</p><p>The comment is used as the search material for the statement "unit.search". It should start with a lower case letter and complete the statement "Units of ...".</p><p>The next line contains four statements. The property "y.unit" contains the unit name. The property "y.convValue" is the pair of constants that are applied to the conversion unit to get the unit name. For example,</p><pre>yard=[3 0]*feet</pre><p>The first number multiplies the conversion unit and the second adds an offset if required. Most of the conversion constants have an offset of zero. An exception is Fahrenheit to Celsius conversion.</p><p>The conversion unit "y.convUnit" is the name of the conversion unit. In the example above it is "feet". This can only be a simple name (no operaters allowed). It must be a unit name that already exists in the define method.</p><p>The statement "y.fundamental" is a boolean variable that describes whether this is a member of the SI system of units. Since all members of the fundamental SI units have already been described, this value is always false.</p><p>Sometimes it is necessary to use mathematical operators to construct a new unit. For example, to define a light year.</p><pre>case {'lightyear'}                           % length in light years
+  y=units2convFac(unit('c*yr'));</pre><p>The "unit" constructor is used to multiply the speed of light "c" by the time in years. The function "units2convFac" is then used to directly create the structure for y.</p><h2>Procedure<a name="3"></a></h2><p>First, demonstrate that conversion unit already exists in the define method. As an example, prove that "feet" exists by typing</p><pre class="codeinput">unit(<span class="string">'feet'</span>)
+</pre><pre class="codeoutput"> 
+ans = 
+     0.3048 m
+</pre><p>This should return an answer in meters. Next, demonstrate that the unit you wish to define does not already exist as the name of some other unit. Suppose that you wish to define a unit called "shortmile". Type</p><pre class="codeinput">unit(<span class="string">'shortmile'</span>)
+</pre><pre class="codeoutput">Error using convConstant/define (line 262)
+Unit known as "shortmile" is not in the conversion table!
+
+Error in unit (line 206)
+                            C=define(convConstant,T1);
+
+Error in adding (line 58)
+unit('shortmile')
+</pre><p>An error should be reported stating that the unit is not in the conversion table. Check each equivalent unit name to be sure that no conflict exists.</p><p>Finally, add the case and definition statements to the "define" method and save the file. Then type "clear classes" and type "unit('&lt;new unit&gt;'). The value should be returned in fundamental units. Use the "unit.search" statement and search for a word that is in your comment. One of the pieces of information returned should be your new unit.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Adding Your Own Conversion Constants
+%% Where to Add
+% The conversion constants are contained within the "define" method in the
+% "convConstant" object. Each constant is part of a series of case
+% statements from one large switch statement. Here is an example case
+% statement.
+%
+%  case {'yard','yards','yd','yds'}             % length in yards
+%    y.unitName='yd';y.convValue=[3 0];y.convUnit='feet';y.fundamental=false;
+%
+% New conversion constants are added by duplicating the structure above.
+%% Syntax
+% The strings within the curly brackets are the permissible names of the
+% units. The convention is to add the full name in both singular and plural
+% forms and abbreviations for the units if they exist.
+%
+% The comment is used as the search material for the statement
+% "unit.search". It should start with a lower case letter and complete the
+% statement "Units of ...".
+% 
+% The next line contains four statements. The property "y.unit" contains
+% the unit name. The property "y.convValue" is the pair of constants that
+% are applied to the conversion unit to get the unit name. For example,
+%
+%  yard=[3 0]*feet
+% 
+% The first number multiplies the conversion unit and the second adds an
+% offset if required. Most of the conversion constants have an offset of
+% zero. An exception is Fahrenheit to Celsius conversion.
+%
+% The conversion unit "y.convUnit" is the name of the conversion unit. In
+% the example above it is "feet". This can only be a simple name (no
+% operaters allowed). It must be a unit name that already exists in the
+% define method.
+%
+% The statement "y.fundamental" is a boolean variable that describes
+% whether this is a member of the SI system of units. Since all members of
+% the fundamental SI units have already been described, this value is
+% always false.
+%
+% Sometimes it is necessary to use mathematical operators to construct a
+% new unit. For example, to define a light year.
+%
+%  case {'lightyear'}                           % length in light years
+%    y=units2convFac(unit('c*yr'));
+%
+% The "unit" constructor is used to multiply the speed of light "c" by the
+% time in years. The function "units2convFac" is then used to directly
+% create the structure for y.
+%% Procedure
+% First, demonstrate that conversion unit already exists in the define
+% method. As an example, prove that "feet" exists by typing
+unit('feet')
+%%
+% This should return an answer in meters. Next, demonstrate that the unit
+% you wish to define does not already exist as the name of some other unit.
+% Suppose that you wish to define a unit called "shortmile". Type
+unit('shortmile')
+%%
+% An error should be reported stating that the unit is not in the
+% conversion table. Check each equivalent unit name to be sure that no
+% conflict exists.
+%
+% Finally, add the case and definition statements to the "define" method
+% and save the file. Then type "clear classes" and type "unit('<new
+% unit>'). The value should be returned in fundamental units. Use the
+% "unit.search" statement and search for a word that is in your comment.
+% One of the pieces of information returned should be your new unit.
+
+##### SOURCE END #####
+--></body></html>

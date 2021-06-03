@@ -1,0 +1,151 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Getting Started</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-09-14"><meta name="DC.source" content="started.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Getting Started</h1><!--introduction--><!--/introduction--><p>There are just two statements which comprise the operations needed to assign units to variables and convert a unit to an equivalent unit of measure. Units are assigned to variables with a "unit" statement. For example, if the length of an object is 6 feet, then the length "L" is:</p><pre class="codeinput">L=unit(6,<span class="string">'feet'</span>)
+</pre><pre class="codeoutput"> 
+L = 
+     1.8288 m
+</pre><p>Note that "L" is returned in units of meters. All units are converted to the international system of units (SI) with the "unit" statement. This assures that all arithmetic operations are conducted in the same system of units. To convert the international system of units to another compatible unit of measure, the "convert" statement is used. For example, suppose that we wish to display "L" in yards. Then</p><pre class="codeinput">convert(L,<span class="string">'yards'</span>)
+</pre><pre class="codeoutput"> 
+ans = 
+     2 yards
+</pre><p>Arithmetic operations can be performed on variables with units without having the variables explicitly converted to the same set of units. Assume that you have a ribbon of material that is 100 yards long, a quarter of an inch wide, and 1 millimeter thick. To find the volume in cubic inches, first assign the length "L", the width "W", and the thickness "T" to variables.</p><pre class="codeinput">L=unit(100,<span class="string">'yards'</span>);
+W=unit(1/4,<span class="string">'inches'</span>);
+T=unit(1,<span class="string">'millimeter'</span>);
+</pre><p>The volume "V" (in cubic inches) is calculated by the product of "L", "W", and "T".</p><pre class="codeinput">V=convert(L*W*T,<span class="string">'inch^3'</span>)
+</pre><pre class="codeoutput"> 
+V = 
+     35.4331 inch^3
+</pre><p>Plots can also be made using variables with units attached. The graph below converts temperature in degrees Fahrenheit to temperature in degrees Celsius. The temperature vector "temp" is used as the range for both Celsius and Fahrenheit variables.</p><pre class="codeinput">temp=unit(-40:5:215,<span class="string">'degF'</span>);
+Celsius=convert(temp,<span class="string">'degC'</span>);
+Fahrenheit=convert(temp,<span class="string">'degF'</span>);
+</pre><p>The figure is made using the "plot" statement. The axis labels are taken from the names of the variables.</p><pre class="codeinput">plot(Fahrenheit,Celsius)
+title(<span class="string">'Fahrenheit to Celsius Temperature Conversion Chart'</span>)
+</pre><img vspace="5" hspace="5" src="started_01.png" alt=""> <p>Help is also available to locate the permissable names for available units. Suppose that you need a unit for voltage but are unsure of the actual name. The search function is called "unit.search". It can be typed in the command window.</p><pre class="codeinput">unit.search(<span class="string">'voltage'</span>)
+</pre><pre class="codeoutput">     Units of voltage in volts     {'volt','volts','V'}
+</pre><p>The strings within the curly braces are the permissable units of voltage. Any of these unit names can be freely interchanged. Sometimes more than one choice will be available. For example, if you look for volt instead of voltage you will get</p><pre class="codeinput">unit.search(<span class="string">'volt'</span>)
+</pre><pre class="codeoutput">     Units of voltage in volts     {'volt','volts','V'}
+     Units of energy in electron volts     {'eV'}
+</pre><p>Pick the unit name that is required.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Getting Started
+%
+%%
+% There are just two statements which comprise the operations needed to
+% assign units to variables and convert a unit to an equivalent unit of
+% measure. Units are assigned to variables with a "unit" statement. For
+% example, if the length of an object is 6 feet, then the length "L" is:
+L=unit(6,'feet')
+%%
+% Note that "L" is returned in units of meters. All units are converted to
+% the international system of units (SI) with the "unit" statement. This
+% assures that all arithmetic operations are conducted in the same system
+% of units. To convert the international system of units to another
+% compatible unit of measure, the "convert" statement is used. For example,
+% suppose that we wish to display "L" in yards. Then
+convert(L,'yards')
+%%
+% Arithmetic operations can be performed on variables with units without
+% having the variables explicitly converted to the same set of units.
+% Assume that you have a ribbon of material that is 100 yards long, a
+% quarter of an inch wide, and 1 millimeter thick. To find the volume in
+% cubic inches, first assign the length "L", the width "W", and the
+% thickness "T" to variables.
+L=unit(100,'yards');
+W=unit(1/4,'inches');
+T=unit(1,'millimeter');
+%%
+% The volume "V" (in cubic inches) is calculated by the product of "L",
+% "W", and "T".
+V=convert(L*W*T,'inch^3')
+%%
+% Plots can also be made using variables with units attached. The graph
+% below converts temperature in degrees Fahrenheit to temperature in
+% degrees Celsius. The temperature vector "temp" is used as the range for
+% both Celsius and Fahrenheit variables.
+temp=unit(-40:5:215,'degF');
+Celsius=convert(temp,'degC');
+Fahrenheit=convert(temp,'degF');
+%%
+% The figure is made using the "plot" statement. The axis labels are taken
+% from the names of the variables.
+plot(Fahrenheit,Celsius)
+title('Fahrenheit to Celsius Temperature Conversion Chart')
+%%
+% Help is also available to locate the permissable names for available
+% units. Suppose that you need a unit for voltage but are unsure of the
+% actual name. The search function is called "unit.search". It can be
+% typed in the command window.
+unit.search('voltage')
+%%
+% The strings within the curly braces are the permissable units of voltage.
+% Any of these unit names can be freely interchanged. Sometimes more than
+% one choice will be available. For example, if you look for volt instead
+% of voltage you will get
+unit.search('volt')
+%%
+% Pick the unit name that is required.
+##### SOURCE END #####
+--></body></html>

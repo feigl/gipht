@@ -1,0 +1,185 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Plotting With Unit Variables</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-09-14"><meta name="DC.source" content="plotting.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Plotting With Unit Variables</h1><!--introduction--><p>There are four plotting routines that have been adapted for plotting variables with units. These are</p><pre>         plot
+         semilogx
+         semilogy
+         loglog</pre><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Reading the Data In</a></li><li><a href="#4">Constructing Unit Variables</a></li><li><a href="#7">Plotting the Data for Dotsero</a></li><li><a href="#8">Plotting Multiple Data Sets</a></li></ul></div><p>These routines differ somewhat from the standard Matlab plotting routines. The "X" variable is a single vector with units. The "Y" variable can either be a single vector with units or a structure containing fields with units. The "X" and "Y" variables must have the same number of points. The variable names of the "X" and "Y" vectors are used to create the default labels on the axes. (These defaults can be changed with the "xlabel" and "ylabel" statements.) The units associated with the "X" and "Y" axes are displayed in parenthesis after the labels. If the "Y" variable is a structure, all members of the structure must have the same vector length and the same units. The field names in the structure are used as the names in the legend.</p><h2>Reading the Data In<a name="2"></a></h2><p>This example plots stream flow data from gage stations along the Colorado river. The data from three gages is first read into Matlab variables.</p><pre class="codeinput">fid=fopen(<span class="string">'glenwood.txt'</span>);
+GlenFlow=textscan(fid,<span class="string">'%*s %*s %s %s %*s %*s %f'</span>,<span class="string">'CollectOutput'</span>,true);
+fid=fopen(<span class="string">'kremmling.txt'</span>);
+Kremflow=textscan(fid,<span class="string">'%*s %*s %s %s %*s %*s %f'</span>,<span class="string">'CollectOutput'</span>,true);
+fid=fopen(<span class="string">'dotsero.txt'</span>);
+Dotsflow=textscan(fid,<span class="string">'%*s %*s %s %s %*s %*s %f'</span>,<span class="string">'CollectOutput'</span>,true);
+fclose(<span class="string">'all'</span>);
+</pre><p>The date and time strings appear in the data as two separate columns. These are combined into one field and converted to date strings. The date strings are then converted to date numbers.</p><pre class="codeinput">[samples,~]=size(Dotsflow{1});  <span class="comment">% Find the number of samples in the flow</span>
+dateTime{samples}=<span class="string">''</span>;           <span class="comment">% Pre-initialize the vector for speed</span>
+<span class="comment">% Concatinate the two cells holding date and time</span>
+<span class="keyword">for</span> N=1:samples
+    dateTime{N}=[Dotsflow{1,1}{N,1} <span class="string">' '</span> Dotsflow{1,1}{N,2}];
+<span class="keyword">end</span>
+D=datenum(dateTime);            <span class="comment">% Get the date number from the strings</span>
+</pre><h2>Constructing Unit Variables<a name="4"></a></h2><p>Matlab's internal format for a date is the date number. It is kept as the number of days from Jan-1-0000 00:00:00. The vector "Date" is created with units of days.</p><pre class="codeinput">Date=convert(unit(D,<span class="string">'day'</span>),<span class="string">'days'</span>);
+</pre><p><b>It is important that the date numbers are converted to units before plotting. Matlab objects look at the left most parameter in the function to determine which method is called. If the "X" vector is not an object of class "unit", the wrong plotting method will be called. Since the built-in plotting function does not understand the class "unit", it will report an error about the "Y" variable.</b></p><p>The flow data for the gage station at Dotsero is extracted from the appropriate column of "DotsFlow" and given units.</p><pre class="codeinput">Dotsero=unit(Dotsflow{1,2}(1:samples),<span class="string">'ft^3/sec'</span>);
+</pre><h2>Plotting the Data for Dotsero<a name="7"></a></h2><p>The data is plotted, the ticks on the x-axis changed to month/day, and a title placed on the graph.</p><pre class="codeinput">plot(Date,Dotsero)
+datetick(<span class="string">'x'</span>,<span class="string">'mm/dd'</span>)
+title(<span class="string">'2010 Flow Rate of the Colorado River at Gage Station Dotsero'</span>)
+</pre><img vspace="5" hspace="5" src="plotting_01.png" alt=""> <h2>Plotting Multiple Data Sets<a name="8"></a></h2><p>Multiple data sets can be plotted on a graph with a structure containing the "Y" vectors. First, the data is assembled from the original data and then converted to acre-feet per day.</p><pre class="codeinput">Flow.Dotsero=convert(Dotsero,<span class="string">'acre*feet/day'</span>);
+Flow.Kremmling=unit(Kremflow{1,2}(1:samples),<span class="string">'ft^3/sec'</span>);
+Flow.Kremmling=convert(Flow.Kremmling,<span class="string">'acre*feet/day'</span>);
+Flow.Glenwood=unit(GlenFlow{1,2}(1:samples),<span class="string">'ft^3/sec'</span>);
+Flow.Glenwood=convert(Flow.Glenwood,<span class="string">'acre*feet/day'</span>);
+</pre><p>The data is plotted with the same date/time vector. Here we capture the legend handle so that the legend position can be determined from the first run using a "get" statement. When the position is known it is saved and used to place the legend programmatically.</p><pre class="codeinput">[~,legendHandle]=plot(Date,Flow);
+datetick(<span class="string">'x'</span>,<span class="string">'mm/dd'</span>)
+title(<span class="string">'2010 Flow Rate for the Colorado River at Three Gage Stations'</span>)
+set(legendHandle,<span class="string">'Position'</span>,[0.6568 0.5885 0.2143 0.1444]);
+</pre><img vspace="5" hspace="5" src="plotting_02.png" alt=""> <p>While this example used the plot statement, the semilogx, semilogy, and loglog statements work in an analogous manner.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Plotting With Unit Variables
+% There are four plotting routines that have been adapted for plotting
+% variables with units. These are
+%
+%           plot
+%           semilogx
+%           semilogy
+%           loglog
+%
+%%
+% These routines differ somewhat from the standard Matlab plotting
+% routines. The "X" variable is a single vector with units. The "Y"
+% variable can either be a single vector with units or a structure
+% containing fields with units. The "X" and "Y" variables must have the
+% same number of points. The variable names of the "X" and "Y" vectors are
+% used to create the default labels on the axes. (These defaults can be
+% changed with the "xlabel" and "ylabel" statements.) The units associated
+% with the "X" and "Y" axes are displayed in parenthesis after the labels.
+% If the "Y" variable is a structure, all members of the structure must
+% have the same vector length and the same units. The field names in the
+% structure are used as the names in the legend.
+%% Reading the Data In
+% This example plots stream flow data from gage stations along the Colorado
+% river. The data from three gages is first read into Matlab variables. 
+fid=fopen('glenwood.txt');
+GlenFlow=textscan(fid,'%*s %*s %s %s %*s %*s %f','CollectOutput',true);
+fid=fopen('kremmling.txt');
+Kremflow=textscan(fid,'%*s %*s %s %s %*s %*s %f','CollectOutput',true);
+fid=fopen('dotsero.txt');
+Dotsflow=textscan(fid,'%*s %*s %s %s %*s %*s %f','CollectOutput',true);
+fclose('all');
+%%
+% The date and time strings appear in the data as two separate columns.
+% These are combined into one field and converted to date strings. The
+% date strings are then converted to date numbers.
+[samples,~]=size(Dotsflow{1});  % Find the number of samples in the flow
+dateTime{samples}='';           % Pre-initialize the vector for speed
+% Concatinate the two cells holding date and time
+for N=1:samples
+    dateTime{N}=[Dotsflow{1,1}{N,1} ' ' Dotsflow{1,1}{N,2}];
+end
+D=datenum(dateTime);            % Get the date number from the strings
+%% Constructing Unit Variables
+% Matlab's internal format for a date is the date number. It is kept as the
+% number of days from Jan-1-0000 00:00:00. The vector "Date" is created
+% with units of days.
+Date=convert(unit(D,'day'),'days');
+%%
+% *It is important that the date numbers are converted to units before
+% plotting. Matlab objects look at the left most parameter in the function
+% to determine which method is called. If the "X" vector is not an object
+% of class "unit", the wrong plotting method will be called. Since the
+% built-in plotting function does not understand the class "unit", it will
+% report an error about the "Y" variable.*
+%%
+% The flow data for the gage station at Dotsero is extracted from the
+% appropriate column of "DotsFlow" and given units.
+Dotsero=unit(Dotsflow{1,2}(1:samples),'ft^3/sec');
+%% Plotting the Data for Dotsero
+% The data is plotted, the ticks on the x-axis changed to month/day, and a
+% title placed on the graph.
+plot(Date,Dotsero)
+datetick('x','mm/dd')
+title('2010 Flow Rate of the Colorado River at Gage Station Dotsero')
+%% Plotting Multiple Data Sets
+% Multiple data sets can be plotted on a graph with a structure containing
+% the "Y" vectors. First, the data is assembled from the original data and
+% then converted to acre-feet per day.
+Flow.Dotsero=convert(Dotsero,'acre*feet/day');
+Flow.Kremmling=unit(Kremflow{1,2}(1:samples),'ft^3/sec');
+Flow.Kremmling=convert(Flow.Kremmling,'acre*feet/day');
+Flow.Glenwood=unit(GlenFlow{1,2}(1:samples),'ft^3/sec');
+Flow.Glenwood=convert(Flow.Glenwood,'acre*feet/day');
+%%
+% The data is plotted with the same date/time vector. Here we capture the
+% legend handle so that the legend position can be determined from the
+% first run using a "get" statement. When the position is known it is saved
+% and used to place the legend programmatically.
+[~,legendHandle]=plot(Date,Flow);
+datetick('x','mm/dd')
+title('2010 Flow Rate for the Colorado River at Three Gage Stations')
+set(legendHandle,'Position',[0.6568 0.5885 0.2143 0.1444]);
+%%
+% While this example used the plot statement, the semilogx, semilogy, and
+% loglog statements work in an analogous manner.
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,278 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Defining Variables and their Units</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-09-14"><meta name="DC.source" content="defining.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Defining Variables and their Units</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Fundamental Units</a></li><li><a href="#5">Finding Defined Unit Names</a></li><li><a href="#9">Creating New Units from Existing Unit Names</a></li><li><a href="#14">Converting to an Equivalent Unit of Measure</a></li></ul></div><h2>Fundamental Units<a name="1"></a></h2><p>A "unit" statement accepts a number and a unit name and converts these to international units (SI). There are just seven different units in the international system of units. These are:</p><pre>         seconds (s)    -- units of time
+         meters (m)     -- units of length
+         kilograms (kg) -- units of mass
+         ampere (A)     -- units of electrical current
+         kelvin (K)     -- units of temperature
+         mole (mol)     -- units of substance quantity
+         candela (cd)   -- units of light intensity</pre><p>The parenthesis contain the abreviation for the fundamental unit. Abbreviations are used as the unit names. These names may appear as a simple abbreviation such as when specifying a yard.</p><pre class="codeinput">unit(1,<span class="string">'yard'</span>)
+</pre><pre class="codeoutput"> 
+ans = 
+     0.9144 m
+</pre><p>or as a mathematical combination such as when specifying an ohm.</p><pre class="codeinput">unit(1,<span class="string">'ohm'</span>)
+</pre><pre class="codeoutput"> 
+ans = 
+     1 m^2*kg/s^3/A^2
+</pre><h2>Finding Defined Unit Names<a name="5"></a></h2><p>The available units and their names can be found with the "unit.search" command. To see if there is a unit for pounds, search for "pound" with the search command.</p><pre class="codeinput">unit.search(<span class="string">'pound'</span>)
+</pre><pre class="codeoutput">     Units of weight in pounds (avoirdupois)     {'pound','pounds','lb','lbs','lbm'}
+     Units of pounds force     {'lbf'}
+</pre><p>Two choices are presented, one for pounds avoirdupois and one for pounds force. The search command returns all descriptions that contain "pound". If you would like to see the entire table of constants, you can use the word "all".</p><pre class="codeinput">unit.search(<span class="string">'all'</span>)
+</pre><pre class="codeoutput">     Units of time in seconds     {'seconds','second','sec','s'}
+     Units of length in meters     {'meter','meters','m'}
+     Units of mass in kilograms     {'kg'}
+     Units of electrical current in amperes     {'ampere','amperes','amp','amps','A'}
+     Units of temperature in degrees kelvin     {'kelvin','K'}
+     Units of amount of a substance in moles     {'mole','moles','mol'}
+     Units of light intensity in candelas     {'candela','candelas','cd'}
+     Units of force in newtons     {'newton','newtons','N'}
+     Units of pressure in pascals     {'pascal','pascals','Pa'}
+     Units of energy in joules     {'joule','joules','J'}
+     Units of power in watts     {'watt','watts','W'}
+     Units of electrical charge in coulombs     {'coulomb','coulombs','C'}
+     Units of voltage in volts     {'volt','volts','V'}
+     Units of magnetic flux in webers     {'weber','webers'}
+     Units of magnetic flux density in teslas     {'tesla','teslas'}
+     Units of magnetic flux density in gauss     {'gauss'}
+     Units of capacitance in farads     {'farad','farads','F'}
+     Units of resistance in ohms     {'ohm','ohms'}
+     Units of inductance in henrys     {'henry','henrys','H'}
+     Units of focal length in diopters     {'diopter','diopters'}
+     Units of length in centimeters     {'cm'}
+     Units of weight in grams     {'gram','grams','gr'}
+     Units of energy in calories     {'calorie','calories','cal'}
+     Units of energy in kilocalories     {'Calorie','Calories','kcal'}
+     Units of energy in dynes     {'dyne','dynes'}
+     Units of energy in british thermal units     {'Btu','BTU'}
+     Units of energy in electron volts     {'eV'}
+     Units of power in horse power     {'hp'}
+     Units of length in kilometers     {'km'}
+     Units of length in yards     {'yard','yards','yd','yds'}
+     Units of length in feet     {'foot','feet','ft'}
+     Units of length in inches     {'inch','inches','in'}
+     Units of length in miles     {'mile','miles'}
+     Units of length in fathoms     {'fathom','fathoms'}
+     Units of length in rods     {'rod','rods'}
+     Units of length in furlongs     {'furlong','furlongs'}
+     Units of length in nautical miles     {'nmi','naut_mi'}
+     Units of length in leagues     {'league','leagues'}
+     Units of length in angstroms     {'angstrom'}
+     Units of length in light years     {'lightyear'}
+     Units of length in astronomical units     {'au'}
+     Units of distance that a star appears to shift when the earth moves one "au"     {'parsec','parsecs'}
+     Units of time in minutes     {'minute','minutes','min'}
+     Units of time in hours     {'hour','hours','hr'}
+     Units of time in days     {'day','days'}
+     Units of time in weeks     {'week','weeks'}
+     Units of time in fortnights     {'fortnight','fortnights'}
+     Units of time in years     {'year','years','yr'}
+     Units of time in centuries     {'century','centuries'}
+     Units of weight in pounds (avoirdupois)     {'pound','pounds','lb','lbs','lbm'}
+     Units of weight in ounces (avoirdupois)     {'ounce','ounces','oz'}
+     Units of weight in grains     {'grain'}
+     Units of weight in tons     {'ton'}
+     Units of atomic mass units     {'amu','u'}
+     Units of pounds force     {'lbf'}
+     Units of temperature in degrees celsius     {'celsius','degC'}
+     Units of temperature in degrees fahrenheit     {'degF'}
+     Units of temperature in degrees rankine     {'degR'}
+     Units of area in acres     {'acre','acres'}
+     Units of area in "are" (pronounced "air")     {'are'}
+     Units of area in hectares     {'hectare','hectares'}
+     Units of area in barns     {'barn','barns'}
+     Units of volume in liters     {'liter','liters','L'}
+     Units of volume in cubic centimeters     {'cc'}
+     Units of volume in fluid ounces     {'fldoz'}
+     Units of volume in table spoons     {'tablespoon','tablespoons','tblsp'}
+     Units of volume in tea spoons     {'teaspoon','teaspoons','tsp'}
+     Units of volume in cups     {'cup','cups'}
+     Units of volume in pints     {'pint','pints'}
+     Units of volume in quarts     {'quart','quarts'}
+     Units of volume in gallons (u.s.)     {'gallon','gallons'}
+     Units of volume in acre feet     {'acre_foot','acre_feet'}
+     Units of velocity in miles per hour     {'mph'}
+     Units of velocity in mach numbers (speed of sound)     {'mach'}
+     Units of velocity in nautical miles per hour     {'knot','knots','kn'}
+     Units of the speed of light in a vacuum     {'c'}
+     Units of acceleration due to gravity     {'g'}
+     Units of charge on an electron     {'e'}
+     Units of mass of an electron     {'me'}
+     Units of mass of a proton     {'mp'}
+     Units of energy expended over time     {'Planck','h'}
+     Units of fine structure constant     {'alpha'}
+     Units of gas constant     {'R'}
+     Units of avogadro's number     {'Avogadro','NA'}
+     Units of magnetic permeability of free space     {'muZero'}
+     Units of dielectric constant of free space     {'epsilonZero'}
+     Units of pressure in atmospheres     {'atm'}
+     Units of pressure in torr     {'torr'}
+     Units of pressure in bars     {'bar','bars'}
+     Units of angle in radians     {'radian','radians','rad'}
+     Units of angle in degrees     {'degree','degrees','deg'}
+     Units of a periodic unit     {'cycle','cycles','rev'}
+     Units of frequency in hertz     {'hertz','Hz'}
+</pre><h2>Creating New Units from Existing Unit Names<a name="9"></a></h2><p>The existing unit names will never cover all of the instances of unit names you may require. For example, the conversion table contains no name for the velocity in feet per second. However, it is possible to construct a unit name through mathematical operators. The ballistic table for the 0.17 Remington Fireball cartridge shows the velocity to be</p><pre class="codeinput">Velocity=unit([4250 3594 3028 2529 2081],<span class="string">'feet/second'</span>);
+</pre><p>where the velocity is expressed in 100 yard increments from the muzzle out to 400 yards. The velocity unit name is defined as the ratio of units "feet" and "second".</p><p>The operands available to combine defined units are *, /, and ^. Addition and subtraction are not permitted with unit names. The number 1 is permitted so that reciprocals can be formed. For example</p><pre class="codeinput">unit(<span class="string">'1/yd'</span>)
+</pre><pre class="codeoutput"> 
+ans = 
+     1.09361 1/m
+</pre><h2>Converting to an Equivalent Unit of Measure<a name="14"></a></h2><p>The "unit" statement always expresses the result in the SI system of measure. Units can be converted to any equivalent unit of measure with the "convert" statement. The velocity, defined above, can be expressed in mach numbers.</p><pre class="codeinput">convert(Velocity,<span class="string">'mach'</span>)
+</pre><pre class="codeoutput"> 
+ans = 
+    unit of  "mach"
+    3.9063    3.3034    2.7832    2.3245    1.9127
+
+</pre><p>The "unit" statement reports unit names with the shortest abreviation. Unit names expressed in a convert statement are reported exactly the way they are expressed. For example</p><pre class="codeinput">x=unit(1,<span class="string">'yds'</span>)
+x=convert(x,<span class="string">'meters'</span>)
+</pre><pre class="codeoutput"> 
+x = 
+     0.9144 m
+ 
+x = 
+     0.9144 meters
+</pre><p>The unit names in a "convert" statement can also be created with operators. The velocity in the example above can be expressed in kilometers per hour by</p><pre class="codeinput">convert(Velocity,<span class="string">'kilometers/hour'</span>)
+</pre><pre class="codeoutput"> 
+ans = 
+    unit of  "kilometers/hour"
+  1.0e+003 *
+
+    4.6634    3.9436    3.3226    2.7750    2.2834
+
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Defining Variables and their Units
+%% Fundamental Units
+% A "unit" statement accepts a number and a unit name and converts these
+% to international units (SI). There are just seven different units in the
+% international system of units. These are:
+%
+%           seconds (s)    REPLACE_WITH_DASH_DASH units of time
+%           meters (m)     REPLACE_WITH_DASH_DASH units of length
+%           kilograms (kg) REPLACE_WITH_DASH_DASH units of mass
+%           ampere (A)     REPLACE_WITH_DASH_DASH units of electrical current
+%           kelvin (K)     REPLACE_WITH_DASH_DASH units of temperature
+%           mole (mol)     REPLACE_WITH_DASH_DASH units of substance quantity
+%           candela (cd)   REPLACE_WITH_DASH_DASH units of light intensity
+%
+% The parenthesis contain the abreviation for the fundamental unit.
+% Abbreviations are used as the unit names. These names may appear as a
+% simple abbreviation such as when specifying a yard.
+unit(1,'yard')
+%%
+% or as a mathematical combination such as when specifying an ohm.
+unit(1,'ohm')
+%%
+%%
+%% Finding Defined Unit Names
+% The available units and their names can be found with the "unit.search"
+% command. To see if there is a unit for pounds, search for "pound" with
+% the search command.
+unit.search('pound')
+%%
+% Two choices are presented, one for pounds avoirdupois and one for pounds
+% force. The search command returns all descriptions that contain "pound".
+% If you would like to see the entire table of constants, you can use the
+% word "all".
+unit.search('all')
+%%
+%%
+%% Creating New Units from Existing Unit Names
+% The existing unit names will never cover all of the instances of unit
+% names you may require. For example, the conversion table contains no name
+% for the velocity in feet per second. However, it is possible to construct
+% a unit name through mathematical operators. The ballistic table for the
+% 0.17 Remington Fireball cartridge shows the velocity to be
+Velocity=unit([4250 3594 3028 2529 2081],'feet/second');
+%%
+% where the velocity is expressed in 100 yard increments from the muzzle
+% out to 400 yards. The velocity unit name is defined as the ratio of units
+% "feet" and "second".
+%%
+% The operands available to combine defined units are *, /, and ^. Addition
+% and subtraction are not permitted with unit names. The number 1 is
+% permitted so that reciprocals can be formed. For example
+unit('1/yd')
+%%
+%%
+%% Converting to an Equivalent Unit of Measure
+% The "unit" statement always expresses the result in the SI system of
+% measure. Units can be converted to any equivalent unit of measure with
+% the "convert" statement. The velocity, defined above, can be expressed in
+% mach numbers.
+convert(Velocity,'mach')
+%%
+% The "unit" statement reports unit names with the shortest abreviation.
+% Unit names expressed in a convert statement are reported exactly the way
+% they are expressed. For example
+x=unit(1,'yds')
+x=convert(x,'meters')
+%%
+% The unit names in a "convert" statement can also be created with
+% operators. The velocity in the example above can be expressed in
+% kilometers per hour by
+convert(Velocity,'kilometers/hour')
+##### SOURCE END #####
+--></body></html>
