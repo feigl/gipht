@@ -1,4 +1,4 @@
-function istat = utmimage(pixarr,xutmmin,xutmmax,yutmmin,yutmmax...
+function H = utmimage(pixarr,xutmmin,xutmmax,yutmmin,yutmmax...
    ,titlestr,cornerlabel,climit,dotx,doty,ctab,mysym,marksize...
    ,drawxlabels,drawylabels,datelabel...
    ,idatatype,datalabel)
@@ -6,7 +6,7 @@ function istat = utmimage(pixarr,xutmmin,xutmmax,yutmmin,yutmmax...
 %    ,titlestr,cornerlabel,climit,dotx,doty,ctab,mysym,marksize...
 %    ,drawxlabels,drawylabels,datelabel...
 %    ,idatatype,datalabel)
-
+% 2021/06/22 Kurt Feigl update to handle list of pixels
 
 % initialize to return an error
 istat = -1;
@@ -41,11 +41,11 @@ istat = -1;
 %labelcolor = [0.5 0.5 0.5]; % gray
 labelcolor = [0.0 0.0 0.0]; % black
 
-% UTM coordinates in km
-xutmmin = xutmmin/1000;
-xutmmax = xutmmax/1000;
-yutmmin = yutmmin/1000;
-yutmmax = yutmmax/1000;
+% % UTM coordinates in km
+% xutmmin = xutmmin/1000;
+% xutmmax = xutmmax/1000;
+% yutmmin = yutmmin/1000;
+% yutmmax = yutmmax/1000;
 
 %% make this routine robust
 if isfinite(xutmmin) == 0
@@ -99,26 +99,59 @@ end
 
 % fprintf(1,'In %s extrema are %g %g +/- %g \n,',mfilename,nanmin(nanmin(pixarr)),nanmax(nanmax(pixarr)),std(colvec(pixarr)));
 
+%axis off;
 switch idatatype
-    case 2 %% values are (unwrapped) range change in meters          
-       %imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr); % use automatic scaling
-       imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr,climit); % use automatic scaling within limits
     case 0 %% values are wrapped phase in cycles on [-0.5 to +0.5]
-           % scale to indices into a color table with 64 labels 
-           % add 33 to center in middle of color bar. 
-           % image (sans "s") does not use automatic scaling
-       image([xutmmin xutmmax],[yutmmax yutmmin],floor(33+64*pixarr)); %
+        % scale to indices into a color table with 64 labels
+        % add 33 to center in middle of color bar.
+        % image (sans "s") does not use automatic scaling
+        %image([xutmmin xutmmax],[yutmmax yutmmin],floor(33+64*pixarr)); %
+        image([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,floor(33+64*pixarr)); %
     case -1 %% values are gradients
-       %imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr); % use automatic scaling
-       imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr,climit); % use automatic scaling within limits
+        %imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr); % use automatic scaling
+        %imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr,climit); % use automatic scaling within limits
+        imagesc([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,climit); % use automatic scaling within limits
+    case 2 %% values are (unwrapped) range change in meters
+        %imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr); % use automatic scaling
+        %imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr,climit); % use automatic scaling within limits
+        imagesc([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,climit); % use automatic scaling within limits
+    case 3 %% plot individual pixels as dots, using automatic scaling within limits
+        % assume that pixarr is actually an array with N rows and 3 columns
+        E=pixarr(:,1);
+        N=pixarr(:,2);
+        V=pixarr(:,3);
+        % try to guess pixel dimension in meters
+        % dE=nanmedian(abs(diff(E)));
+        % dN=nanmedian(abs(diff(N)));
+        % find a number in points
+        circleSize=marksize;
+        circleSize=nanmin([ceil((xutmmax-xutmmin)/sqrt(numel(V))),ceil((yutmmax-yutmmin)/sqrt(numel(V)))]);
+        circleSize=nanmin([circleSize,3]);
+        scatter(E/1000.,N/1000.,circleSize,V,'filled'); % plot in km and mm
+        caxis(climit);    
     otherwise
         error(sprintf('unknown idatatype %d\n',idatatype));
- end
+end
 
+hold on;
+axis xy; 
+% 20200205 try to fix aspect ratio
+axis equal;
+axis tight;
+% 2021/06/22  % draw a frame around
+box on
+set(gca,'Clipping','on','LineWidth',1);
+
+if isa(ctab,'numeric')
+    colormap(ctab)
+end
 if (drawxlabels == 0)
     set(gca,'XTickLabelMode','manual');
     set(gca,'XTickLabel','');
+    set(gca,'XColor',labelcolor);  % 2011-JUL-04
+    %axis off;
 else
+    axis on;
     set(gca,'FontName','Helvetica','FontWeight','bold');
     xticklabels = get(gca,'XTickLabel');
     [nr,nc]=size(xticklabels);
@@ -126,20 +159,23 @@ else
     %whos xticklabels
     xticks = get(gca,'XTick');
     %whos xticks
-    if nr*nc > 10
+    if nr*nc > 5
         set(gca,'XTickLabelMode','manual');
         set(gca,'XTickLabel',xticklabels(1:2:nr,:));
         %get(gca,'XTickLabel')
         set(gca,'XTick',xticks(1:2:nr));
         %get(gca,'XTick')
-    end    
+    end
+    set(gca,'XColor',labelcolor);  % 2011-JUL-04
 end
-set(gca,'XColor',labelcolor);  % 2011-JUL-04
 
 if (drawylabels == 0)
     set(gca,'YTickLabelMode','manual');
     set(gca,'YTickLabel','');
+    set(gca,'YColor',labelcolor);  % 2011-JUL-04
+    %axis off;
 else
+    %axis on;
     set(gca,'FontName','Helvetica','FontWeight','bold');
     yticklabels=get(gca,'YTickLabel');
     [nr,nc]=size(yticklabels);
@@ -147,16 +183,15 @@ else
     %whos yticklabels
     yticks = get(gca,'ytick');
     %whos yticks
-    if nr*nc > 10
+    if nr*nc > 5
         set(gca,'YTickLabelMode','manual');
         set(gca,'YTickLabel',yticklabels(1:2:nr,:));
         %get(gca,'YTickLabel')
         set(gca,'YTick',yticks(1:2:nr));
         %get(gca,'YTick')
     end
-    
+    set(gca,'YColor',labelcolor);  % 2011-JUL-04
 end
-set(gca,'YColor',labelcolor);  % 2011-JUL-04
 
 ha=text(0.02,0.98,cornerlabel...
 ,'Units','normalized','Clipping','off','FontName','Helvetica','margin',1,'FontWeight','bold'...
@@ -173,24 +208,23 @@ ha=text(0.95,0.98,datelabel...
 ,'HorizontalAlignment','Right','VerticalAlignment','Top'...
 ,'BackgroundColor',[1 1 1 ]); % white box underneath
 
-hold on;
-axis xy; 
-% 20200205 try to fix aspect ratio
-axis equal;
-axis tight;
+
 
 %% plot markers
-if marksize > 0 && numel(dotx) > 0 && numel(doty) > 0
-  plot(dotx/1000,doty/1000,mysym,'MarkerSize',marksize); hold on;
+if marksize > 0 && numel(dotx) > 0 && numel(doty) > 0 && numel(mysym) == 3
+  plot(dotx/1000,doty/1000,mysym(1:2),'MarkerSize',marksize,'MarkerFaceColor',mysym(3)); 
 end
 
 %% 20180529 add this line to avoid issue on unix systems with missing panel
 drawnow;
 
 %% return with status
-istat = 0;
+%istat = 0;
+% return with handle to axis
+H=gca;
 
 
 return
+end
  
 

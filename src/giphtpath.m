@@ -47,12 +47,14 @@ if numel(home) > 0
     addpath(genpath(strcat(home,filesep,'gipht',filesep,'GraphTreeTA')),'-begin');
     addpath(genpath(strcat(home,filesep,'gipht',filesep,'extern')),'-begin');
     addpath(genpath(strcat(home,filesep,'gipht',filesep,'utils')),'-begin');
+    addpath(genpath(strcat(home,filesep,'gipht',filesep,'geostatistical')),'-begin');
     addpath(genpath(strcat(home,filesep,'gipht',filesep,'src')),'-begin');
     %addpath(genpath('/Volumes/GoogleDrive/Shared drives/PoroTomo/Software/MatlabPoroTomo/UnitConversion_rev2'),'-begin');
 else
     addpath(genpath('~feigl/gipht/GraphTreeTA'),'-begin');
     addpath(genpath('~feigl/gipht/extern'),'-begin');
     addpath(genpath('~feigl/gipht/utils'),'-begin');
+    addpath(genpath('~feigl/gipht/geostatistical'),'-begin');
     addpath(genpath('~feigl/gipht/src'),'-begin');
 end
 
