@@ -1,51 +1,52 @@
-function H = utmimage(pixarr,xutmmin,xutmmax,yutmmin,yutmmax...
-   ,titlestr,cornerlabel,climit,dotx,doty,ctab,mysym,marksize...
+function varargout = utmimage(pixarr,xutmmin,xutmmax,yutmmin,yutmmax...
+   ,titlestr,cornerlabel,climits,dotx,doty,ctab,mysym,marksize...
    ,drawxlabels,drawylabels,datelabel...
-   ,idatatype,datalabel)
+   ,idatatype,datalabel,cbar)
 % function istat = utmimage(pixarr,xutmmin,xutmmax,yutmmin,yutmmax...
-%    ,titlestr,cornerlabel,climit,dotx,doty,ctab,mysym,marksize...
+%    ,titlestr,cornerlabel,climits,dotx,doty,ctab,mysym,marksize...
 %    ,drawxlabels,drawylabels,datelabel...
 %    ,idatatype,datalabel)
 % 2021/06/22 Kurt Feigl update to handle list of pixels
+% 2021/09/02 Kurt Feigl 
+%  if climit has more than 2 elements, use it to stretch color table
 
-% initialize to return an error
+%% initialize 
+% default is to return an error
 istat = -1;
+Vstretch=nan(size(pixarr));
 
-% if nargin < 8 || exist('climit','var') == 0 || exist('dotx','var') == 0 || exist('doty','var') == 0
-%    climit  = [-0.5 0.5];
-%    dotx = 0;
-%    doty = 0;
-% end
-% if nargin < 11 || exist('ctab','var') == 0
-%    ctab = 'jet';
-% end
-% if nargin < 12 || exist('mysym','var') == 0
-%    mysym = 'ko';  % default is draw a black circle, but do not connect
-% end
-% if nargin < 13 || exist('marksize','var') == 0
-%    marksize = 5;
-% end
-% if nargin < 14 || exist('drawxlabels','var') == 0
-%    drawxlabels=0;
-% end
-% if nargin < 15 || exist('drawylabels','var') == 0
-%    drawylabels=0;
-% end
-% if nargin < 16 || exist('datelabel','var') == 0
-%    datelabel='';
-% end
-% if nargin < 17 || exist('idatatype','var') == 0
-%    idatatype = 0; % wrapped phase is default
-% end
+if nargin < 8 || exist('climit','var') == 0 || exist('dotx','var') == 0 || exist('doty','var') == 0
+   climit  = [-0.5 0.5];
+   dotx = 0;
+   doty = 0;
+end
+if nargin < 11 || exist('ctab','var') == 0
+   ctab = 'jet';
+end
+if nargin < 12 || exist('mysym','var') == 0
+   mysym = 'ko';  % default is draw a black circle, but do not connect
+end
+if nargin < 13 || exist('marksize','var') == 0
+   marksize = 5;
+end
+if nargin < 14 || exist('drawxlabels','var') == 0
+   drawxlabels=0;
+end
+if nargin < 15 || exist('drawylabels','var') == 0
+   drawylabels=0;
+end
+if nargin < 16 || exist('datelabel','var') == 0
+   datelabel='';
+end
+if nargin < 17 || exist('idatatype','var') == 0
+   idatatype = 0; % wrapped phase is default
+end
+if nargin < 18 || exist('cbar','var') == 0
+   cbar = 0; % default is to NOT draw a colorbar
+end
 
 %labelcolor = [0.5 0.5 0.5]; % gray
 labelcolor = [0.0 0.0 0.0]; % black
-
-% % UTM coordinates in km
-% xutmmin = xutmmin/1000;
-% xutmmax = xutmmax/1000;
-% yutmmin = yutmmin/1000;
-% yutmmax = yutmmax/1000;
 
 %% make this routine robust
 if isfinite(xutmmin) == 0
@@ -90,8 +91,7 @@ end
 %     end
 % end
 
-
-% prune
+%% prune data
 if isreal(pixarr) ~= 1
     warning('Found complex data in pixarr. Taking real part.');
     pixarr = real(pixarr);
@@ -108,18 +108,16 @@ switch idatatype
         %image([xutmmin xutmmax],[yutmmax yutmmin],floor(33+64*pixarr)); %
         image([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,floor(33+64*pixarr)); %
     case -1 %% values are gradients
-        %imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr); % use automatic scaling
-        %imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr,climit); % use automatic scaling within limits
-        imagesc([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,climit); % use automatic scaling within limits
+        % use automatic scaling within limits
+        imagesc([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,climits); % 
     case 2 %% values are (unwrapped) range change in meters
-        %imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr); % use automatic scaling
-        %imagesc([xutmmin xutmmax],[yutmmax yutmmin],pixarr,climit); % use automatic scaling within limits
-        imagesc([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,climit); % use automatic scaling within limits
-    case 3 %% plot individual pixels as dots, using automatic scaling within limits
+       % use automatic scaling within limits
+        imagesc([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,climits);
+    case 3 %% plot individual pixels as dots
         % assume that pixarr is actually an array with N rows and 3 columns
-        E=pixarr(:,1);
-        N=pixarr(:,2);
-        V=pixarr(:,3);
+        E=colvec(pixarr(:,1)/1.e3);  % UTM easting in km
+        N=colvec(pixarr(:,2)/1.e3);  % UTM northing in km
+        V=colvec(pixarr(:,3));       % field values in (arbitrary) input units
         % try to guess pixel dimension in meters
         % dE=nanmedian(abs(diff(E)));
         % dN=nanmedian(abs(diff(N)));
@@ -127,8 +125,15 @@ switch idatatype
         circleSize=marksize;
         circleSize=nanmin([ceil((xutmmax-xutmmin)/sqrt(numel(V))),ceil((yutmmax-yutmmin)/sqrt(numel(V)))]);
         circleSize=nanmin([circleSize,3]);
-        scatter(E/1000.,N/1000.,circleSize,V,'filled'); % plot in km and mm
-        caxis(climit);    
+
+        if numel(climits) > 2
+            % stretch color table
+            [H, Vstretch] = contourfnu2(E,N,V,'levels',climits,'cmap',ctab,'method','scatter','symsize',circleSize,'symbol','s','pos_colorbar','none');
+        else
+            % use automatic scaling within limits
+            scatter(E,N,circleSize,V,'filled'); % plot in km and mm
+            caxis(climits);
+        end
     otherwise
         error(sprintf('unknown idatatype %d\n',idatatype));
 end
@@ -203,25 +208,41 @@ ha=text(0.02,0.98,cornerlabel...
 %,'HorizontalAlignment','Center','VerticalAlignment','Top'...
 %,'BackgroundColor',[1 1 1 ]); % white box underneath
 
-ha=text(0.95,0.98,datelabel...
-,'Units','normalized','Clipping','off','FontName','Helvetica','margin',1,'FontWeight','bold'...
-,'HorizontalAlignment','Right','VerticalAlignment','Top'...
-,'BackgroundColor',[1 1 1 ]); % white box underneath
+% ha=text(0.95,0.98,datelabel...
+% ,'Units','normalized','Clipping','off','FontName','Helvetica','margin',1,'FontWeight','bold'...
+% ,'HorizontalAlignment','Right','VerticalAlignment','Top'...
+% ,'BackgroundColor',[1 1 1 ]); % white box underneath
 
 
 
-%% plot markers
-if marksize > 0 && numel(dotx) > 0 && numel(doty) > 0 && numel(mysym) == 3
-  plot(dotx/1000,doty/1000,mysym(1:2),'MarkerSize',marksize,'MarkerFaceColor',mysym(3)); 
-end
+% %% plot markers
+% if marksize > 0 && numel(dotx) > 0 && numel(doty) > 0 && numel(mysym) == 3
+%   plot(dotx/1000,doty/1000,mysym(1:2),'MarkerSize',marksize,'MarkerFaceColor',mysym(3)); 
+% end
 
 %% 20180529 add this line to avoid issue on unix systems with missing panel
-drawnow;
+%drawnow;
+
+% % draw colorbar
+% if cbar == 1
+%     Hcb = colorbar;
+%     Hcb.Label.String=datalabel;
+% end
 
 %% return with status
 %istat = 0;
 % return with handle to axis
 H=gca;
+
+% return graphics handle
+if nargout >= 1
+    varargout{1} = H;
+end
+
+% return values rescaled to stretch histogram
+if nargout >= 2 && numel(isfinite(Vstretch)) > 0
+    varargout{2} = Vstretch;
+end
 
 
 return

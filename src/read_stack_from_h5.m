@@ -1,0 +1,11 @@
+fname='../inputs/ifgramStack.h5'
+h5disp(fname)
+I=h5info(fname)
+I.Datasets
+I.Datasets(1).Name
+I.Datasets(2).Name
+I.Datasets(3).Name
+I.Datasets(4).Name
+I.Datasets(5).Name
+I.Datasets(6).Name
+S=h5read(fname,'/unwrapPhase');

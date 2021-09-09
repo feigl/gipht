@@ -87,19 +87,22 @@ addParameter(P,'symsize',5);
 addParameter(P,'symbol','o');
 addParameter(P,'ninterp',0);
 addParameter(P,'method','imagesc');
+addParameter(P,'pos_colorbar','eastoutside');
 parse(P,x,y,data,varargin{:});
-P.Results
+%P.Results
 
-if isfield(P.Results,'method'), method=P.Results.method;   end
-if isfield(P.Results,'ninterp'),ninterp=P.Results.ninterp; end
-if isfield(P.Results,'symsize'),symsize=P.Results.symsize; end
 if isfield(P.Results,'levels') ,v=P.Results.levels;        end
+if isfield(P.Results,'cmap')   ,cmap=P.Results.cmap;       end
+if isfield(P.Results,'symsize'),symsize=P.Results.symsize; end
 if isfield(P.Results,'symbol') ,symbol=P.Results.symbol;   end
-method
-ninterp
-symsize
-symbol
-v
+if isfield(P.Results,'ninterp'),ninterp=P.Results.ninterp; end
+if isfield(P.Results,'method'), method=P.Results.method;   end
+if isfield(P.Results,'pos_colorbar') ,pos_colorbar=P.Results.pos_colorbar;   end
+% method
+% ninterp
+% symsize
+% symbol
+% v
 % Pass both the parameter name and value to the parse method, and display the results.
 % 
 % parse(p,'myParam',100);
@@ -116,7 +119,7 @@ if(~exist('pos_colorbar','var')||isempty(pos_colorbar)),   pos_colorbar = 'easto
 if(~exist('overticklabel','var')||isempty(overticklabel)), overticklabel = true;             end
 if(~exist('method','var')||isempty(method)),               method = 'imagesc';               end
 if(~exist('ninterp','var')||isempty(ninterp)),             ninterp = 0;                      end
-if(~exist('symsize','var')||isempty(symsize)),             symsize = 1;                     end
+if(~exist('symsize','var')||isempty(symsize)),             symsize = 1;                      end
 if(ninterp>0)
     data=interp2(data,ninterp);
     if( strcmp(method,'contourf')||strcmp(method,'contour')||strcmp(method,'pcolor') )
@@ -162,8 +165,7 @@ z(isnan(data)) = nan;
 
 % draw
 if(strcmp(method,'imagesc'))
-%     hout.h = imagesc(x,y,z);axis xy
-    hout.h = imagesc(x,y,z,'AlphaData',~isnan(z));axis xy
+    hout.h = imagesc(x,y,z,'AlphaData',~isnan(z));
 elseif(strcmp(method,'contourf'))
     [hout.c,hout.h] = contourf(x,y,z,1:nlev-1);
 elseif(strcmp(method,'contour'))
@@ -171,16 +173,22 @@ elseif(strcmp(method,'contour'))
 elseif(strcmp(method,'pcolor'))
     hout.h = pcolor(x,y,z);shading flat
 elseif(strcmp(method,'scatter'))
-    scatter(x,y,symsize,z,symbol,'filled'); % 
+    hout.h = scatter(x,y,symsize,z,symbol,'filled'); 
 end
+
+% set coordinates
+axis xy; 
+axis equal;
+axis tight;
+
 if(exist('nancolor','var')), set(gca,'color',nancolor); end
     
 % set colormap and colorbar
 Ncmap=size(cmap,1);
 Ndraw=nlev-1;
 cmapdraw(1:Ndraw,:)=cmap( round(linspace(1,Ncmap,Ndraw)) ,:);
-colormap(gca,cmapdraw)
-caxis([1,nlev])
+colormap(gca,cmapdraw);
+caxis([1,nlev]);
 if(~strcmp(pos_colorbar,'none'))
     hc = colorbar('location',pos_colorbar);
     if(overticklabel)
@@ -196,16 +204,22 @@ if(~strcmp(pos_colorbar,'none'))
         ylimits = get(hc,'Ylim');
         ystep = (ylimits(2)-ylimits(1))/Ndraw;
         set(hc,'ytick',ylimits(1):ystep:ylimits(2))
-        set(hc,'yticklabel',vlabel)
+        set(hc,'yticklabel',vlabel);
     elseif(any(strcmp(pos_colorbar,{'southoutside','northoutside','south','north'})))
         xlimits = get(hc,'Xlim');
         xstep = (xlimits(2)-xlimits(1))/Ndraw;
         set(hc,'xtick',xlimits(1):xstep:xlimits(2))
-        set(hc,'xticklabel',vlabel)
+        set(hc,'xticklabel',vlabel);
     end
     hout.hc = hc;
 end
 
-if nargout > 0
+% return graphics handle
+if nargout >= 1
     varargout{1} = hout;
+end
+
+% return rescaled z
+if nargout >= 2
+    varargout{2} = z;
 end
