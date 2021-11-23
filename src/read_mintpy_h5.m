@@ -1,10 +1,15 @@
-function [INFO, ATTR, DATA] = read_mintpy_h5(h5_file_name)
+function [INFO, ATTR, DATA] = read_mintpy_h5(h5_file_name,dataset1)
 %% Read data from HDF5 file in Matlab
 
 % Ref https://www.mathworks.com/help/matlab/high-level-functions.html
 
 % 2021/06/11 Kurt Feigl
+% 2021/10/18 Kurt Feigl
 
+narginchk(1,2);
+if nargin < 2
+    dataset1='';
+end
 %% Read attributes from HDF5 file
 ATTR=struct;
 INFO = h5info(h5_file_name);
@@ -20,8 +25,53 @@ for i = 1:num_atr
         ATTR.(name1) = valu2;  % value is numeric
     else
         ATTR.(name1) = valu1;  % value is string
-    end   
+    end 
+    if numel(strfind(name1,'X_STEP')>0) || numel(strfind(name1,'Y_STEP')) >0
+        fprintf('%s is %f\n',char(name1),ATTR.(name1));
+    end
 end
+
+% make arrays of latitude and longitude
+if  isfield(ATTR,'Y_STEP') && isfield(ATTR,'Y_FIRST') ...
+ && isfield(ATTR,'X_STEP') && isfield(ATTR,'X_FIRST') 
+    % count like a C programmer
+    lon_vec=[ATTR.X_FIRST : ATTR.X_STEP : ATTR.X_FIRST+ATTR.X_STEP*(ATTR.WIDTH-1)];
+    lat_vec=[ATTR.Y_FIRST : ATTR.Y_STEP : ATTR.Y_FIRST+ATTR.Y_STEP*(ATTR.LENGTH-1)];
+    if ATTR.Y_STEP < 0
+        lat_vec = lat_vec(end:-1:1);
+        
+        % % make grid of coordinates
+        %
+        % jcols = repmat([1:ATTR.WIDTH]  ,  ATTR.LENGTH,          1);
+        % irows = repmat([1:ATTR.LENGTH]',            1, ATTR.WIDTH);
+        %
+        % fieldNames=fieldnames(DATA);
+        % if sum(contains(fieldNames,'longitude'))
+        %    DATA.longitudes  = lon_vec(jcols);  % do not overwrite existing field
+        % else
+        %    DATA.longitude = lon_vec(jcols);
+        % end
+        % if sum(contains(fieldNames,'latitude'))
+        %    DATA.latitudes  = lat_vec(irows);  % do not overwrite existing field
+        % else
+        %    DATA.latitude = lat_vec(irows);
+        % end
+        %
+        DATA.lon_vec = lon_vec; % row vector
+        DATA.lat_vec = transpose(lat_vec); % column vector
+    else
+        DATA.lon_vec = lon_vec;
+        DATA.lat_vec = lat_vec;
+    end
+else
+    % assume that rows step from north to south
+    ATTR.Y_STEP = -1;
+    %             jcols = repmat([1:ATTR.WIDTH]  ,  ATTR.LENGTH,          1);
+    %             irows = repmat([1:ATTR.LENGTH]',            1, ATTR.WIDTH);
+    DATA.lon_vec = nan;
+    DATA.lat_vec = nan;
+end
+
 
 % az_lks      = h5readatt(vel_file,'/','ALOOKS');             az_lks      = str2double(az_lks{1});
 % rg_lks      = h5readatt(vel_file,'/','RLOOKS');             rg_lks      = str2double(rg_lks{1});
@@ -38,18 +88,29 @@ end
 % lon_step    = h5readatt(vel_file,'/','X_STEP');             x_step      = str2double(x_step{1});
 % lat_step    = h5readatt(vel_file,'/','Y_STEP');             y_step      = str2double(y_step{1});
 
-lon_vec=[ATTR.X_FIRST : ATTR.X_STEP : ATTR.X_FIRST+ATTR.X_STEP*ATTR.WIDTH];
-lat_vec=[ATTR.Y_FIRST : ATTR.Y_STEP : ATTR.Y_FIRST+ATTR.Y_STEP*ATTR.LENGTH];
+k=0;
+if numel(dataset1) > 0
+    ndatasets=numel(INFO.Datasets);
+    for i=1:ndatasets
+        name1 = INFO.Datasets(i).Name
+        if strfind(name1,dataset1)
+            k=k+1;
+            idatasets(k)=i;
+        end
+    end
+else
+    ndatasets=numel(INFO.Datasets);
+    idatasets=1:ndatasets;
+end
 
 
-
-ndatasets=numel(INFO.Datasets);
 
 %% read data sets
-for i=1:ndatasets
+for i=idatasets
     name1 = INFO.Datasets(i).Name
     dataSetNames{i} = name1;
     A = h5read(h5_file_name, sprintf('/%s',name1));
+    whos A
     ndim = numel(size(A));
     fprintf(1,'Array %s has dimension = %d numel = %d ',name1,ndim,numel(A)); 
     switch ndim
@@ -66,6 +127,7 @@ for i=1:ndatasets
             error(sprintf('Cannot handle dimension %d\n',ndim));
     end
     
+        
     if ATTR.Y_STEP < 0
         % transpose and flip up-to-down
         switch ndim
@@ -102,30 +164,9 @@ for i=1:ndatasets
         end
         
     end
-end
-if ATTR.Y_STEP < 0
-    lat_vec = lat_vec(end:-1:1);
-end
+    end
 
-% make grid of coordinates
-
-jcols = repmat([1:ATTR.WIDTH]  ,  ATTR.LENGTH,          1);
-irows = repmat([1:ATTR.LENGTH]',            1, ATTR.WIDTH);
-
-fieldNames=fieldnames(DATA);
-if sum(contains(fieldNames,'longitude'))
-   DATA.longitudes  = lon_vec(jcols);  % do not overwrite existing field
-else
-   DATA.longitude = lon_vec(jcols);
-end
-if sum(contains(fieldNames,'latitude'))
-   DATA.latitudes  = lat_vec(irows);  % do not overwrite existing field
-else
-   DATA.latitude = lat_vec(irows);
-end
-
-DATA.lon_vec = lon_vec; % row vector
-DATA.lat_vec = transpose(lat_vec); % column vector
+    
 
 % update names of data sets
 dataSetNames=fieldnames(DATA);

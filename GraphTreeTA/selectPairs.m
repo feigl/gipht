@@ -278,15 +278,15 @@ if numel(CRITERIA.filter) > 0 ...
                     fprintf(1,'Filter failed.\n');
                 end
             else
-                fprintf(1,'Using existing filtered file named %s.\n',fname2); 
+                fprintf(1,'Using existing filtered file named %s.\n',fname2);
                 iok1(iPair) = iPair;
                 Tpairs.filename{iPair} = fname2;
             end
         end
     end
+    iok=find(iok1 > 0);
+    Tpairs = Tpairs(iok,:);  
 end
-iok=find(iok1 > 0);
-Tpairs = Tpairs(iok,:);
 % check size
 [nPairs, ndummy] = size(Tpairs);
 if nPairs ~= kount

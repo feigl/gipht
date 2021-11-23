@@ -73,7 +73,7 @@ function varargout = contourfnu2(x,y,data,varargin)
 
 % Create an inputParser object and add a name-value pair into the input scheme.
 % 
- P = inputParser;
+P = inputParser;
 % paramName = 'myParam';
 % defaultVal = 0;
 % addParameter(p,paramName,defaultVal)
@@ -88,6 +88,7 @@ addParameter(P,'symbol','o');
 addParameter(P,'ninterp',0);
 addParameter(P,'method','imagesc');
 addParameter(P,'pos_colorbar','eastoutside');
+addParameter(P,'labelstring','');
 parse(P,x,y,data,varargin{:});
 %P.Results
 
@@ -97,6 +98,7 @@ if isfield(P.Results,'symsize'),symsize=P.Results.symsize; end
 if isfield(P.Results,'symbol') ,symbol=P.Results.symbol;   end
 if isfield(P.Results,'ninterp'),ninterp=P.Results.ninterp; end
 if isfield(P.Results,'method'), method=P.Results.method;   end
+if isfield(P.Results,'labelstring'), labelstring=P.Results.labelstring;   end
 if isfield(P.Results,'pos_colorbar') ,pos_colorbar=P.Results.pos_colorbar;   end
 % method
 % ninterp
@@ -110,8 +112,8 @@ if isfield(P.Results,'pos_colorbar') ,pos_colorbar=P.Results.pos_colorbar;   end
 % ans = struct with fields:
 %     myParam: 100
 
-datamax = max(data(:));
-datamin = min(data(:));
+datamax = nanmax(data(:));
+datamin = nanmin(data(:));
 
 if(~exist('v','var')||isempty(v)),                         v = linspace(datamin,datamax,10); end
 if(~exist('cmap','var')||isempty(cmap)),                   cmap = jet;                       end
@@ -120,6 +122,7 @@ if(~exist('overticklabel','var')||isempty(overticklabel)), overticklabel = true;
 if(~exist('method','var')||isempty(method)),               method = 'imagesc';               end
 if(~exist('ninterp','var')||isempty(ninterp)),             ninterp = 0;                      end
 if(~exist('symsize','var')||isempty(symsize)),             symsize = 1;                      end
+if(~exist('labelstring','var') || isempty(labelstring)),   labelstring = '';                 end
 if(ninterp>0)
     data=interp2(data,ninterp);
     if( strcmp(method,'contourf')||strcmp(method,'contour')||strcmp(method,'pcolor') )
@@ -162,6 +165,8 @@ for i=1:nlev-1
     end
 end
 z(isnan(data)) = nan;
+
+whos
 
 % draw
 if(strcmp(method,'imagesc'))
@@ -211,6 +216,9 @@ if(~strcmp(pos_colorbar,'none'))
         set(hc,'xtick',xlimits(1):xstep:xlimits(2))
         set(hc,'xticklabel',vlabel);
     end
+    %To add a text description along the colorbar, access the underlying text object using the Label property of the colorbar.
+    labelstring
+    hc.Label.String=labelstring;
     hout.hc = hc;
 end
 

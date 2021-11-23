@@ -12,10 +12,10 @@ switch siteCode
                 nmin = -Inf;
                 nmax = +Inf;
             case 'big'
-                emin = nanmin(TMAP.Easting);
-                emax = nanmax(TMAP.Easting);
-                nmin = nanmin(TMAP.Northing);
-                nmax = nanmax(TMAP.Northing);
+                emin =  418000;
+                emax =  436000;
+                nmin = 3980000;
+                nmax = 3998000;
             case 'med'  % square
                 emin =  418000;
                 emax =  434000;
