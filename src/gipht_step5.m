@@ -61,7 +61,7 @@ fidtxtout = fopen(fnparout,'a');
 panelcols = 4;
 panelrows = ceil(np/panelcols);
 nfull = panelrows * panelcols;
-climit = [-0.5 0.5];
+climits = [-0.5 0.5];
 
 % make a mesh of for entire sub-region
 % ymax = max(yax(isub));
@@ -869,7 +869,7 @@ for i = 1:np
     % set limits of color table
     switch idatatype1 %%TODO handle a different data type for each pair
         case 0
-            climit=[-0.5, +0.5];
+            climits=[-0.5, +0.5];
             if bitget(figopt,1) == 1
                 
                 ctab = cmapblackzero(1); % black at zero at bottom of color bar
@@ -877,8 +877,8 @@ for i = 1:np
                 ctab = colormap('jet');
             end
         otherwise
-            climit(1) = nanmin(colvec([imA imB imC imD imE imF imG imH]));
-            climit(2) = nanmax(colvec([imA imB imC imD imE imF imG imH]));
+            climits(1) = nanmin(colvec([imA imB imC imD imE imF imG imH]));
+            climits(2) = nanmax(colvec([imA imB imC imD imE imF imG imH]));
             ctab = cmapgraynan;
     end
     
@@ -917,38 +917,40 @@ for i = 1:np
     %% set limits of color table
     switch idatatype1 %%TODO handle a different data type for each pair
         case 0
-            climit=[-0.5, +0.5];
+            climits=[-0.5, +0.5];
         otherwise
-%             climit(1) = nanmin(nanmin([imA imF imG imH])); 
-%             climit(2) = nanmax(nanmax([imA imF imG imH]));
-            climit(1) = quantile(colvec([imA imF imG imH]),0.05); 
-            climit(2) = quantile(colvec([imA imF imG imH]),0.95);
+            % climit(1) = nanmin(nanmin([imA imF imG imH]));
+            % climit(2) = nanmax(nanmax([imA imF imG imH]));
+            if do_stretch == 1
+                climits = quantile(colvec([imA imF imG imH]),[0.05:0.05:0.95]);
+            else
+                climits(1) = quantile(colvec([imA imF imG imH]),0.05);
+                climits(2) = quantile(colvec([imA imF imG imH]),0.95);
+            end
     end
 
     
     %% make 8-panel plot in portrait
     nf=nf+1; h(nf)=utmimage8(imA,imB,imC,imD,imE,imF,imG,imH...
         ,tlA,tlB,tlC,tlD,tlE,tlF,tlG,tlH...
-        ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes,idatatype1,datalabel);
+        ,wesn,titlestr,climits,dotx,doty,ctab,1,mysyms,marksizes,idatatype1,datalabel);
     %     ,wesn,titlestr,climit,[Xcorners11 NaN Xcorners21]/1000,[Ycorners11 NaN Ycorners21]/1000,ctab,1,mysyms,marksizes);
     feval(printfun,sprintf('%s_%03d_8PAN',runname,i));
     
     %% make 8-panel plot in landscape
     nf=nf+1; h(nf)=utmimage8landscape(imA,imB,imC,imD,imE,imF,imG,imH...
         ,tlA,tlB,tlC,tlD,tlE,tlF,tlG,tlH...
-        ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes,idatatype1,datalabel);
+        ,wesn,titlestr,climits,dotx,doty,ctab,1,mysyms,marksizes,idatatype1,datalabel);
     %     ,wesn,titlestr,climit,[Xcorners11 NaN Xcorners21]/1000,[Ycorners11 NaN Ycorners21]/1000,ctab,1,mysyms,marksizes);
     %feval(printfun,sprintf('%s_%03d_8PANLS.pdf',runname,i),'landscape');
     feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
     
     %% make 4-panel plot of wrapped phase
-    feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
     tlA = ''; tlF = '';
     datelabel = '';
- 
     nf=nf+1; h(nf)=utmimage4(imA,imF,imG,imH ...
         ,tlA,tlF,tlG,tlH ...
-        ,wesn,titlestr,climit,dotx,doty,ctab,1,mysyms,marksizes...
+        ,wesn,titlestr,climits,dotx,doty,ctab,1,mysyms,marksizes...
         ,datelabel,idatatype1,datalabel);
     feval(printfun,sprintf('%s_%03d_4PAN',runname,i));  
      
@@ -1032,7 +1034,7 @@ for i = 1:np
         
         %         y2lab='mm/yr';
         nf=nf+1;h(nf) = draw_profile(xt,yt1,yt2,xlab,y1lab,y2lab,tlab);
-        feval(printfun,sprintf('%s_profU_ew_P%03d',runname,i)');
+        feval(printfun,sprintf('%s_profU_ew_P%03d',runname,i));
         
         %   2012-10-04 values in meters
         kq = kq+1;
@@ -1214,26 +1216,26 @@ if np > 1 && np < 36
     % utmmageNM(ims,tls,nrows,mcols....
     %             ,wesn,titlestr,climit,dotutmx,dotutmy,ctab)
     
-    climit=[-0.5, +0.5];
+    climits=[-0.5, +0.5];
     
     %nf=nf+1;h(nf)=figure;
     utmimageNM(oims,tls,panelrows,panelcols,wesn...
-        ,'Observed Phase Values',climit,0.,0.,ctab)
+        ,'Observed Phase Values',climits,0.,0.,ctab)
     feval(printfun,sprintf('%s_ALLOBS',runname));
     
     %nf=nf+1;h(nf)=figure;
     utmimageNM(mims,tls,panelrows,panelcols,wesn...
-        ,'Final Modeled Phase Values',climit,0,0,ctab)
+        ,'Final Modeled Phase Values',climits,0,0,ctab)
     feval(printfun,sprintf('%s_ALLMOD',runname));
     
     %nf=nf+1;h(nf)=figure;
     utmimageNM(rims,tls,panelrows,panelcols,wesn...
-        ,'Final Residual Phase Values',climit,0,0,ctab)
+        ,'Final Residual Phase Values',climits,0,0,ctab)
     feval(printfun,sprintf('%s_ALLRES',runname));
     
     %nf=nf+1;h(nf)=figure;
     utmimageNM(cims,tls,panelrows,panelcols,wesn...
-        ,'Final Deviations in Phase',climit,0,0,ctab)
+        ,'Final Deviations in Phase',climits,0,0,ctab)
     feval(printfun,sprintf('%s_ALLDEV',runname));
     
 end

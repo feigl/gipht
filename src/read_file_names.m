@@ -57,8 +57,9 @@ switch file_type
         %  ../intf/1992220_1993169/unwrap_mask_ll.grd   % unwrapped phase in radians
         
         % Read the arguments into a Cell Array
-%       CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','%')
-        CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','#')
+%       CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','%');
+        CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','#'); % comment is hash "#"
+        %CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle',{'#','%'});  % does not work
         fclose(fid);
         [nrows,ncols] = size(CDAT)
         if ncols >= 5 && nrows > 0

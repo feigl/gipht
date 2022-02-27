@@ -14,7 +14,7 @@ function H1 = utmimage8landscape(im1,im2,im3,im4,im5,im6,im7,im8...
 % Last Modified 2021/06/22 
 % Tried unsuccessfully to remove white space between plots in horizontal
 % dimension
-
+labelcolor = [0. 0. 0.]; % Black
 
 if nargin < 19
    cbar = 0;
@@ -93,23 +93,23 @@ set(H1,'Position',[1 1 1000*11./8.5 1000]);
 %% parse levels and extrema
 switch idatatype
     case 0
-        labu = 'cycles';
         if abs(climits(2)-0.5) < 1e-6
-            labt = '+1/2 (cycle)';
+            labt = '+1/2';
         else
             labt = sprintf('%+4.1f',climits(1));
         end
         if abs(climits(1)+0.5) < 1e-6
-            labb = '-1/2 (cycle)';
+            labb = '-1/2';
         else
             labb = sprintf('%+4.1f',climits(2));
         end
+        do_stretch = 0;
     case -1
-        labu = 'strain';
         zmin = nanmin(climits);
         zmax = nanmax(climits);
         labt = sprintf('%+5.1E',zmin);
         labb = sprintf('%+5.1E',zmax);
+        do_stretch = 0;
     case {2,3}
         zmin = nanmin(climits);
         zmax = nanmax(climits);
@@ -122,12 +122,12 @@ switch idatatype
         else
             labt = sprintf('%+5.1E',zmax);
             labb = sprintf('%+5.1E',zmin);
-        end      
+        end
+        do_stretch = 1;
     otherwise
         error(sprintf('unknown idatatype %d\n',idatatype));
 end
 labu = datalabel;
-
 colormap(ctab);
 
 % draw panels in smart order to see tick labels
@@ -141,68 +141,88 @@ dy = 0.325*rs*rat;
 ddx = 0.0;
 ddy = 0.0;
 subplot('position',[x0+3*(dx+ddx)  y0+dy+ddy   dx dy]); 
-[H, Vstretch] = utmimage(im4,xutmmin,xutmmax,yutmmin,yutmmax,tl4,'d',climits,dotxutm, dotyutm,ctab,mysyms{4},marksizes(4),0,0,'',idatatype,datalabel,1);
-if cbar == 1  
-%    ha=text(1.25 ,-0.850,labb            ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Right'  ,'VerticalAlignment','Bottom','rotation', 0);
-%    ha=text(1.25 , 0.000,labu            ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',90);    
-%    ha=text(1.25 , 0.850,labt            ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Right ' ,'VerticalAlignment','Top','rotation', 0); 
-   hc=text(0.50 , 1.0      ,'Deviation' ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',0);    
+[H, Vstretch] = utmimage(im4,xutmmin,xutmmax,yutmmin,yutmmax,tl4,'d',climits,dotxutm, dotyutm,ctab,mysyms{4},marksizes(4),0,0,'',idatatype,datalabel,cbar,do_stretch);
+if cbar == 1
+    %    ha=text(1.25 ,-0.850,labb            ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Right'  ,'VerticalAlignment','Bottom','rotation', 0);
+    %    ha=text(1.25 , 0.000,labu            ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',90);
+    %    ha=text(1.25 , 0.850,labt            ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Right ' ,'VerticalAlignment','Top','rotation', 0);
+    hc=text(0.50 , 1.0      ,'Deviation' ,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',0);
+    ha=text(1.1,0.05,   labb,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+    ha=text(1.1,0.95,   labt,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+    ha=text(1.1,0.50,   labu,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor...
+        ,'rotation',90,'HorizontalAlignment','Center','VerticalAlignment','Top','Color',labelcolor);
 end
 
 subplot('position',[x0+2*(dx+ddx)  y0+dy+ddy   dx dy]);
-[H, Vstretch] = utmimage(im3,xutmmin,xutmmax,yutmmin,yutmmax,tl3,'c',climits, dotxutm,dotyutm,ctab,mysyms{3},marksizes(3),0,0,'',idatatype,datalabel);
+[H, Vstretch] = utmimage(im3,xutmmin,xutmmax,yutmmin,yutmmax,tl3,'c',climits, dotxutm,dotyutm,ctab,mysyms{3},marksizes(3),0,0,'',idatatype,datalabel,cbar,do_stretch);
 if cbar == 1  
    hc=text(0.5  , 1.0      ,'Residual','Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',0);    
 end
 
 subplot('position',[x0+1*(dx+ddx)  y0+dy+ddy   dx dy]); 
-[H, Vstretch] = utmimage(im2,xutmmin,xutmmax,yutmmin,yutmmax,tl2,'b',climits, dotxutm,dotyutm,ctab,mysyms{2},marksizes(2),0,0,'',idatatype,datalabel);
+[H, Vstretch] = utmimage(im2,xutmmin,xutmmax,yutmmin,yutmmax,tl2,'b',climits, dotxutm,dotyutm,ctab,mysyms{2},marksizes(2),0,0,'',idatatype,datalabel,cbar,do_stretch);
 if cbar == 1  
    hc=text(0.5  , 1.0      ,'Modeled','Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',0);    
 end
 
 subplot('position',[x0+0*(dx+ddx)  y0+dy+ddy   dx dy]); 
-[H, Vstretch] = utmimage(im1,xutmmin,xutmmax,yutmmin,yutmmax,tl1,'a',climits, dotxutm,dotyutm,ctab,mysyms{1},marksizes(1),0,0,'',idatatype,datalabel);
+[H, Vstretch] = utmimage(im1,xutmmin,xutmmax,yutmmin,yutmmax,tl1,'a',climits, dotxutm,dotyutm,ctab,mysyms{1},marksizes(1),0,0,'',idatatype,datalabel,cbar,do_stretch);
 if cbar == 1  
    hc=text(0.50  ,  1.0      ,'Observed','Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','HorizontalAlignment','Center' ,'VerticalAlignment','Bottom','rotation',0);    
-   hc=text(-0.15,+0.1, 'Northing (km)','Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','rotation',90,'HorizontalAlignment','Left','VerticalAlignment','Top');
+   hc=text(-0.10,+0.1, 'Northing (km)','Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','rotation',90,'HorizontalAlignment','Left','VerticalAlignment','Top');
 end
 
 subplot('position',[x0+3*(dx+ddx)  y0+ddy  dx dy]); 
-[H, Vstretch] = utmimage(im8,xutmmin,xutmmax,yutmmin,yutmmax,tl8,'h',climits, dotxutm, dotyutm,ctab,mysyms{8},marksizes(8),0,0,'',idatatype,datalabel);
+[H, Vstretch] = utmimage(im8,xutmmin,xutmmax,yutmmin,yutmmax,tl8,'h',climits, dotxutm, dotyutm,ctab,mysyms{8},marksizes(8),0,0,'',idatatype,datalabel,cbar,do_stretch);
+if cbar == 1
+    ha=text(1.1,0.05,   labb,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+    ha=text(1.1,0.95,   labt,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+    ha=text(1.1,0.50,   labu,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor...
+        ,'rotation',90,'HorizontalAlignment','Center','VerticalAlignment','Top','Color',labelcolor);
+end
 
 subplot('position',[x0+2*(dx+ddx)  y0+ddy  dx dy]);
-[H, Vstretch] = utmimage(im7,xutmmin,xutmmax,yutmmin,yutmmax,tl7,'g',climits, dotxutm, dotyutm,ctab,mysyms{7},marksizes(7),0,0,'',idatatype,datalabel);
+[H, Vstretch] = utmimage(im7,xutmmin,xutmmax,yutmmin,yutmmax,tl7,'g',climits, dotxutm, dotyutm,ctab,mysyms{7},marksizes(7),0,0,'',idatatype,datalabel,cbar,do_stretch);
 
 subplot('position',[x0+1*(dx+ddx)  y0+ddy  dx dy]); 
-[H, Vstretch] = utmimage(im6,xutmmin,xutmmax,yutmmin,yutmmax,tl6,'f',climits, dotxutm, dotyutm,ctab,mysyms{6},marksizes(6),0,0,'',idatatype,datalabel);
+[H, Vstretch] = utmimage(im6,xutmmin,xutmmax,yutmmin,yutmmax,tl6,'f',climits, dotxutm, dotyutm,ctab,mysyms{6},marksizes(6),0,0,'',idatatype,datalabel,cbar,do_stretch);
 
 if cbar == 1
    hc=text(+0.2,-0.03    , 'Easting (km)','Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','Bold','rotation', 0,'HorizontalAlignment','Left','VerticalAlignment','Top');
 end
 
 subplot('position',[x0+0*(dx+ddx)  y0+ddy  dx dy]); 
-[H, Vstretch] = utmimage(im5,xutmmin,xutmmax,yutmmin,yutmmax,tl5,'e',climits,  dotxutm, dotyutm,ctab,mysyms{5},marksizes(5),1,1,'',idatatype,datalabel);
+[H, Vstretch] = utmimage(im5,xutmmin,xutmmax,yutmmin,yutmmax,tl5,'e',climits,  dotxutm, dotyutm,ctab,mysyms{5},marksizes(5),1,1,'',idatatype,datalabel,cbar,do_stretch);
 
 % 2021/06/28 draw color bar last
 if cbar == 1 
-    hc=colorbar('Position',[x0+4*(dx+ddx) y0+ddy 0.015 2*dy]);
-    colormap(hc,ctab);
-
-    %get(hc)
-    %set(ha,'YTickLabel',[]);
-    %drawnow;
-    hc.Label.String = datalabel;
+    %% TODO - add numerical values here
+%     hc=colorbar('Position',[x0+4*(dx+ddx) y0+ddy 0.015 2*dy]);
+%     get(hc)
+%     get(hc,'TickLabels')
+    %hc=colorbar('Position',[x0+4*(dx+ddx) y0+ddy 0.015 2*dy-ddy],'YTickLabel',[]);
+    hc=colorbar('Position',[x0+4*(dx+ddx) y0+0.05*dy 0.015 0.90*dy],'YTickLabel',[]);
+    hc=colorbar('Position',[x0+4*(dx+ddx) y0+1.05*dy 0.015 0.90*dy],'YTickLabel',[]);
     
-    if numel(climits) > 2
-        ylimits = get(hc,'Ylim');
-        ystep = (ylimits(2)-ylimits(1))/(numel(climits)-1);
-        set(hc,'ytick',ylimits(1):ystep:ylimits(2));
-        yticks=get(hc,'ytick');
-        for i=1:numel(yticks)
-            ticklabels{i}=num2str(climits(i));
+    % TODO 2022/02/26 make stretching work
+    if do_stretch
+        %colormap(hc,ctab);
+        
+        get(hc)
+        set(hc,'YTickLabel',[]);
+        drawnow;
+        hc.Label.String = datalabel;
+        
+        if numel(climits) > 2
+            ylimits = get(hc,'Ylim');
+            ystep = (ylimits(2)-ylimits(1))/(numel(climits)-1);
+            set(hc,'ytick',ylimits(1):ystep:ylimits(2));
+            yticks=get(hc,'ytick');
+            for i=1:numel(yticks)
+                ticklabels{i}=num2str(climits(i));
+            end
+            set(hc,'TickLabels',ticklabels);
         end
-        set(hc,'TickLabels',ticklabels);
     end
 end
 

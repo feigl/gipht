@@ -25,18 +25,18 @@ V=V(iok);
 % calculate distance from center
 %R=hypot(X-nanmean(X),Y-nanmean(Y));
 %calculate distance 
-R=hypot(diff(X),diff(Y));
+H=hypot(diff(X),diff(Y));
 % sort by distance
-[R,isort]=sort(R);
-whos R
-min(R)
+[H,isort]=sort(H);
+whos H
+min(H)
 V=V(isort);
 ndata=numel(V)
 
 figure
-plot(R,'g-');
+plot(H,'g-');
 xlabel('index');
-ylabel('distance R');
+ylabel('distance h [m]');
 
 
 % autocovariance
@@ -60,7 +60,8 @@ whos Corr1
 whos Corr2
 
 % Calculate 
-%Lohman, R. B., and M. Simons (2005), Some thoughts on the use of InSAR data to constrain models of surface deformation: Noise structure and data downsampling, Geochemistry, Geophysics, Geosystems, 6, n/a-n/a. 
+%Lohman, R. B., and M. Simons (2005), Some thoughts on the use of InSAR data to constrain models of surface deformation:
+%Noise structure and data downsampling, Geochemistry, Geophysics, Geosystems, 6, n/a-n/a.
 
 
 % % histogram of autocovariance
@@ -71,8 +72,13 @@ whos Corr2
 
 % histogram of correlation
 nf=nf+1;figure
+subplot(2,1,1);
 histogram(colvec(Corr1));
 xlabel('Correlation coefficient');
+ylabel('count');
+subplot(2,1,2);
+histogram(colvec(Corr2));
+xlabel('Normalized Correlation coefficient');
 ylabel('count');
 
 % Correlation as a function of distance
@@ -85,14 +91,11 @@ plot(abs(lags2(1:ndata)),Corr2(1:ndata),'bo');
 grid on;
 xlabel('lag');
 ylabel('correlation');
-title('Correlation coefficient');
+title('Normalized Correlation coefficient');
 
 nf=nf+1;figure; hold on;
-% plot(R(2:end),Corr1(ndata+1:end),'r.');
-% plot(R(2:end),Corr1(ndata-1:-1:1),'ro');
-plot(R(2:end),Corr2(ndata+1:end),'b.');
-plot(R(2:end),Corr2(ndata-1:-1:1),'bo');
-%legend('Corr1 right','Corr1 left','Corr2 right', 'Corr2 left');
+plot(H(1:end),Corr2(ndata:end),'b.');
+plot(H(1:end),Corr2(ndata:-1:1),'bo');
 grid on;
 xlabel('distance [m]');
 ylabel('correlation');

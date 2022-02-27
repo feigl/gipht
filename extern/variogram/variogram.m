@@ -93,7 +93,7 @@ params.thetastep   = 30;
 params.subsample   = inf;
 params = parseargs(params,varargin{:});
 
-if params.maxdist > maxd;
+if params.maxdist > maxd
     warning('Matlab:Variogram',...
             ['Maximum distance exceeds maximum distance \n' ... 
              'in the dataset. maxdist was decreased to ' num2str(maxd) ]);
