@@ -166,7 +166,6 @@ for i=1:nlev-1
 end
 z(isnan(data)) = nan;
 
-whos
 
 % draw
 if(strcmp(method,'imagesc'))
@@ -195,6 +194,7 @@ cmapdraw(1:Ndraw,:)=cmap( round(linspace(1,Ncmap,Ndraw)) ,:);
 colormap(gca,cmapdraw);
 caxis([1,nlev]);
 if(~strcmp(pos_colorbar,'none'))
+    pos_colorbar
     hc = colorbar('location',pos_colorbar);
     if(overticklabel)
         vlabel = v;
@@ -205,17 +205,21 @@ if(~strcmp(pos_colorbar,'none'))
         if(v(1)==-inf), vlabel(1) = {''}; end
         if(v(end)==inf), vlabel(end) = {''}; end
     end
-    if(any(strcmp(pos_colorbar,{'eastoutside','westoutside','east','west'})))
-        ylimits = get(hc,'Ylim');
-        ystep = (ylimits(2)-ylimits(1))/Ndraw;
-        set(hc,'ytick',ylimits(1):ystep:ylimits(2))
-        set(hc,'yticklabel',vlabel);
-    elseif(any(strcmp(pos_colorbar,{'southoutside','northoutside','south','north'})))
-        xlimits = get(hc,'Xlim');
-        xstep = (xlimits(2)-xlimits(1))/Ndraw;
-        set(hc,'xtick',xlimits(1):xstep:xlimits(2))
-        set(hc,'xticklabel',vlabel);
-    end
+    vlabel
+    set(hc,'TickLabels',vlabel);
+    
+%     if(any(strcmp(pos_colorbar,{'eastoutside','westoutside','east','west'})))
+%         ylimits = get(hc,'Ylim');
+%         ystep = (ylimits(2)-ylimits(1))/Ndraw;
+%         set(hc,'ytick',ylimits(1):ystep:ylimits(2))
+%         set(hc,'yticklabel',vlabel);
+%     elseif(any(strcmp(pos_colorbar,{'southoutside','northoutside','south','north'})))
+%         xlimits = get(hc,'Xlim');
+%         xstep = (xlimits(2)-xlimits(1))/Ndraw;
+%         set(hc,'xtick',xlimits(1):xstep:xlimits(2))
+%         set(hc,'xticklabel',vlabel);
+%     end
+
     %To add a text description along the colorbar, access the underlying text object using the Label property of the colorbar.
     labelstring
     hc.Label.String=labelstring;

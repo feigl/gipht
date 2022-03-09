@@ -180,14 +180,14 @@ for i = 1:np
     INFO = grdinfo3(fn0);
     nrsub = INFO.ny
     ncsub = INFO.nx
-    %[tmpx,tmpy,tmpz] = grdread3(fn0); % GMT grid file 
-    [grdx,grdy,tmpz] = grdread3(fn0); % GMT grid file 
+    %[tmpx,tmpy,tmpz] = grdread3(fn0); % GMT grid file
+    [grdx,grdy,tmpz] = grdread3(fn0); % GMT grid file
     phao = double(tmpz)*FACTIN;
     ndata = numel(phao);
     
     kmasts = kmast*ones(ndata,1);
     kslavs = kslav*ones(ndata,1);
-
+    
     
     if bitget(figopt,2) == 1
         % recalculate model at each pixel individually
@@ -370,12 +370,12 @@ for i = 1:np
         
         storage=[];
         clear DST2;
-%         function DST = build_dst(fitfun,xyzm,tepochs,bpest,dops,DD,unitv...
-%     ,xd,yd,ippix1,mpercys,idatatype...
-%     ,dx,dy,dz,orbvm,orbvs,alon,alat...
-%     ,qii1,qii2,qjj1,qjj2...
-%     ,phasig,kindex,kmasts,kslavs)
-
+        %         function DST = build_dst(fitfun,xyzm,tepochs,bpest,dops,DD,unitv...
+        %     ,xd,yd,ippix1,mpercys,idatatype...
+        %     ,dx,dy,dz,orbvm,orbvs,alon,alat...
+        %     ,qii1,qii2,qjj1,qjj2...
+        %     ,phasig,kindex,kmasts,kslavs)
+        
         DST2 = build_dst(fitfun,xyzm1,tepochs,bpest,dops,DD1,unitv1...
             ,zeros(ndata,1),zeros(ndata,1),ippix1,mpercys(i),idatatype...
             ,dx1,dy1,dz1,orbvm1,orbvs1,clond1,clatd1...
@@ -383,7 +383,7 @@ for i = 1:np
             ,phasig,kindex,kmasts,kslavs);
         
         fprintf(1,'Number of finite values in DST2.z0 = %d\n',numel(find(isfinite(DST2.z0)==1)));
-    
+        
         %             % call fitting function first time to initialize
         %             % calculate modeled values for phase, NOT gradient
         for ii=1:numel(DST2.idatatype)
@@ -405,10 +405,10 @@ for i = 1:np
         end
         %             fprintf(1,'Setting Offset parameters in final estimate to zero ....\n');
         %             PST1.p1(22) = 0;
-                % temporary storage structure TST
+        % temporary storage structure TST
         %[rng,TST] = feval(fitfun,DST2,PST);
         [rng,TST1] = feval(fitfun,DST2,PST1); %20150727
-
+        
         fprintf(1,'Evaluating fitting function %s for final   estimate at %d locations....\n',fitfun,numel(DST2.x));
         mCdl1 = feval(fitfun,DST2,PST1,TST1); % final
         %profile off
@@ -420,17 +420,17 @@ for i = 1:np
         % phase residuals for all pixels in this pair
         nf=nf+1;h(nf)=figure;
         res1 = rwrapm(DST.phaobs-DST.phamod);
-%         % Test for von Miseness
-%         [Sm,VMnessString1] = vonmisesness (colvec(res1))    % Mardia and Jupp
-%         [U2,VMnessString2] = vonmisesness2(colvec(res1))    % Fisher
-%         % make QQ plot
-%         qqplotvonmises(colvec(res1)/2.0/pi);
-%         feval(printfun,sprintf('%s_QQPLOT_%03d_von_mises',runname,i));
+        %         % Test for von Miseness
+        %         [Sm,VMnessString1] = vonmisesness (colvec(res1))    % Mardia and Jupp
+        %         [U2,VMnessString2] = vonmisesness2(colvec(res1))    % Fisher
+        %         % make QQ plot
+        %         qqplotvonmises(colvec(res1)/2.0/pi);
+        %         feval(printfun,sprintf('%s_QQPLOT_%03d_von_mises',runname,i));
         
         % get vector values
         if bitget(figopt,3) == 1
             fprintf(1,'Evaluating fitting function %s for final   estimate at %d locations....\n',fitfun,numel(DST2.x));
-           %KF20170724[rng0,DST2] = feval(fitfun,DST2,PST1,TST); % final
+            %KF20170724[rng0,DST2] = feval(fitfun,DST2,PST1,TST); % final
             [rng0,DST2] = feval(fitfun,DST2,PST1,TST1); % final
             %profile off
             if isreal(rng0) ~= 1
@@ -509,8 +509,8 @@ for i = 1:np
     fprintf(1,'Extreme values of mdl1 %12.4e %12.4e \n',nanmin(nanmin(mdl1)),nanmax(nanmax(mdl1)));
     
     
-
-
+    
+    
     %% handle wrapping
     switch idatatype1
         case 0 %% observable is phase in radians
@@ -546,7 +546,7 @@ for i = 1:np
                 iok=find(devs_all00>0);
             end
             
-             % 2010-MAR-22 OK to calculate scalar cost as average of vector costs
+            % 2010-MAR-22 OK to calculate scalar cost as average of vector costs
             totcost00 = nanmean(colvec(devs_all00(iok)));
             totcost0  = nanmean(colvec(devs_all0(iok)));
             totcost1  = nanmean(colvec(devs_all1(iok)));
@@ -558,7 +558,7 @@ for i = 1:np
             %% residuals in radians
             res0 = phao-mdl0;
             res1 = phao-mdl1;
-
+            
             wrm0 = nan(size(mdl0));
             wrm1 = nan(size(mdl0));
             
@@ -567,14 +567,14 @@ for i = 1:np
             devs_all00 = phao;
             devs_all0  = res0;
             devs_all1  = res1;
-                        
+            
             % 2012-JUN-25 select OK points
             if pselect == 0
                 iok = ones(size(devs_all00));
             else
                 iok=find(isfinite(devs_all00) == 1);
             end
-
+            
             % use RMS to evaluate cost
             totcost00 = nanrms(colvec(devs_all00(iok)));
             totcost0  = nanrms(colvec(devs_all0(iok)));
@@ -583,7 +583,7 @@ for i = 1:np
             objfun1 = 'nanrms';
     end
     
- 
+    
     
     
     fprintf(1,'Total Cost (by %s) of null  model = %12.4f %s for %6d observations in sub-region\n',objfun1,totcost00,objlabel,numel(iok));
@@ -695,9 +695,9 @@ for i = 1:np
         fprintf(1,'After  range2vector %d %d\n',size(omr));
         omr = reshape(omr,nrsub,ncsub);
         fprintf(1,'After  reshape      %d %d\n',size(omr));
-%         figure;
-%         plot(colvec(DST2.x0),colvec(omr),'.k');
-%         title('omr');
+        %         figure;
+        %         plot(colvec(DST2.x0),colvec(omr),'.k');
+        %         title('omr');
         
         omx = reshape(omv(1,:),nrsub,ncsub); % unwrapped observed vector displacement in m [east   component]
         omy = reshape(omv(2,:),nrsub,ncsub); % unwrapped observed vector displacement in m [north  component]
@@ -725,9 +725,9 @@ for i = 1:np
     titlestr = sprintf('Pair %3d epochs %3d %3d %s to %s Dt = %.1f yr '...
         ,i,iuniqorbs(kmast),iuniqorbs(kslav)...
         ,char(tepochs(kmast)),char(tepochs(kslav)),double(years(tepochs(kslav)-tepochs(kmast))));
-      %  ,strrep(runname,'_','\_'));  
-   %        ,nanmean(colvec(devs_all0))/DNPC,nanmean(colvec(devs_all1))/DNPC...
- 
+    %  ,strrep(runname,'_','\_'));
+    %        ,nanmean(colvec(devs_all0))/DNPC,nanmean(colvec(devs_all1))/DNPC...
+    
     
     %% build images
     imA = reshape(     double(phao)/DNPC ,nlmesh3,ncmesh3);tlA = 'Initial';
@@ -747,12 +747,12 @@ for i = 1:np
     else
         imE = reshape(     double(phao)/DNPC ,nlmesh3,ncmesh3);tlE = 'Final';
     end
-    if idatatype1 == 0       
+    if idatatype1 == 0
         imF = reshape(     double(wrm1)/DNPC ,nlmesh3,ncmesh3);tlF = 'Mod1';
     else
-        imF = reshape(     double(mdl1)/DNPC ,nlmesh3,ncmesh3);tlF = 'Mod1';        
+        imF = reshape(     double(mdl1)/DNPC ,nlmesh3,ncmesh3);tlF = 'Mod1';
     end
-        
+    
     imG = reshape(     double(res1)/DNPC ,nlmesh3,ncmesh3);tlG = 'Res1';
     imH = reshape(double(devs_all1)/DNPC ,nlmesh3,ncmesh3);tlH = 'Dev1';
     
@@ -764,11 +764,11 @@ for i = 1:np
         inull = [];
     end
     
-%     
-%     inull=union(inull,find(abs(imE) < 1/256.0));
-%     inull=union(inull,find(isfinite(imE)==0)); %
-%     inull=union(inull,find(abs(imA) < 1/256.0));
-%     inull=union(inull,find(isfinite(imA)==0));
+    %
+    %     inull=union(inull,find(abs(imE) < 1/256.0));
+    %     inull=union(inull,find(isfinite(imE)==0)); %
+    %     inull=union(inull,find(abs(imA) < 1/256.0));
+    %     inull=union(inull,find(isfinite(imA)==0));
     
     % How handle values for multi-panel plots
     %figopt % xx1 propagate nulls from quadtree, paint missing data black
@@ -800,12 +800,12 @@ for i = 1:np
         else
             interpolation_method = 'natural';extrapolation_method = 'none';
         end
-
+        
         warning(sprintf('Replacing %d pixels with Interpolated values using interpolation_method %s and extrapolation_method %s\n'...
             ,numel(inull)),interpolation_method,extrapolation_method);
         imA(inull) = NaN;
         %imA(inull) = fillingaps(imA,interpolation_method,extrapolation_method);
-        %imB(inull) = NaN; 
+        %imB(inull) = NaN;
         imC = fillingaps(imC,interpolation_method,extrapolation_method);
         imD = fillingaps(imD,interpolation_method,extrapolation_method);
         imE = fillingaps(imE,interpolation_method,extrapolation_method);
@@ -855,10 +855,10 @@ for i = 1:np
     % Write phase to binary .pha files and instructions for using them
     %    log_phases(runname, i, imA, imF, imG, imH, imE, uns, mds, urs, ucs);
     %   2012-JUN-25 make everything into meters
-%     log_phases(runname, i, imA, imF, imG, imH, imE...
-%         , 1.0e3*uns, 1.0e3*mds, 1.0e3*urs, 1.0e3*ucs...
-%         , 1.0e3*omr, 1.0e3*omx, 1.0e3*omy, 1.0e3*omz...
-%         , 1.0e3*umr, 1.0e3*umx, 1.0e3*umy, 1.0e3*umz);
+    %     log_phases(runname, i, imA, imF, imG, imH, imE...
+    %         , 1.0e3*uns, 1.0e3*mds, 1.0e3*urs, 1.0e3*ucs...
+    %         , 1.0e3*omr, 1.0e3*omx, 1.0e3*omy, 1.0e3*omz...
+    %         , 1.0e3*umr, 1.0e3*umx, 1.0e3*umy, 1.0e3*umz);
     write_grids(runname, i, imA, imF, imG, imH, imE...
         , uns, mds, urs, ucs...
         , omr, omx, omy, omz...
@@ -866,81 +866,83 @@ for i = 1:np
         , demx,demy ...
         , OPT.demdescfile, idatatype1);
     
-    % set limits of color table
-    switch idatatype1 %%TODO handle a different data type for each pair
-        case 0
-            climits=[-0.5, +0.5];
-            if bitget(figopt,1) == 1
-                
-                ctab = cmapblackzero(1); % black at zero at bottom of color bar
-            else
-                ctab = colormap('jet');
-            end
-        otherwise
-            climits(1) = nanmin(colvec([imA imB imC imD imE imF imG imH]));
-            climits(2) = nanmax(colvec([imA imB imC imD imE imF imG imH]));
-            ctab = cmapgraynan;
-    end
     
-    % set color table
-        
-%% get centroid of Okada source
-%     xcentroid = p1(get_parameter_index('Okada1_Centroid_Easting_in_m____',qnames));
-%     ycentroid = p1(get_parameter_index('Okada1_Centroid_Northing_in_m___',qnames));
-%     icentroid = NaN;
-%     jcentroid = NaN;
-%     if isfinite(xcentroid) == 1
-%         icentroid = find(abs(yax(isub)-ycentroid) < abs(dy/2.));
-%         if numel(icentroid) >= 1
-%             icentroid=icentroid(1);
-%         end
-%     end
-%     if isfinite(ycentroid) == 1
-%         jcentroid = find(abs(xax(jsub)-xcentroid) < abs(dx/2.));
-%         if numel(jcentroid) >= 1
-%             jcentroid=jcentroid(1);
-%         end
-%     end
+    % get centroid of Okada source
+    xcentroid = p1(get_parameter_index('Okada1_Centroid_Easting_in_m____',pnames));
+    ycentroid = p1(get_parameter_index('Okada1_Centroid_Northing_in_m___',pnames));
+    %     icentroid = NaN;
+    %     jcentroid = NaN;
+    %     if isfinite(xcentroid) == 1
+    %         icentroid = find(abs(yax(isub)-ycentroid) < abs(dy/2.));
+    %         if numel(icentroid) >= 1
+    %             icentroid=icentroid(1);
+    %         end
+    %     end
+    %     if isfinite(ycentroid) == 1
+    %         jcentroid = find(abs(xax(jsub)-xcentroid) < abs(dx/2.));
+    %         if numel(jcentroid) >= 1
+    %             jcentroid=jcentroid(1);
+    %         end
+    %     end
     
-    % draw symbols at centers of sources, UTM coordinates are in meters
-%     dotx = xcentroid;
-%     doty = ycentroid;  
-    dotx = nan;
-    doty = nan;
-    mysym='w*';
-    marksize = 10;
-    for ii=1:8
-        mysyms{ii} = mysym;
-        marksizes(ii) = marksize;
+    if isfinite(xcentroid) == 1 && isfinite(ycentroid) == 1
+        %draw symbols at centers of sources, UTM coordinates are in meters
+        dotx = xcentroid;
+        doty = ycentroid;
+        %     dotx = nan;
+        %     doty = nan;
+        for ii=1:8
+            switch ii
+                case {5,6,7,8}
+                    mysym='mo';
+                    marksize = 10;
+                otherwise
+                    mysym='';
+                    marksize=1;
+            end         
+            mysyms{ii} = mysym;
+            marksizes(ii) = marksize;
+        end
     end
     
     %% set limits of color table
     switch idatatype1 %%TODO handle a different data type for each pair
         case 0
             climits=[-0.5, +0.5];
+            if bitget(figopt,1) == 1
+                ctab = cmapblackzero(1); % black at zero at bottom of color bar
+            else
+                ctab = colormap('jet');
+            end
+            cbar_pos = 'none'
         otherwise
+            ctab = colormap('jet');
             % climit(1) = nanmin(nanmin([imA imF imG imH]));
             % climit(2) = nanmax(nanmax([imA imF imG imH]));
             if do_stretch == 1
-                climits = quantile(colvec([imA imF imG imH]),[0.05:0.05:0.95]);
+                climits = quantile(colvec([imA imB imC imD imE imF imG imH]),[0.05:0.05:0.95]);
+                cbar_pos='EastOutside';
             else
-                climits(1) = quantile(colvec([imA imF imG imH]),0.05);
-                climits(2) = quantile(colvec([imA imF imG imH]),0.95);
+                %                 climits(1) = nanmin(colvec([imA imB imC imD imE imF imG imH]));
+                %                 climits(2) = nanmax(colvec([imA imB imC imD imE imF imG imH]));
+                climits(1) = quantile(colvec([imA imB imC imD imE imF imG imH]),0.05);
+                climits(2) = quantile(colvec([imA imB imC imD imE imF imG imH]),0.95);
+                cbar_pos = 'none'
             end
     end
-
     
     %% make 8-panel plot in portrait
     nf=nf+1; h(nf)=utmimage8(imA,imB,imC,imD,imE,imF,imG,imH...
         ,tlA,tlB,tlC,tlD,tlE,tlF,tlG,tlH...
-        ,wesn,titlestr,climits,dotx,doty,ctab,1,mysyms,marksizes,idatatype1,datalabel);
+        ,wesn,titlestr,climits,dotx,doty,ctab,cbar_pos ...
+        ,mysyms,marksizes,idatatype1,datalabel,do_stretch);
     %     ,wesn,titlestr,climit,[Xcorners11 NaN Xcorners21]/1000,[Ycorners11 NaN Ycorners21]/1000,ctab,1,mysyms,marksizes);
     feval(printfun,sprintf('%s_%03d_8PAN',runname,i));
     
     %% make 8-panel plot in landscape
     nf=nf+1; h(nf)=utmimage8landscape(imA,imB,imC,imD,imE,imF,imG,imH...
         ,tlA,tlB,tlC,tlD,tlE,tlF,tlG,tlH...
-        ,wesn,titlestr,climits,dotx,doty,ctab,1,mysyms,marksizes,idatatype1,datalabel);
+        ,wesn,titlestr,climits,dotx,doty,ctab,cbar_pos,mysyms,marksizes,idatatype1,datalabel);
     %     ,wesn,titlestr,climit,[Xcorners11 NaN Xcorners21]/1000,[Ycorners11 NaN Ycorners21]/1000,ctab,1,mysyms,marksizes);
     %feval(printfun,sprintf('%s_%03d_8PANLS.pdf',runname,i),'landscape');
     feval(printfun,sprintf('%s_%03d_8PANLS',runname,i));
@@ -952,15 +954,15 @@ for i = 1:np
         ,tlA,tlF,tlG,tlH ...
         ,wesn,titlestr,climits,dotx,doty,ctab,1,mysyms,marksizes...
         ,datelabel,idatatype1,datalabel);
-    feval(printfun,sprintf('%s_%03d_4PAN',runname,i));  
-     
+    feval(printfun,sprintf('%s_%03d_4PAN',runname,i));
+    
     
     %% Make profiles
     % decide to show rate or not
     itref = get_parameter_index('Reference_Epoch_in_years________',pnames);
-%   20151121 not defined in final estimate
-%   if abs(PST.p1(itref)) > 0
-%   if abs(PST.p0(itref)) > 0
+    %   20151121 not defined in final estimate
+    %   if abs(PST.p1(itref)) > 0
+    %   if abs(PST.p0(itref)) > 0
     if abs(PST1.p0(itref)) > 0
         y0lab='displacement';
         y2lab='mm';
@@ -1003,7 +1005,7 @@ for i = 1:np
         tlab = strcat(sprintf('Northing = %.3f km ',ymesh3(iprof,jprof)/1000),' :',titlestr);
         xt=xmesh3(iprof,:)/1000;
         xlab='Easting (km)';
-                
+        
         fprintf(1,'Making E-W profile in east rate for Pair %03d\n',i);
         xt=xmesh3(iprof,:)/1000;
         yt1=omx(iprof,:)*1000/time_span;
@@ -1066,25 +1068,25 @@ for i = 1:np
         %         qnames{iq} = sprintf('Pair_%05d_DisZatCen_m_MOD__',i);
         
         %   2012-10-25 values in meters
-%         if numel(icentroid) == 1 && numel(jcentroid) == 1
-%             if isfinite(icentroid) == 1 && isfinite(jcentroid) == 1
-%                 kq = kq+1;
-%                 q0(kq)     = NaN;
-%                 q1(kq)     = umx(icentroid,jcentroid);
-%                 qsig(kq)   = NaN;
-%                 qnames{kq} = sprintf('Pair_%05d_ModDisXCentroid_m',i);
-%                 kq = kq+1;
-%                 q0(kq)     = NaN;
-%                 q1(kq)     = umy(icentroid,jcentroid);
-%                 qsig(kq)   = NaN;
-%                 qnames{kq} = sprintf('Pair_%05d_ModDisYCentroid_m',i);
-%                 kq = kq+1;
-%                 q0(kq)     = NaN;
-%                 q1(kq)     = umz(icentroid,jcentroid);
-%                 qsig(kq)   = NaN;
-%                 qnames{kq} = sprintf('Pair_%05d_ModDisZCentroid_m',i);
-%             end
-%         end
+        %         if numel(icentroid) == 1 && numel(jcentroid) == 1
+        %             if isfinite(icentroid) == 1 && isfinite(jcentroid) == 1
+        %                 kq = kq+1;
+        %                 q0(kq)     = NaN;
+        %                 q1(kq)     = umx(icentroid,jcentroid);
+        %                 qsig(kq)   = NaN;
+        %                 qnames{kq} = sprintf('Pair_%05d_ModDisXCentroid_m',i);
+        %                 kq = kq+1;
+        %                 q0(kq)     = NaN;
+        %                 q1(kq)     = umy(icentroid,jcentroid);
+        %                 qsig(kq)   = NaN;
+        %                 qnames{kq} = sprintf('Pair_%05d_ModDisYCentroid_m',i);
+        %                 kq = kq+1;
+        %                 q0(kq)     = NaN;
+        %                 q1(kq)     = umz(icentroid,jcentroid);
+        %                 qsig(kq)   = NaN;
+        %                 qnames{kq} = sprintf('Pair_%05d_ModDisZCentroid_m',i);
+        %             end
+        %         end
     end
     
     % calculate some derived parameters
@@ -1121,74 +1123,74 @@ for i = 1:np
     %     qnames{iq} = sprintf('Pair_%05d_Unwrap_Obs_Mod_mm',i);
     %     mds(iprof,jprof)/1.0e3;
     %   2012-10-04 values in meters
-%     iq = iq+1;
-%     q0(iq)     = DST.mpercy(1)*nanmin(colvec(double(mdl0)))/DNPC;
-%     q1(iq)     = DST.mpercy(1)*nanmin(colvec(double(mdl1)))/DNPC;
-%     qsig(iq)   = DST.mpercy(1)*nanstd(colvec(double(mdl1)))/DNPC;
-%     qnames{iq} = sprintf('Pair_%05d_MiniRange_m_MOD__',i);
-%     iq = iq+1;
-%     q0(iq)     = DST.mpercy(1)*nanmax(colvec(double(mdl0)))/DNPC;
-%     q1(iq)     = DST.mpercy(1)*nanmax(colvec(double(mdl1)))/DNPC;
-%     qsig(iq)   = DST.mpercy(1)*nanstd(colvec(double(mdl1)))/DNPC;
-%     qnames{iq} = sprintf('Pair_%05d_MaxiRange_m_MOD__',i);
-%     
-%     
-%     %  PRINT OUT THE DERIVED PARAMETERS
-%     qnames = truncate_parameter_names(qnames);
-%     iq1 = iq2+1;
-%     iq2 = iq;
-%     uqb(iq1:iq2)=NaN;
-%     lqb(iq1:iq2)=NaN;
-%     
-%     for j=iq1:iq2
-%         qflags{j} = 'D#';
-%         adj = q1(j)-q0(j);
-%         
-%         outfmt = getfmt(q1(j),qnames{j});
-%         
-%         fprintf(1        ,outfmt,qflags{j},j+mparam,qnames{j} ,q0(j),q1(j),adj,qsig(j),sadj,(uqb(j)-lqb(j))/2.0);
-%         fprintf(fidtxtout,outfmt,qflags{j},j+mparam,qnames{j}, q0(j),q1(j),adj,qsig(j),sadj,(uqb(j)-lqb(j))/2.0);
-%     end
+    %     iq = iq+1;
+    %     q0(iq)     = DST.mpercy(1)*nanmin(colvec(double(mdl0)))/DNPC;
+    %     q1(iq)     = DST.mpercy(1)*nanmin(colvec(double(mdl1)))/DNPC;
+    %     qsig(iq)   = DST.mpercy(1)*nanstd(colvec(double(mdl1)))/DNPC;
+    %     qnames{iq} = sprintf('Pair_%05d_MiniRange_m_MOD__',i);
+    %     iq = iq+1;
+    %     q0(iq)     = DST.mpercy(1)*nanmax(colvec(double(mdl0)))/DNPC;
+    %     q1(iq)     = DST.mpercy(1)*nanmax(colvec(double(mdl1)))/DNPC;
+    %     qsig(iq)   = DST.mpercy(1)*nanstd(colvec(double(mdl1)))/DNPC;
+    %     qnames{iq} = sprintf('Pair_%05d_MaxiRange_m_MOD__',i);
+    %
+    %
+    %     %  PRINT OUT THE DERIVED PARAMETERS
+    %     qnames = truncate_parameter_names(qnames);
+    %     iq1 = iq2+1;
+    %     iq2 = iq;
+    %     uqb(iq1:iq2)=NaN;
+    %     lqb(iq1:iq2)=NaN;
+    %
+    %     for j=iq1:iq2
+    %         qflags{j} = 'D#';
+    %         adj = q1(j)-q0(j);
+    %
+    %         outfmt = getfmt(q1(j),qnames{j});
+    %
+    %         fprintf(1        ,outfmt,qflags{j},j+mparam,qnames{j} ,q0(j),q1(j),adj,qsig(j),sadj,(uqb(j)-lqb(j))/2.0);
+    %         fprintf(fidtxtout,outfmt,qflags{j},j+mparam,qnames{j}, q0(j),q1(j),adj,qsig(j),sadj,(uqb(j)-lqb(j))/2.0);
+    %     end
     
-%     % print corners of Okada models
-%     iii=get_parameter_index('Okada1_Length_in_m______________',pnames);
-%     if p0(iii) > 0
-%         fprintf(1,'Initial UTM coordinates of 4 corners, upper center, and Centroid of Okada1\n');
-%         for iiii=[1 2 3 4 7 10]
-%             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},Xcorners10(iiii),Ycorners10(iiii),Hcorners10(iiii));
-%         end
-%         fprintf(1,'Final   UTM coordinates of 4 corners, upper center, and Centroid of Okada1\n');
-%         for iiii=[1 2 3 4 7 10]
-%             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},Xcorners11(iiii),Ycorners11(iiii),Hcorners11(iiii));
-%         end
-%         fprintf(1,'Initial Lon Lat of 4 corners, upper center, Centroid of Okada1\n');
-%         for iiii=[1 2 3 4 7 10]
-%             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},LonCorners10(iiii),LatCorners10(iiii),Hcorners10(iiii));
-%         end
-%         fprintf(1,'Final   Lon Lat of 4 corners, upper center, Centroid of Okada1\n');
-%         for iiii=[1 2 3 4 7 10]
-%             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},LonCorners11(iiii),LatCorners11(iiii),Hcorners11(iiii));
-%         end
-%     end
-%     iii=get_parameter_index('Okada2_Length_in_m______________',pnames);
-%     if p0(iii) > 0
-%         fprintf(1,'Initial UTM coordinates of 4 corners, upper center, and Centroid of Okada2\n');
-%         for iiii=[1 2 3 4 7 10]
-%             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},Xcorners20(iiii),Ycorners20(iiii),Hcorners20(iiii));
-%         end
-%         fprintf(1,'Final   UTM coordinates of 4 corners, upper center, and Centroid of Okada2\n');
-%         for iiii=[1 2 3 4 7 10]
-%             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},Xcorners21(iiii),Ycorners21(iiii),Hcorners21(iiii));
-%         end
-%         fprintf(1,'Initial Lon Lat of 4 corners, upper center, Centroid of Okada2\n');
-%         for iiii=[1 2 3 4 7 10]
-%             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},LonCorners20(iiii),LatCorners20(iiii),Hcorners20(iiii));
-%         end
-%         fprintf(1,'Final   Lon Lat of 4 corners, upper center, Centroid of Okada2\n');
-%         for iiii=[1 2 3 4 7 10]
-%             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},LonCorners21(iiii),LatCorners21(iiii),Hcorners21(iiii));
-%         end
-%     end
+    %     % print corners of Okada models
+    %     iii=get_parameter_index('Okada1_Length_in_m______________',pnames);
+    %     if p0(iii) > 0
+    %         fprintf(1,'Initial UTM coordinates of 4 corners, upper center, and Centroid of Okada1\n');
+    %         for iiii=[1 2 3 4 7 10]
+    %             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},Xcorners10(iiii),Ycorners10(iiii),Hcorners10(iiii));
+    %         end
+    %         fprintf(1,'Final   UTM coordinates of 4 corners, upper center, and Centroid of Okada1\n');
+    %         for iiii=[1 2 3 4 7 10]
+    %             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},Xcorners11(iiii),Ycorners11(iiii),Hcorners11(iiii));
+    %         end
+    %         fprintf(1,'Initial Lon Lat of 4 corners, upper center, Centroid of Okada1\n');
+    %         for iiii=[1 2 3 4 7 10]
+    %             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},LonCorners10(iiii),LatCorners10(iiii),Hcorners10(iiii));
+    %         end
+    %         fprintf(1,'Final   Lon Lat of 4 corners, upper center, Centroid of Okada1\n');
+    %         for iiii=[1 2 3 4 7 10]
+    %             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},LonCorners11(iiii),LatCorners11(iiii),Hcorners11(iiii));
+    %         end
+    %     end
+    %     iii=get_parameter_index('Okada2_Length_in_m______________',pnames);
+    %     if p0(iii) > 0
+    %         fprintf(1,'Initial UTM coordinates of 4 corners, upper center, and Centroid of Okada2\n');
+    %         for iiii=[1 2 3 4 7 10]
+    %             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},Xcorners20(iiii),Ycorners20(iiii),Hcorners20(iiii));
+    %         end
+    %         fprintf(1,'Final   UTM coordinates of 4 corners, upper center, and Centroid of Okada2\n');
+    %         for iiii=[1 2 3 4 7 10]
+    %             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},Xcorners21(iiii),Ycorners21(iiii),Hcorners21(iiii));
+    %         end
+    %         fprintf(1,'Initial Lon Lat of 4 corners, upper center, Centroid of Okada2\n');
+    %         for iiii=[1 2 3 4 7 10]
+    %             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},LonCorners20(iiii),LatCorners20(iiii),Hcorners20(iiii));
+    %         end
+    %         fprintf(1,'Final   Lon Lat of 4 corners, upper center, Centroid of Okada2\n');
+    %         for iiii=[1 2 3 4 7 10]
+    %             fprintf(1,'%s %12.4f %12.4f %12.4f\n',Ncorners{iiii},LonCorners21(iiii),LatCorners21(iiii),Hcorners21(iiii));
+    %         end
+    %     end
     
     
     % do not open too many windows

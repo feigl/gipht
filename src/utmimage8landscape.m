@@ -203,27 +203,27 @@ if cbar == 1
     %hc=colorbar('Position',[x0+4*(dx+ddx) y0+ddy 0.015 2*dy-ddy],'YTickLabel',[]);
     hc=colorbar('Position',[x0+4*(dx+ddx) y0+0.05*dy 0.015 0.90*dy],'YTickLabel',[]);
     hc=colorbar('Position',[x0+4*(dx+ddx) y0+1.05*dy 0.015 0.90*dy],'YTickLabel',[]);
-    
-    % TODO 2022/02/26 make stretching work
-    if do_stretch
-        %colormap(hc,ctab);
-        
-        get(hc)
-        set(hc,'YTickLabel',[]);
-        drawnow;
-        hc.Label.String = datalabel;
-        
-        if numel(climits) > 2
-            ylimits = get(hc,'Ylim');
-            ystep = (ylimits(2)-ylimits(1))/(numel(climits)-1);
-            set(hc,'ytick',ylimits(1):ystep:ylimits(2));
-            yticks=get(hc,'ytick');
-            for i=1:numel(yticks)
-                ticklabels{i}=num2str(climits(i));
-            end
-            set(hc,'TickLabels',ticklabels);
-        end
-    end
+%     
+%     % TODO 2022/02/26 make stretching work
+%     if do_stretch
+%         %colormap(hc,ctab);
+%         
+%         get(hc)
+%         set(hc,'YTickLabel',[]);
+%         drawnow;
+%         hc.Label.String = datalabel;
+%         
+%         if numel(climits) > 2
+%             ylimits = get(hc,'Ylim');
+%             ystep = (ylimits(2)-ylimits(1))/(numel(climits)-1);
+%             set(hc,'ytick',ylimits(1):ystep:ylimits(2));
+%             yticks=get(hc,'ytick');
+%             for i=1:numel(yticks)
+%                 ticklabels{i}=num2str(climits(i));
+%             end
+%             set(hc,'TickLabels',ticklabels);
+%         end
+%     end
 end
 
 % Wasted a lot of time trying unsuccessfully to make all this stuff work

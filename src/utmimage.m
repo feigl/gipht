@@ -1,7 +1,7 @@
 function varargout = utmimage(pixarr,xutmmin,xutmmax,yutmmin,yutmmax...
    ,titlestr,cornerlabel,climits,dotx,doty,ctab,mysym,marksize...
-   ,drawxlabels,drawylabels,datelabel...
-   ,idatatype,datalabel,cbar,do_stretch)
+   ,drawxlabels,drawylabels,datelabel ...
+   ,idatatype, datalabel, cbar_pos, do_stretch)
 % function istat = utmimage(pixarr,xutmmin,xutmmax,yutmmin,yutmmax...
 %    ,titlestr,cornerlabel,climits,dotx,doty,ctab,mysym,marksize...
 %    ,drawxlabels,drawylabels,datelabel...
@@ -15,8 +15,10 @@ function varargout = utmimage(pixarr,xutmmin,xutmmax,yutmmin,yutmmax...
 istat = -1;
 Vstretch=nan(size(pixarr));
 
-if nargin < 8 || exist('climit','var') == 0 || exist('dotx','var') == 0 || exist('doty','var') == 0
-   climits  = [-0.5 0.5];
+if nargin < 8 || exist('climit','var') == 0
+    climits  = [-0.5 0.5];
+end
+if exist('dotx','var') == 0 || exist('doty','var') == 0  
    dotx = 0;
    doty = 0;
 end
@@ -41,8 +43,8 @@ end
 if nargin < 17 || exist('idatatype','var') == 0
    idatatype = 0; % wrapped phase is default
 end
-if nargin < 18 || exist('cbar','var') == 0
-   cbar = 0; % default is to NOT draw a colorbar
+if nargin < 18 || exist('cbar_pos','var') == 0
+   cbar_pos = 'none'; % default is to NOT draw a colorbar
 end
 if nargin < 19 || exist('do_stretch','var') == 0
    do_stretch = 0; % default is to NOT not stretch histogram
@@ -105,7 +107,8 @@ if do_stretch == 1
 %             climits(2) = nanmax(cuts);
 %         end
 %     end 
-    [H, Vstretch] = contourfnu2([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,'levels',climits,'cmap',ctab,'method','imagesc','pos_colorbar','none');
+    %[H, Vstretch] = contourfnu2([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,'levels',climits,'cmap',ctab,'method','imagesc','pos_colorbar','none');
+    [H, Vstretch] = contourfnu2([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,'levels',climits,'cmap',ctab,'method','imagesc','pos_colorbar',cbar_pos);
 else
     switch idatatype
         case 0 %% values are wrapped phase in cycles on [-0.5 to +0.5]
@@ -119,7 +122,7 @@ else
             imagesc([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,climits); %
         case 2 %% values are (unwrapped) range change in meters
             % use automatic scaling within limits
-            imagesc([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,climits);
+            imagesc([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,'AlphaData',~isnan(pixarr),climits);
         case 3 %% plot individual pixels as dots
             % assume that pixarr is actually an array with N rows and 3 columns
             E=colvec(pixarr(:,1)/1.e3);  % UTM easting in km
@@ -138,7 +141,8 @@ else
             
             if numel(climits) > 2
                 % stretch color table
-                [H, Vstretch] = contourfnu2(E,N,V,'levels',climits,'cmap',ctab,'method','scatter','symsize',circleSize,'symbol','s','pos_colorbar','none');
+                %[H, Vstretch] = contourfnu2(E,N,V,'levels',climits,'cmap',ctab,'method','scatter','symsize',circleSize,'symbol','s','pos_colorbar','none');
+                [H, Vstretch] = contourfnu2(E,N,V,'levels',climits,'cmap',ctab,'method','scatter','symsize',circleSize,'symbol','s','pos_colorbar',cbar_pos);
             else
                 % use automatic scaling within limits
                 scatter(E,N,circleSize,V,'filled'); % plot in km and mm
@@ -149,7 +153,8 @@ else
     end
 end
 
-hold on;
+hold on;  
+
 axis xy;
 % 20200205 try to fix aspect ratio
 axis equal;
@@ -157,6 +162,11 @@ axis tight;
 % 2021/06/22  % draw a frame around
 box on
 set(gca,'Clipping','on','LineWidth',1);
+
+% draw symbols
+if numel(dotx) > 0 && numel(doty) > 0
+    plot(dotx/1000.,doty/1000.,mysym,'MarkerSize',marksize);
+end
 
 if isa(ctab,'numeric')
     colormap(ctab)
