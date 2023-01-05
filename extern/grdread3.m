@@ -68,7 +68,9 @@ end
 
 [ndims,nvars,ngatts,unlimdimid] = netcdf.inq(ncid);
 
-
+nvars
+ngatts
+ndims
 switch nvars
     case 3                       % (v4) GMT netCDF grid file
         x=netcdf.getVar(ncid,0)';

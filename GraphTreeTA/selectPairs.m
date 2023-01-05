@@ -45,16 +45,16 @@ for iPair=1:numel(criteriaFieldNames)
                 % default is no filtering
                 CRITERIA.(criteriaFieldName1) = '';
             case 'dx'
-%                 typical values
-%                 dx = 100; % [m] pixel dimension for filtered array
-%                 dy = 100; % [m] pixel dimension for filtered array
-%                 default is no filtering
+                %                 typical values
+                %                 dx = 100; % [m] pixel dimension for filtered array
+                %                 dy = 100; % [m] pixel dimension for filtered array
+                %                 default is no filtering
                 CRITERIA.(criteriaFieldName1) = nan;
             case 'dy'
-%                 typical values
-%                 dx = 100; % [m] pixel dimension for filtered array
-%                 dy = 100; % [m] pixel dimension for filtered array
-%                 default is no filtering
+                %                 typical values
+                %                 dx = 100; % [m] pixel dimension for filtered array
+                %                 dy = 100; % [m] pixel dimension for filtered array
+                %                 default is no filtering
                 CRITERIA.(criteriaFieldName1) = nan;
             case 'fileNameEnding'
                 %fileNameEnding = 'phasefilt_mask_utm.grd'; % wrapped phase in radians GIPhT idatatype = 0
@@ -247,45 +247,47 @@ if nPairs ~= kount
 end
 
 %% filter
-if numel(CRITERIA.filter) > 0 ...
-        && isfinite(CRITERIA.dx) && CRITERIA.dx > 0. ...
-        && isfinite(CRITERIA.dy) && CRITERIA.dy > 0.
-    kount = 0;
-    iok1 = zeros(nPairs,1);
-    for iPair = 1:nPairs
-        fname1 = char(Tpairs.filename{iPair});
-        fname2 = strrep(fname1,'.grd','_filt.grd');
-        if exist(fname1,'file') == 2
-            kount = kount+1;
-            if exist(fname2,'file') == 0
-                fprintf(1,'Filtering file named fname1 = %s',fname1);
-                % filter
-                %                 dx = 100; % new pixel dimension [m]
-                %                 dy = 100; % new pixel dimension [m]
-                %commandLine = sprintf('gmt grdfilter -D0 -Fb%04.0f/%04.0f -I%04.0f/%04.0f %s -G%s\n'...
-                commandLine = sprintf('%s %s -G%s\n'...
-                    , CRITERIA.filter...
-                    ,fname1,fname2);
-                [status, result] = system(commandLine);
-                if status == 0
-                    Tpairs.filename{iPair} = fname2;
-                    iok1(iPair) = iPair;
-                    fprintf(1,' Filtered to make %s\n',fname2);
+if isfield(CRITERIA,'filter')
+    if numel(CRITERIA.filter) > 0 ...
+            && isfinite(CRITERIA.dx) && CRITERIA.dx > 0. ...
+            && isfinite(CRITERIA.dy) && CRITERIA.dy > 0.
+        kount = 0;
+        iok1 = zeros(nPairs,1);
+        for iPair = 1:nPairs
+            fname1 = char(Tpairs.filename{iPair});
+            fname2 = strrep(fname1,'.grd','_filt.grd');
+            if exist(fname1,'file') == 2
+                kount = kount+1;
+                if exist(fname2,'file') == 0
+                    fprintf(1,'Filtering file named fname1 = %s',fname1);
+                    % filter
+                    %                 dx = 100; % new pixel dimension [m]
+                    %                 dy = 100; % new pixel dimension [m]
+                    %commandLine = sprintf('gmt grdfilter -D0 -Fb%04.0f/%04.0f -I%04.0f/%04.0f %s -G%s\n'...
+                    commandLine = sprintf('%s %s -G%s\n'...
+                        , CRITERIA.filter...
+                        ,fname1,fname2);
+                    [status, result] = system(commandLine);
+                    if status == 0
+                        Tpairs.filename{iPair} = fname2;
+                        iok1(iPair) = iPair;
+                        fprintf(1,' Filtered to make %s\n',fname2);
+                    else
+                        commandLine
+                        status
+                        result
+                        fprintf(1,'Filter failed.\n');
+                    end
                 else
-                    commandLine
-                    status
-                    result
-                    fprintf(1,'Filter failed.\n');
+                    fprintf(1,'Using existing filtered file named %s.\n',fname2);
+                    iok1(iPair) = iPair;
+                    Tpairs.filename{iPair} = fname2;
                 end
-            else
-                fprintf(1,'Using existing filtered file named %s.\n',fname2);
-                iok1(iPair) = iPair;
-                Tpairs.filename{iPair} = fname2;
             end
         end
+        iok=find(iok1 > 0);
+        Tpairs = Tpairs(iok,:);
     end
-    iok=find(iok1 > 0);
-    Tpairs = Tpairs(iok,:);  
 end
 % check size
 [nPairs, ndummy] = size(Tpairs);
@@ -295,8 +297,8 @@ if nPairs ~= kount
     error(sprintf('miscount'));
 end
 
-    
- 
+
+
 
 %% Analyze graphs for several subsets of the data
 %dataSets = {'ALL','MSF'};

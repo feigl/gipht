@@ -194,7 +194,7 @@ cmapdraw(1:Ndraw,:)=cmap( round(linspace(1,Ncmap,Ndraw)) ,:);
 colormap(gca,cmapdraw);
 caxis([1,nlev]);
 if(~strcmp(pos_colorbar,'none'))
-    pos_colorbar
+    %pos_colorbar
     hc = colorbar('location',pos_colorbar);
     if(overticklabel)
         vlabel = v;
@@ -205,7 +205,7 @@ if(~strcmp(pos_colorbar,'none'))
         if(v(1)==-inf), vlabel(1) = {''}; end
         if(v(end)==inf), vlabel(end) = {''}; end
     end
-    vlabel
+    %vlabel
     set(hc,'TickLabels',vlabel);
     
 %     if(any(strcmp(pos_colorbar,{'eastoutside','westoutside','east','west'})))

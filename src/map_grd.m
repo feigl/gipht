@@ -47,22 +47,28 @@ end
 
 
 %% read input GMT grid file and its metadata
-[xe,ye,IMAGE] = grdread3(grdfilename);
-INFO = grdinfo3(grdfilename);
+[xe,ye,IMAGE] = grdread4(grdfilename);
+INFO = grdinfo4(grdfilename);
 
 %% if coordinates are in UTM meters, then plot in kilometers
-if    contains(INFO.xname,'meters') == 1 ...
-   || strcmp (INFO.yname,'m') == 1 ...
-   || strcmp (INFO.yname,'m') == 1 
-    lengthfact = 1.e3; % plot in km
-%     xlab = strrep(INFO.xname,'in meters','[km]');
-%     ylab = strrep(INFO.yname,'in meters','[km]');   
-    xlab = 'Easting [km]';
-    ylab = 'Northing [km]';   
+if isfield(INFO,'xname')
+    if    contains(INFO.xname,'meters') == 1 ...
+            || strcmp (INFO.yname,'m') == 1 ...
+            || strcmp (INFO.yname,'m') == 1
+        lengthfact = 1.e3; % plot in km
+        %     xlab = strrep(INFO.xname,'in meters','[km]');
+        %     ylab = strrep(INFO.yname,'in meters','[km]');
+        xlab = 'Easting [km]';
+        ylab = 'Northing [km]';
+    else
+        lengthfact = 1; % no scaling
+        xlab = INFO.xname;
+        ylab = INFO.yname;
+    end
 else
     lengthfact = 1; % no scaling
-    xlab = INFO.xname;
-    ylab = INFO.yname; 
+    xlab = 'Longitude [deg]';
+    ylab = 'Latitude [deg]';
 end
     
 

@@ -1,4 +1,4 @@
-function zi = griddata2(x,y,z,xi,yi,method)
+function zi = griddata2(x,y,z,xi,yi,interp_method,extrap_method)
 % replace old GRIDDATA with TriScatteredInterp
 %  GRIDDATA Data gridding and surface fitting.
 %
@@ -30,19 +30,39 @@ function zi = griddata2(x,y,z,xi,yi,method)
 %     data.
 %     If METHOD is [], then the default 'linear' method will be used.
 %
-% Options for method
+% Options for interp_method
 %             'natural'   Natural neighbor interpolation
 %             'linear'    Linear interpolation (default)
 %             'nearest'   Nearest neighbor interpolation
 %             'nearnat'   Nearest neighbor at edges, natural elsewhere
+% Options for extrap_method
+%             'natural'   Natural neighbor extrapolation
+%             'linear'    Linear interpolation 
+%             'none'      Do not extrapolate (default)
 
-if exist('method','var') ~= 1
-    method = 'linear'; % Natural neighbor interpolation
+% 2022/09/26 Kurt Feigl
+
+
+if exist('interp_method','var') == 1
+    if strcmpi(method,'v4') == 1
+        interp_method = 'natural'; % Natural neighbor interpolation
+    end
+else
+    interp_method = 'linear'; % Natural neighbor interpolation
 end
-if strcmpi(method,'v4') == 1
-    method = 'natural'; % Natural neighbor interpolation
+
+if exist('extrap_method','var') == 1
+    if strcmpi(method,'v4') == 1
+        extrap_method = 'natural'; % Natural neighbor interpolation
+    end
+else
+    extrap_method = 'none'; % default is not to extrapolate
 end
-fprintf(1,'Starting GRIDDATA2 with method = %s\n',method);
+
+
+    
+
+fprintf(1,'Starting GRIDDATA2 with interpolation method = %s and extrpolation method =%s\n',interp_method,extrap_method);
 t0 = tic;
 
 % make a grid
@@ -61,7 +81,7 @@ else
     return
 end
 
-if strcmpi(method,'nearnat') == 1
+if strcmpi(interp_method,'nearnat') == 1
     % construct interpolating function
     F1 = TriScatteredInterp(colvec(x),colvec(y),colvec(z),'natural');    
     F2 = TriScatteredInterp(colvec(x),colvec(y),colvec(z),'nearest'); 
@@ -76,9 +96,14 @@ if strcmpi(method,'nearnat') == 1
     i = rowvec((nrows-nedge+1:nrows)'*ones(1,ncols)); j = rowvec(meshgrid(1:ncols,1:nedge)); k = sub2ind([nrows,ncols],i,j); zi(k) = F2(xi(k),yi(k)); % bottom edge
     j = rowvec((1:nedge)'*ones(1,nrows));             i = rowvec(meshgrid(1:nrows,1:nedge)); k = sub2ind([nrows,ncols],i,j); zi(k) = F2(xi(k),yi(k)); % top edge
     j = rowvec((ncols-nedge+1:ncols)'*ones(1,nrows)); i = rowvec(meshgrid(1:nrows,1:nedge)); k = sub2ind([nrows,ncols],i,j); zi(k) = F2(xi(k),yi(k)); % bottom edge
-else    
+else 
+    % prune 
+    iok=find(~ismissing(x));
+    iok=intersect(iok,find(~ismissing(y)));
+    iok=intersect(iok,find(~ismissing(z)));
     % construct interpolating function
-    F = TriScatteredInterp(colvec(x),colvec(y),colvec(z),method);
+    %F = TriScatteredInterp(colvec(x(iok)),colvec(y(iok)),colvec(z(iok)),interp_method,extrap_method);
+    F = scatteredInterpolant(colvec(x(iok)),colvec(y(iok)),colvec(z(iok)),interp_method,extrap_method);
     
     % evaluate interpolating functions at locations
     zi =F(xi,yi);    

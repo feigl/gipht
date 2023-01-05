@@ -235,14 +235,14 @@ if verbose == 1
     fprintf(1,'Rank deficiency, including constraints %d\n',rd);
 end
 
-if verbose == 1
-    G
-    figure;
-    spy(G);
-    xlabel('column');ylabel('row');
-    title(sprintf('G matrix for %s has ndat = %d rows and mparams = %d columns'...
-        ,strrep(mfilename,'_',' '),ndat,mparams));
-end
+% if verbose == 1
+%     G
+%     figure;
+%     spy(G);
+%     xlabel('column');ylabel('row');
+%     title(sprintf('G matrix for %s has ndat = %d rows and mparams = %d columns'...
+%         ,strrep(mfilename,'_',' '),ndat,mparams));
+% end
 
 
 if rd > 0
