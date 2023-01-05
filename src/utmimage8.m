@@ -1,7 +1,8 @@
 function h1 = utmimage8(im1,im2,im3,im4,im5,im6,im7,im8...
-    ,tl1,tl2,tl3,tl4,tl5,tl6,tl7,tl8....
-    ,wesn,titlestr,climit,dotxutm,dotyutm,ctab,cbar,mysyms,marksizes...
-    ,idatatype,datalabel)
+    ,tl1,tl2,tl3,tl4,tl5,tl6,tl7,tl8 ....
+    ,wesn,titlestr,climit,dotxutm,dotyutm,ctab ...
+    ,cbar_pos,mysyms,marksizes ...
+    ,idatatype,datalabel,do_stretch)
 % function h1 = utmimage8(im1,im2,im3,im4,im5,im6,im7,im8...
 %                        ,tl1,tl2,tl3,tl4,tl5,tl6,tl7,tl8....
 %             ,wesn,titlestr,climit,dotxutm,dotyutm,ctab,cbar,mysyms,marksizes...
@@ -71,8 +72,6 @@ set(h1,'PaperSize',[8.5 11.0]);
 % 2021/06/22
 set(h1,'Position',[1 1 1000 1000*11.0/8.5]);
 
-
-
 %% parse levels and extrema
 switch idatatype
     case 0
@@ -87,14 +86,14 @@ switch idatatype
         else
             labb = sprintf('%+4.1f',climit(2));
         end
-        stretch = 0;
+        %do_stretch = 0;
     case -1
         labu = 'strain';
         zmin = nanmin(climit);
         zmax = nanmax(climit);
         labt = sprintf('%+5.1E',zmax);
         labb = sprintf('%+5.1E',zmin);
-        stretch = 0;
+        %do_stretch = 0;
     case {2,3}
         %labu = 'mm';
         labu = datalabel;
@@ -110,7 +109,7 @@ switch idatatype
             labt = sprintf('%+5.1E',zmax);
             labb = sprintf('%+5.1E',zmin);
         end
-        stretch = 1;
+        %do_stretch = 1;
     otherwise
         error(sprintf('unknown idatatype %d\n',idatatype));
 end
@@ -120,68 +119,79 @@ end
 colormap(ctab);
 
 % draw panels in smart order to see tick labels
-
 subplot('position',[0.325  0.775*rat  0.225 0.225*rat]*rs);%drawnow;
-utmimage(im5,xutmmin,xutmmax,yutmmin,yutmmax,tl5,'e',climit,dotxutm, dotyutm,ctab,mysyms{5},marksizes(5),0,0,'',idatatype,datalabel,cbar,stretch);
-title(tl5,'FontName','Helvetica','FontWeight','bold');
-if cbar ==1
-    ha=colorbar('Position',[0.550 0.775*rat 0.015 0.2250*rat]*rs,'YTickLabel',[]);
-    ha=text(1.1,1.1, datalabel,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor); 
-    ha=text(1.1,0.05,   labb,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);  
-    ha=text(1.1,0.95,   labt,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);  
-    ha=text(1.1,0.50,  'Obs',  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor...
-        ,'rotation',0,'HorizontalAlignment','Left','VerticalAlignment','Top','Color',labelcolor);  
+
+% draw a colorbar for panels on right column
+if do_stretch == 1
+    cbar_pos = 'EastOutside';
+else
+    cbar_pos = 'none';
 end
+
+utmimage(im5,xutmmin,xutmmax,yutmmin,yutmmax,tl5,'e',climit,dotxutm, dotyutm,ctab,mysyms{5},marksizes(5),0,0,'',idatatype,datalabel,cbar_pos,do_stretch);
+title(tl5,'FontName','Helvetica','FontWeight','bold');
+if do_stretch == 0
+    ha=colorbar('Position',[0.550 0.775*rat 0.015 0.2250*rat]*rs,'YTickLabel',[]);
+end
+ha=text(1.1,1.1, datalabel,'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+ha=text(1.1,0.05,   labb,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+ha=text(1.1,0.95,   labt,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+ha=text(1.1,0.50,  'Obs',  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor...
+    ,'rotation',0,'HorizontalAlignment','Left','VerticalAlignment','Top','Color',labelcolor);
 
 subplot('position',[0.325  0.550*rat  0.225 0.225*rat]*rs);%drawnow;
-utmimage(im6,xutmmin,xutmmax,yutmmin,yutmmax,tl6,'f',climit,dotxutm, dotyutm,ctab,mysyms{6},marksizes(6),0,0,'',idatatype,datalabel,cbar,stretch);
-if cbar ==1
+utmimage(im6,xutmmin,xutmmax,yutmmin,yutmmax,tl6,'f',climit,dotxutm, dotyutm,ctab,mysyms{6},marksizes(6),0,0,'',idatatype,datalabel,cbar_pos,do_stretch);
+if do_stretch == 0
     ha=colorbar('Position',[0.550 0.550*rat 0.015 0.2250*rat]*rs,'YTickLabel',[]);
-    ha=text(1.1,0.05,   labb,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);  
-    ha=text(1.1,0.95,   labt,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);  
-    ha=text(1.1,0.50,  'Mod',  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor...
-        ,'rotation',0,'HorizontalAlignment','Left','VerticalAlignment','Top','Color',labelcolor);  
 end
+ha=text(1.1,0.05,   labb,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+ha=text(1.1,0.95,   labt,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+ha=text(1.1,0.50,  'Mod',  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor...
+    ,'rotation',0,'HorizontalAlignment','Left','VerticalAlignment','Top','Color',labelcolor);
 
 subplot('position',[0.325  0.325*rat  0.225 0.225*rat]*rs);%drawnow;
-utmimage(im7,xutmmin,xutmmax,yutmmin,yutmmax,tl7,'g',climit,dotxutm, dotyutm,ctab,mysyms{7},marksizes(7),0,0,'',idatatype,datalabel,cbar,stretch);
-if cbar ==1
+utmimage(im7,xutmmin,xutmmax,yutmmin,yutmmax,tl7,'g',climit,dotxutm, dotyutm,ctab,mysyms{7},marksizes(7),0,0,'',idatatype,datalabel,cbar_pos,do_stretch);
+if do_stretch == 0
     ha=colorbar('Position',[0.550 0.325*rat 0.015 0.2250*rat]*rs,'YTickLabel',[]);
-    ha=text(1.1,0.05,   labb,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);  
-    ha=text(1.1,0.95,   labt,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);  
-    ha=text(1.1,0.50,  'Res',  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor...
-        ,'rotation',0,'HorizontalAlignment','Left','VerticalAlignment','Top','Color',labelcolor);  
 end
+ha=text(1.1,0.05,   labb,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+ha=text(1.1,0.95,   labt,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+ha=text(1.1,0.50,  'Res',  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor...
+    ,'rotation',0,'HorizontalAlignment','Left','VerticalAlignment','Top','Color',labelcolor);
 
 subplot('position',[0.325  0.1*rat  0.225 0.225*rat]*rs);%drawnow;
-utmimage(im8,xutmmin,xutmmax,yutmmin,yutmmax,tl8,'h',climit,dotxutm, dotyutm,ctab,mysyms{8},marksizes(8),0,0,'',idatatype,datalabel,cbar,stretch);
+utmimage(im8,xutmmin,xutmmax,yutmmin,yutmmax,tl8,'h',climit,dotxutm, dotyutm,ctab,mysyms{8},marksizes(8),0,0,'',idatatype,datalabel,cbar_pos,do_stretch);
 ha=text(+0.2,-0.03 , 'Easting (km)', 'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','rotation', 0,'HorizontalAlignment','Left','VerticalAlignment','Top');
 set(ha,'Color',labelcolor);  % 2011-JUL-04
-if cbar == 1
+if do_stretch == 0
     ha=colorbar('Position',[0.550 0.1*rat 0.015 0.2250*rat]*rs,'YTickLabel',[]);
-    ha=text(1.1,0.50,   '0' ,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);  
-    ha=text(1.1,0.95,   labt,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);  
-    ha=text(1.1,0.75,  'Dev',  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor...
-        ,'rotation',0,'HorizontalAlignment','Left','VerticalAlignment','Top','Color',labelcolor);  
 end
+ha=text(1.1,0.50,   '0' ,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+ha=text(1.1,0.95,   labt,  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor);
+ha=text(1.1,0.75,  'Dev',  'Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','Color',labelcolor...
+    ,'rotation',0,'HorizontalAlignment','Left','VerticalAlignment','Top','Color',labelcolor);
+
+subplot('position',[0.325  0.1*rat   0.225 0.225*rat]*rs);%drawnow;
+utmimage(im8,xutmmin,xutmmax,yutmmin,yutmmax,tl8,'h',climit,dotxutm, dotyutm,ctab,mysyms{8},marksizes(8),1,1,'',idatatype,datalabel,cbar_pos,do_stretch);
+
+% draw panels in left column
+%cbar_pos = 'none'; % do not draw color bars
 
 subplot('position',[0.1  0.775*rat   0.225 0.225*rat]*rs);%drawnow;
-utmimage(im1,xutmmin,xutmmax,yutmmin,yutmmax,tl1,'a',climit,dotxutm,dotyutm,ctab,mysyms{1},marksizes(1),0,0,'',idatatype,datalabel,cbar,stretch);
+utmimage(im1,xutmmin,xutmmax,yutmmin,yutmmax,tl1,'a',climit,dotxutm,dotyutm,ctab,mysyms{1},marksizes(1),0,0,'',idatatype,datalabel,cbar_pos,do_stretch);
 title(tl1,'FontName','Helvetica','FontWeight','bold');
 
 subplot('position',[0.1  0.550*rat   0.225 0.225*rat]*rs);%drawnow;
-utmimage(im2,xutmmin,xutmmax,yutmmin,yutmmax,tl2,'b',climit,dotxutm,dotyutm,ctab,mysyms{2},marksizes(2),0,0,'',idatatype,datalabel,cbar,stretch);
+utmimage(im2,xutmmin,xutmmax,yutmmin,yutmmax,tl2,'b',climit,dotxutm,dotyutm,ctab,mysyms{2},marksizes(2),0,0,'',idatatype,datalabel,cbar_pos,do_stretch);
 
 subplot('position',[0.1  0.325*rat   0.225 0.225*rat]*rs);%drawnow;
-utmimage(im3,xutmmin,xutmmax,yutmmin,yutmmax,tl3,'c',climit,dotxutm,dotyutm,ctab,mysyms{3},marksizes(3),0,0,'',idatatype,datalabel);
+utmimage(im3,xutmmin,xutmmax,yutmmin,yutmmax,tl3,'c',climit,dotxutm,dotyutm,ctab,mysyms{3},marksizes(3),0,0,'',idatatype,datalabel,cbar_pos,do_stretch);
 ha=text(-0.05,+0.225, 'Northing (km)','Units','normalized','Clipping','off','FontName','Helvetica','FontWeight','bold','rotation',90,'HorizontalAlignment','Left','VerticalAlignment','Bottom');
 set(ha,'Color',labelcolor);  % 2011-JUL-04
 
 subplot('position',[0.1  0.1*rat   0.225 0.225*rat]*rs);%drawnow;
-utmimage(im4,xutmmin,xutmmax,yutmmin,yutmmax,tl4,'d',climit,dotxutm, dotyutm,ctab,mysyms{4},marksizes(4),1,1,'',idatatype,datalabel,cbar,stretch);
+utmimage(im4,xutmmin,xutmmax,yutmmin,yutmmax,tl4,'d',climit,dotxutm, dotyutm,ctab,mysyms{4},marksizes(4),1,1,'',idatatype,datalabel,cbar_pos,do_stretch);
 
-subplot('position',[0.325  0.1*rat   0.225 0.225*rat]*rs);%drawnow;
-utmimage(im8,xutmmin,xutmmax,yutmmin,yutmmax,tl8,'h',climit,dotxutm, dotyutm,ctab,mysyms{8},marksizes(8),1,1,'',idatatype,datalabel,cbar,stretch);
 
 %% label with title at top
 %subplot('position',[0.1 1.0*rat 0.5 0.05*rat]*rs,'Units','normalized');%drawnow;

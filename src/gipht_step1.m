@@ -139,17 +139,20 @@ switch ndatatypes
         idatatype1 = 0;
         FACTIN = 1; % .grd file contains radians
         DNPC = 2 * pi;     
-        datalabel = '[cycles]';       
+        datalabel = '[cycles]'; 
+        do_stretch = 0;
     case -1 % east component of gradient
         idatatype1 = -1;
         FACTIN = 1; % grd file contains dimensionless strain
         DNPC = 1;
         datalabel = '[dimless]';
+        do_stretch = 0;
      case 2   % range change in meters after unwrapping
         idatatype1 = 2;
         FACTIN = 1.; % grd file contains meters
         DNPC = 1.0e-3;     
         datalabel = '[mm]';
+        do_stretch = 0;
     otherwise
         error(sprintf('unknown ndatatypes %d\n',ndatatypes));
 end
@@ -455,7 +458,7 @@ for i = 1:np
     fprintf(1,'Minimal values in meters         for xyzm %10.1f %10.1f %10.1f \n',min(xyzm(1,i1:i2)),min(xyzm(2,i1:i2)),min(xyzm(3,i1:i2)));
     fprintf(1,'Maximal values in meters         for xyzm %10.1f %10.1f %10.1f \n',max(xyzm(1,i1:i2)),max(xyzm(2,i1:i2)),max(xyzm(3,i1:i2)));
     fprintf(1,'Extremal values in raw           for grdd %12.4f %12.4f \n',min(colvec(grdd)),max(colvec(grdd)));
-    fprintf(1,'Extremal values in cycles        for phao %12.4f %12.4f \n',min(phao(i1:i2)/DNPC),max(phao(i1:i2)/DNPC));
+    fprintf(1,'Extremal values %s               for phao %12.4f %12.4f \n',datalabel,min(phao(i1:i2)/DNPC),max(phao(i1:i2)/DNPC));
     
     %% plot data as an image
     SYMS.x = colvec(xyzm(1,i1:i2));
