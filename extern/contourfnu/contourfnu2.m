@@ -149,12 +149,19 @@ if(isrow(v)), v = v'; end
 v = sort(v);
 % extendmin = datamin<v(1);
 % extendmax = datamax>v(end);
-if(datamin<v(1))
-    v = [-inf;v];
-end
-if(datamax>v(end))
-    v = [v;inf];
-end
+% if(datamin<v(1))
+%     v = [-inf;v];
+% end
+% if(datamax>v(end))
+%     v = [v;inf];
+% end
+
+% 2023/02/01 show actual values
+% v = [datamin;v];
+% v = [v;datamax];
+% v = sort(v);
+
+
 nlev = length(v);
 
 % piecewise linear mapping,  v -> 1:nlev,    data -> 1 to nlev
@@ -184,7 +191,9 @@ elseif(strcmp(method,'contour'))
 elseif(strcmp(method,'pcolor'))
     hout.h = pcolor(x,y,z);shading flat
 elseif(strcmp(method,'scatter'))
-    hout.h = scatter(x,y,symsize,z,symbol,'filled'); 
+    hout.h = scatter(x,y,symsize,z,symbol,'filled');
+else
+    [hout.c,hout.h] = contourf(x,y,z,1:nlev-1);
 end
 
 % set coordinates
@@ -205,8 +214,8 @@ if(~strcmp(pos_colorbar,'none'))
     hc = colorbar('location',pos_colorbar);
     vlabel = cellstr(num2str(v,tickfmt));
     if(overticklabel)
-        if(v(1)== -inf), vlabel(1)   = cellstr(num2str(datamin,'%+#.2f')); end
-        if(v(end)==inf), vlabel(end) = cellstr(num2str(datamax,'%+#.2f')); end
+        if(v(1)== -inf), vlabel(1)   = cellstr(num2str(datamin,tickfmt)); end
+        if(v(end)==inf), vlabel(end) = cellstr(num2str(datamax,tickfmt)); end
     else   
         if(v(1) ==-inf), vlabel(1)   = {''}; end
         if(v(end)==inf), vlabel(end) = {''}; end
@@ -227,11 +236,9 @@ if(~strcmp(pos_colorbar,'none'))
         set(hc.XLabel,{'String','Rotation','Position'},{labelstring,0,[0.5 -0.01]});
     end
 
-    %To add a text description along the colorbar, access the underlying text object using the Label property of the colorbar.
-    labelstring
-    %hc.Label.String=labelstring;
-    
+    %To add a text description along the colorbar, access the underlying text object using the Label property of the colorbar.    
     hout.hc = hc;
+    hout.hc.Label.String=labelstring;
 end
 
 % return graphics handle
