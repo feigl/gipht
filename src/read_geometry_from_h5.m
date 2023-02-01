@@ -75,7 +75,9 @@ for i=1:nDataSets
     clear A;
     fprintf(1,'Reading data set %s\n',name1)
     A = h5read(fname,sprintf('//%s',name1));
-    if ~isnumeric(A)
+    if isnumeric(A)
+        A = double(A);
+    else
         A = str2double(A);
     end
     ndim=ndims(A)

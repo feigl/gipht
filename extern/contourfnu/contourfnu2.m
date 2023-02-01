@@ -25,6 +25,7 @@ function varargout = contourfnu2(x,y,data,varargin)
 %                 .c     contour matrix (method='contourf')
 %                 .hc    colorbar handle (pos_colorbar~='none')
 % 2021/06/29 Kurt Feigl add patch
+% 2023/01/12 Kurt Feigl add overticklabel
 
 % function a = findArea(width,varargin)
 %    defaultHeight = 1;
@@ -89,17 +90,22 @@ addParameter(P,'ninterp',0);
 addParameter(P,'method','imagesc');
 addParameter(P,'pos_colorbar','eastoutside');
 addParameter(P,'labelstring','');
+addParameter(P,'overticklabel','');
+addParameter(P,'tickfmt','');
 parse(P,x,y,data,varargin{:});
 %P.Results
 
-if isfield(P.Results,'levels') ,v=P.Results.levels;        end
-if isfield(P.Results,'cmap')   ,cmap=P.Results.cmap;       end
-if isfield(P.Results,'symsize'),symsize=P.Results.symsize; end
-if isfield(P.Results,'symbol') ,symbol=P.Results.symbol;   end
-if isfield(P.Results,'ninterp'),ninterp=P.Results.ninterp; end
-if isfield(P.Results,'method'), method=P.Results.method;   end
-if isfield(P.Results,'labelstring'), labelstring=P.Results.labelstring;   end
-if isfield(P.Results,'pos_colorbar') ,pos_colorbar=P.Results.pos_colorbar;   end
+if isfield(P.Results,'levels') ,       v=P.Results.levels;                      end
+if isfield(P.Results,'cmap')   ,       cmap=P.Results.cmap;                     end
+if isfield(P.Results,'symsize'),       symsize=P.Results.symsize;               end
+if isfield(P.Results,'symbol') ,       symbol=P.Results.symbol;                 end
+if isfield(P.Results,'ninterp'),       ninterp=P.Results.ninterp;               end
+if isfield(P.Results,'method'),        method=P.Results.method;                 end
+if isfield(P.Results,'labelstring'),   labelstring=P.Results.labelstring;       end
+if isfield(P.Results,'pos_colorbar') , pos_colorbar=P.Results.pos_colorbar;     end
+if isfield(P.Results,'overticklabel'), overticklabel=P.Results.overticklabel;   end
+if isfield(P.Results,'tickfmt'),       tickfmt=P.Results.tickfmt;               end
+
 % method
 % ninterp
 % symsize
@@ -123,6 +129,7 @@ if(~exist('method','var')||isempty(method)),               method = 'imagesc';  
 if(~exist('ninterp','var')||isempty(ninterp)),             ninterp = 0;                      end
 if(~exist('symsize','var')||isempty(symsize)),             symsize = 1;                      end
 if(~exist('labelstring','var') || isempty(labelstring)),   labelstring = '';                 end
+if(~exist('tickfmt','var') || isempty(tickfmt)),            tickfmt = '%+#.2g';              end
 if(ninterp>0)
     data=interp2(data,ninterp);
     if( strcmp(method,'contourf')||strcmp(method,'contour')||strcmp(method,'pcolor') )
@@ -190,39 +197,40 @@ if(exist('nancolor','var')), set(gca,'color',nancolor); end
 % set colormap and colorbar
 Ncmap=size(cmap,1);
 Ndraw=nlev-1;
-cmapdraw(1:Ndraw,:)=cmap( round(linspace(1,Ncmap,Ndraw)) ,:);
+cmapdraw(1:Ndraw,:)=cmap(round(linspace(1,Ncmap,Ndraw)) ,:);
 colormap(gca,cmapdraw);
 caxis([1,nlev]);
 if(~strcmp(pos_colorbar,'none'))
     %pos_colorbar
     hc = colorbar('location',pos_colorbar);
+    vlabel = cellstr(num2str(v,tickfmt));
     if(overticklabel)
-        vlabel = v;
-        if(v(1)==-inf), vlabel(1) = datamin; end
-        if(v(end)==inf), vlabel(end) = datamax; end
-    else
-        vlabel = cellstr(num2str(v));
-        if(v(1)==-inf), vlabel(1) = {''}; end
+        if(v(1)== -inf), vlabel(1)   = cellstr(num2str(datamin,'%+#.2f')); end
+        if(v(end)==inf), vlabel(end) = cellstr(num2str(datamax,'%+#.2f')); end
+    else   
+        if(v(1) ==-inf), vlabel(1)   = {''}; end
         if(v(end)==inf), vlabel(end) = {''}; end
     end
-    %vlabel
     set(hc,'TickLabels',vlabel);
     
-%     if(any(strcmp(pos_colorbar,{'eastoutside','westoutside','east','west'})))
-%         ylimits = get(hc,'Ylim');
-%         ystep = (ylimits(2)-ylimits(1))/Ndraw;
-%         set(hc,'ytick',ylimits(1):ystep:ylimits(2))
-%         set(hc,'yticklabel',vlabel);
-%     elseif(any(strcmp(pos_colorbar,{'southoutside','northoutside','south','north'})))
-%         xlimits = get(hc,'Xlim');
-%         xstep = (xlimits(2)-xlimits(1))/Ndraw;
-%         set(hc,'xtick',xlimits(1):xstep:xlimits(2))
-%         set(hc,'xticklabel',vlabel);
-%     end
+    if(any(strcmp(pos_colorbar,{'eastoutside','westoutside','east','west'})))
+        ylimits = get(hc,'Ylim');
+        ystep = (ylimits(2)-ylimits(1))/Ndraw;
+        set(hc,'ytick',ylimits(1):ystep:ylimits(2))
+        set(hc,'yticklabel',vlabel);
+        set(hc.XLabel,{'String','Rotation','Position'},{labelstring,0,[0.5 1.01]});
+    elseif(any(strcmp(pos_colorbar,{'southoutside','northoutside','south','north'})))
+        xlimits = get(hc,'Xlim');
+        xstep = (xlimits(2)-xlimits(1))/Ndraw;
+        set(hc,'xtick',xlimits(1):xstep:xlimits(2))
+        set(hc,'xticklabel',vlabel);
+        set(hc.XLabel,{'String','Rotation','Position'},{labelstring,0,[0.5 -0.01]});
+    end
 
     %To add a text description along the colorbar, access the underlying text object using the Label property of the colorbar.
     labelstring
-    hc.Label.String=labelstring;
+    %hc.Label.String=labelstring;
+    
     hout.hc = hc;
 end
 
