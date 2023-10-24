@@ -724,7 +724,6 @@ switch ianneal
         %     documentation.
         % options for algorithm
         %options = optimoptions('fmincon','Display','Iter','Algorithm','interior-point'); % run interior-point algorithm
-        options = optimoptions('fmincon','Display','Iter','Algorithm','sqp'); % run sqp
         %funobj = 'funcoststdnres4'; % name of objective function
         objfun
         fh = str2func(objfun); % function handle

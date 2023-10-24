@@ -116,7 +116,9 @@ else
             % add 33 to center in middle of color bar.
             % image (sans "s") does not use automatic scaling
             %image([xutmmin xutmmax],[yutmmax yutmmin],floor(33+64*pixarr)); %
-            image([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,floor(33+64*pixarr)); %
+            %image([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,floor(33+64*pixarr)); %
+            % 2023/10/24
+            imagesc([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr); %
         case -1 %% values are gradients
             % use automatic scaling within limits
             imagesc([xutmmin xutmmax]/1000.,[yutmmax yutmmin]/1000.,pixarr,climits); %

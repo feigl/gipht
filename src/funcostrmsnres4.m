@@ -10,10 +10,16 @@ PST.p1 = colvec(p1);
 % field of residuals 
 resids = funcostsdiff(DST,PST,TST);
 
-iok = find(isfinite(resids)==1);
+iok = find(isfinite(resids));
+iok = intersect(iok,find(abs(DST.phasig)>0));
 
 % cost is root mean square of weighted residuals
 cost1=rms(resids(iok) ./ DST.phasig(iok));
+
+if ~isfinite(cost1)
+    warning("cost1 is not finite %f. Setting to 1.",cost1)
+    cost1 = 1
+end
 
 return;
 

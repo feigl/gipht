@@ -8,6 +8,7 @@ function [pfnames, mdate, imast, sdate, islav, hamb, ddays, t1, t2, idatatypes, 
 % [1xNcel, 1xNcel, Nx1dbl, 1xNcel, Nx1dbl, Nx1dbl, Nx1dbl, Nx1dbl, Nx1dbl] where N=#pairs
 % for use with DIAPASON DTOOLS
 % 20160524 handle file names from GMT5SAR
+% 2023/10/23 handle either kind of comment, with much hassle
 fprintf(1,'%s begins ...\n',mfilename);
 
 %% check to see that file exists
@@ -57,51 +58,56 @@ switch file_type
         %  ../intf/1992220_1993169/unwrap_mask_ll.grd   % unwrapped phase in radians
         
         % Read the arguments into a Cell Array
-%       CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','%');
-        CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','#'); % comment is hash "#"
+        %CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','%');
+        %CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle','#'); % comment is hash "#"
         %CDAT=textscan(fid,'%s %s %d %f %s','CommentStyle',{'#','%'});  % does not work
-        fclose(fid);
-        [nrows,ncols] = size(CDAT)
-        if ncols >= 5 && nrows > 0
-            yyyymmdd1    = CDAT{1};  % Master Date
-            yyyymmdd2    = CDAT{2};  % Slave Date
-            idatatypes   = CDAT{3};  % data type
-            mpercys      = CDAT{4};  % fringe spacing meters per cycle
-            names        = CDAT{5};  % fifth column of dat file is the grid file name
-            
-            np = nrows;
-            for i=1:np
-                str1 = char(yyyymmdd1(i));
-                str2 = char(yyyymmdd2(i));
-                y1 = str2num(str1(1:4));
-                y2 = str2num(str2(1:4));
-                m1 = str2num(str1(5:6));
-                m2 = str2num(str2(5:6));
-                d1 = str2num(str1(7:8));
-                d2 = str2num(str2(7:8));
-                
-                
-                %[y1,m1,d1] = yeardoy2yyyyymmdd(yyyy1,doy1);
-                %[y2,m2,d2] = yeardoy2yyyyymmdd(yyyy2,doy2);
-                % t1 = datetime(y1,m1,d1,'TimeZone','UTC');t1.Format = 'yyyy-MM-dd_HH:mm:SSSSSS [ZZZZ]'  ; % 24 hour clock
-                % t2 = datetime(y2,m2,d2,'TimeZone','UTC');t2.Format = 'yyyy-MM-dd_HH:mm:SSSSSS [ZZZZ]'  ; % 24 hour clock
-                t1(i) = datetime(y1,m1,d1,'TimeZone','UTC');t1.Format = 'yyyy-MM-dd'  ; % 24 hour clock
-                t2(i) = datetime(y2,m2,d2,'TimeZone','UTC');t2.Format = 'yyyy-MM-dd'  ; % 24 hour clock
-                                
-%                 % try to guess data type from file name
-%                 if numel(strfind(str1,'phasefilt')) > 0
-%                     idatatypes(i) = 0;
-%                 elseif numel(strfind(str1,'qgradx')) > 0
-%                     idatatypes(i) = -1;
-%                 elseif numel(strfind(str1,'unwrap_mask')) > 0
-%                     idatatypes(i) = 2;
-%                 else
-%                     errror(sprintf('cannot parse data type from file name %s\n',str1));
-%                 end
+        % fclose(fid);
+        % https://www.mathworks.com/matlabcentral/answers/180407-how-to-pass-multiple-comment-style-to-skip-the-header-of-a-text-file
+
+        kount=0;
+        tline = fgetl(fid)
+        %read lines until end of file is reached (tline empty) or not a comment
+        while tline ~= -1
+            %filepos = ftell(fid);
+            tline = fgetl(fid)
+
+            if tline ~= -1
+                if strncmp(tline,'#',1) == false && strncmp(tline,'%',1) == false
+                    %now use textscan, comments are already skipped
+                    CDAT = textscan(tline, '%s %s %d %f %s')
+
+                    [nrows,ncols] = size(CDAT)
+                    if ncols >= 5 && nrows > 0
+                        yyyymmdd1    = CDAT{1};  % Master Date
+                        yyyymmdd2    = CDAT{2};  % Slave Date
+                        idatatypes   = CDAT{3};  % data type
+                        mpercys      = CDAT{4};  % fringe spacing meters per cycle
+                        names        = CDAT{5};  % fifth column of dat file is the grid file name
+
+                        kount=kount+1;
+
+                        str1 = char(yyyymmdd1{1})
+                        str2 = char(yyyymmdd2{1})
+                        y1 = str2num(str1(1:4));
+                        y2 = str2num(str2(1:4));
+                        m1 = str2num(str1(5:6));
+                        m2 = str2num(str2(5:6));
+                        d1 = str2num(str1(7:8));
+                        d2 = str2num(str2(7:8));
+
+
+                        %[y1,m1,d1] = yeardoy2yyyyymmdd(yyyy1,doy1);
+                        %[y2,m2,d2] = yeardoy2yyyyymmdd(yyyy2,doy2);
+                        % t1 = datetime(y1,m1,d1,'TimeZone','UTC');t1.Format = 'yyyy-MM-dd_HH:mm:SSSSSS [ZZZZ]'  ; % 24 hour clock
+                        % t2 = datetime(y2,m2,d2,'TimeZone','UTC');t2.Format = 'yyyy-MM-dd_HH:mm:SSSSSS [ZZZZ]'  ; % 24 hour clock
+                        t1(kount) = datetime(y1,m1,d1,'TimeZone','UTC');t1.Format = 'yyyy-MM-dd'  ; % 24 hour clock
+                        t2(kount) = datetime(y2,m2,d2,'TimeZone','UTC');t2.Format = 'yyyy-MM-dd'  ; % 24 hour cloc
+                    end
+                end
             end
-        else
-            error(sprintf('miscount with file_type = %d',file_type))
         end
+        fclose(fid);
+        np=kount;
     otherwise
         error(sprintf('Unknown case: file_type is %d\n',file_type));
 end

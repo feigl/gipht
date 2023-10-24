@@ -10,7 +10,10 @@ uwm = feval(fitfun,DST,PST,TST);
 % residual 
 costs = DST.phaobs - uwm; 
 
-iok = find(isfinite(costs)==1);
+% replace non-finite values with observed values
+ibad = find(isfinite(costs)==false);
+costs(ibad)=DST.phaobs(ibad);
+
 
 return;
 

@@ -66,18 +66,46 @@ else
     ver9=false;
 end
 
+ver9 = false
 if ver9 == true
     %% new style
     INFO = ncinfo(file);
-    nvars=numel(INFO.Variables);
+    nvars=numel(INFO.Variables)
+ 
 
-    if INFO.Variables(1).Attributes(4).Name ==  'node_offset'
-       pixel=INFO.Variables(1).Attributes(4).Value;
-    else
-       fprintf(1,'Assuming grid-node registration.\n');
-       pixel=0;
-    end
     if nvars == 6
+        if INFO.Variables(1).Attributes(4).Name ==  'node_offset'
+           pixel=INFO.Variables(1).Attributes(4).Value;
+        else
+           fprintf(1,'Assuming grid-node registration.\n');
+           pixel=0;
+        end
+    
+        for i=1:nvars
+            name1=INFO.Variables(i).Name
+            val=ncread(file,name1);
+            switch name1
+                case {'z'}
+                    z=val;
+                case {'x_range'}
+                    x_range=val;
+                case {'y_range'}
+                    y_range=val;
+                case {'z_range'}
+                    z_range=val;
+                case {'spacing'}
+                    spacing=val;
+                    dx=spacing(1);
+                    dy=spacing(2);
+                case {'dimension'}
+                    dim=val;
+                    nx = dim(1);
+                    ny = dim(2);
+                otherwise
+                    warning(sprintf('Unknown variable %s',name1));
+            end
+        end
+    elseif nvars == 4
         for i=1:nvars
             name1=INFO.Variables(i).Name
             val=ncread(file,name1);
@@ -103,8 +131,9 @@ if ver9 == true
             end
         end
     else
-        error(sprintf('incorrect dimension %d',6));
+        error(sprintf('incorrect nvars %d',nvars));
     end
+    whos
    
     %% check sanity
     nz = numel(z);

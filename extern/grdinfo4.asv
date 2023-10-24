@@ -69,26 +69,35 @@ if ver9 == true
     fprintf(1,'Variables\n');
     II.Variables.Name
     nvars = numel(II.Variables)
+%     name1=II.Variables(1).Attributes(1).Value
+%     name2=II.Variables(2).Attributes(1).Value
+%     name3=II.Variables(3).Attributes(1).Value
+%     name4=II.Variables(4).Attributes(1).Value
 
     for j=1:nvars
         name1=II.Variables(j).Attributes.Name
         switch name1
             case 'units'
-                value1=II.Variables(j).Attributes.value;
+                value1=II.Variables(j).Attributes.value
             otherwise
-                value1=' ';
-        end
-        switch j
-            case 1
-                INFO.xname = value1;
-            case 2
-                INFO.yname = value1;   
-            case 3
-                INFO.zname = value1;
-            otherwise
-                warning("unknown variable %d %s",j,value1)
-        end
+                
     end
+%     if II.Variables(2).Attributes.Name == 'units'
+%         INFO.xname=II.Variables(2).Attributes.Value
+%     else
+%         INFO.xname=' ';
+%     end
+%     if II.Variables(3).Attributes.Name == 'units'
+%         INFO.yname=II.Variables(3).Attributes.Value
+%     else
+%         INFO.yname=' ';
+%     end
+%     if II.Variables(4).Attributes.Name == 'units'
+%         INFO.zname=II.Variables(4).Attributes.Value
+%     else
+%         INFO.zname=' ';
+%     end
+
 
 %     % peruse structure
 %     for i=1:nvars

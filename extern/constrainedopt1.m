@@ -1,4 +1,4 @@
-function [mhat,fval,model,energy,count]=constrainedopt1(FUN,bounds,OPTIONS,varargin)
+function [mhat,fval,model,energy,count]=constrainedopt1(OBJFUN,bounds,OPTIONS,FITFUN,DST,PST,TST)
 %function [mhat,fval,model,energy,count]=constrainedopt1(FUN,bounds,OPTIONS,varargin)
 %Constrained optimization tries to find a minimum to the function 'FUN'.
 %
@@ -68,6 +68,10 @@ if size(bounds,2)~=2
     error('Second argument must be an nx2 matrix of parameter bounds, where n is the number of parameters.');
 end
 
+
+whos
+
+
 %Check OPTIONS
 
 if isempty(OPTIONS)
@@ -118,7 +122,30 @@ beq = zeros(size(mhat));
 beq(ifixed) = mhat(ifixed);
 
 count = 0;
-cost0=feval(FUN,mhat,varargin{:})
+whos
+
+% whos FUN
+% FUN
+% nargins=numel(varargin)
+% varargin
+% 
+% for ii=1:nargins
+%     S1=varargin{ii}
+% end
+% 
+% cost0=feval(FUN,varargin{2:nargins})
+% cost0=feval(OBJFUN,DST,PST,TST)
+
+%% Try using an anonymous function with three arguments
+%https://www.mathworks.com/matlabcentral/answers/47591-passing-extra-params-to-fmincon-anonymous-function-vs-old-method
+%myfun = @(kSearch)funObj(kSearch,x0,ti,tP);
+%[kSearch,resnorm] = fmincon(myfun,kSearch,[],[],[],[],lb,ub,[],optionLSQ);
+OBJFUN
+
+objfun = @(dst,pst,tst) OBJFUN(DST,PST,TST)
+cost0 = objfun(DST,PST,TST)
+
+%% 
 lb = bounds(:,1);
 ub = bounds(:,2);
 
@@ -182,11 +209,58 @@ if numel(which('fmincon')) > 0
    % optoptions = optimset('Algorithm','interior-point','Display','Iter'); % run interior-point algorithm
   optoptions = optimset('Algorithm','sqp','Display','Iter'); % run interior-point algorithm
 
-    [mstar,fval,exitflag,output]=fmincon(FUN,mhat...
+%     [mstar,fval,exitflag,output]=fmincon(FUN,mhat...
+%         ,[],[],Aeq,beq,lb,ub...
+%         ,[],optoptions,varargin{:});
+%     [mstar,fval,exitflag,output]=fmincon(FUN,mhat...
+%         ,[],[],Aeq,beq,lb,ub...
+%         ,[],optoptions,varargin{2:nargins});
+
+%     To optimize for specific values of a1 and a2, first assign the values 
+%     to these two parameters. Then create two one-argument anonymous 
+%     functions that capture the values of a1 and a2, and call myfun and 
+%     mycon with two arguments. Finally, pass these anonymous functions to 
+%     fmincon:
+%  
+%          a1 = 2; a2 = 1.5; % define parameters first
+%          options = optimoptions('fmincon','Algorithm','interior-point'); % run interior-point algorithm
+%          x = fmincon(@(x) myfun(x,a1),[1;2],[],[],[],[],[],[],@(x) mycon(x,a2),options)
+
+% https://www.mathworks.com/matlabcentral/answers/363901-problem-defining-anonymous-functions-with-multiple-inputs
+% So you either need to give fmincon:
+% mu = fmincon( @(thetaest) f=@(thetaest,aest), ...
+% or:
+% mu = fmincon( @(x) f(x(1), x(2)), ...
+% or something similar so that it has a vector or array argument.
+% NOTE — This is UNTESTED CODE. It should work.
+% OBJFUN
+% objfunHandle = str2func(OBJFUN)
+% 
+%    [mstar,fval,exitflag,output]=fmincon(@(objfunHandle) objfunHandle(DST, PST, TST) ...
+%         ,mhat...
+%         ,[],[],Aeq,beq,lb,ub...
+%         ,[],optoptions);
+
+  
+%  FUNHANDLE = @(ARGLIST)EXPRESSION constructs an anonymous function and
+%      returns a handle to that function. The body of the function, to the 
+%      right of the parentheses, is a single MATLAB expression. ARGLIST is a
+%      comma-separated list of input arguments. Execute the function by
+%      calling it by means of the returned function handle, FUNHANDLE. For
+%      more information on anonymous functions, see "Types of Functions" in
+%      the MATLAB Programming documentation.
+ 
+    
+
+   [mstar,fval,exitflag,output]=fmincon(objfun ...
+        ,mhat...
         ,[],[],Aeq,beq,lb,ub...
-        ,[],optoptions,varargin{:});
+        ,[],optoptions);
+
+
     if exitflag == 1 || exitflag == 0
-        cost1=feval(FUN,mstar,varargin{:});
+        %cost1=feval(FUN,mstar,varargin{:});
+        cost1=NaN
         if cost1<cost0
             mhat = mstar;
             fval = cost1;

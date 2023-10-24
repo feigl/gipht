@@ -125,7 +125,9 @@ title(tstr,'Interpreter','None');
 
 %% make color bar
 c = colorbar;
-c.Label.String = INFO.zname;
+if isfield(INFO,'zname')
+    c.Label.String = INFO.zname;
+end
 h = gcf;
 
 return
