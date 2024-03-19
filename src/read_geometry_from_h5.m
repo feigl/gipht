@@ -144,7 +144,7 @@ for i=1:nDataSets
                     title(sprintf('%s\n%s epoch %d date %s',fname,name1,ii,'date'),'Interpreter','None');
                 end
             case {'longitude','latitude','azimuthAngle','height','incidenceAngle','slantRangeDistance','waterMask','velocity','velocityStd'}
-                 nf=nf+1;figure;
+                nf=nf+1;figure;
                 if isfield(GEOM,'lon_vec') && isfield(GEOM,'lat_vec')
                     imagesc(GEOM.lon_vec,GEOM.lat_vec,GEOM.(name1));
                     xlabel('longitude');
