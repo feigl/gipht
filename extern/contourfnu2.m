@@ -147,14 +147,14 @@ end
 
 if(isrow(v)), v = v'; end
 v = sort(v);
-% extendmin = datamin<v(1);
-% extendmax = datamax>v(end);
-% if(datamin<v(1))
-%     v = [-inf;v];
-% end
-% if(datamax>v(end))
-%     v = [v;inf];
-% end
+extendmin = datamin<v(1);
+extendmax = datamax>v(end);
+if(datamin<v(1))
+    v = [-inf;v];
+end
+if(datamax>v(end))
+    v = [v;inf];
+end
 
 % 2023/02/01 show actual values
 % v = [datamin;v];
@@ -238,7 +238,8 @@ if(~strcmp(pos_colorbar,'none'))
 
     %To add a text description along the colorbar, access the underlying text object using the Label property of the colorbar.    
     hout.hc = hc;
-    hout.hc.Label.String=labelstring;
+    %hout.hc.Label.String=labelstring;
+    xlabel(hc,labelstring,'units','normalized','Position', [0.5, 1.02]);
 end
 
 % return graphics handle

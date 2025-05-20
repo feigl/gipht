@@ -59,6 +59,8 @@ else
     ver9=false;
 end
 
+ver9
+
 if ver9 == true
     II=ncinfo(file)
 
@@ -71,10 +73,14 @@ if ver9 == true
     nvars = numel(II.Variables)
 
     for j=1:nvars
-        name1=II.Variables(j).Attributes.Name
+        %name1=II.Variables(j).Attributes.Name
+        S=II.Variables(j).Attributes;
+        name1=S.Name;
+        fprintf(1,'j = %1d name1 = %s\n',j,name1);
         switch name1
             case 'units'
-                value1=II.Variables(j).Attributes.value;
+                %value1=II.Variables(j).Attributes.Value;
+                value1=S.Value
             otherwise
                 value1=' ';
         end

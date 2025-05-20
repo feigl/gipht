@@ -46,9 +46,9 @@ else
 end
 
 
-%% read input GMT grid file and its metadata
-[xe,ye,IMAGE] = grdread4(grdfilename);
-INFO = grdinfo4(grdfilename);
+%% read input meta data from GMT grid file 
+INFO = grdinfo4(grdfilename)
+
 
 %% if coordinates are in UTM meters, then plot in kilometers
 if isfield(INFO,'xname')
@@ -71,6 +71,8 @@ else
     ylab = 'Latitude [deg]';
 end
     
+%% read input data from GMT grid file 
+[xe,ye,IMAGE] = grdread4(grdfilename);
 
 %% set up figure
 figure; hold on;

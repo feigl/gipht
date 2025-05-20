@@ -14,7 +14,7 @@ x = [x1; x2];
 g = [1*ones(length(x1), 1); 2*ones(length(x2), 1)];
 boxplot(x, g ...
     ,'BoxStyle','traditional' ...
-    ,'Labels',{label1, label2}...
+    ,'Labels',{sprintf('%s (n = %d)',label1,numel(x1)), sprintf('%s (n= %d)',label2,numel(x2))} ...
     ,'Whisker',1.5 ...
     ,'Jitter',0.5 ...
     ,'Notch','on' ...
@@ -56,7 +56,7 @@ legstr{end+1}='Whisker: 75th percentile + 1.5 * (interquartile range)';
 plot(nan,nan,'b-','LineWidth',1');
 legstr{end+1}='Top edge of blue box: 75th percentile.';
 q75 = quantile(x1,0.75)
-text(1.2,q75,sprintf(fmt,q75),'HorizontalAlignment','left' ,'VerticalAlignment','middle','FontSize',9); % 'BackgroundColor','w','Margin',1,'EdgeColor','b',
+text(.2,q75,sprintf(fmt,q75),'HorizontalAlignment','left' ,'VerticalAlignment','middle','FontSize',9); % 'BackgroundColor','w','Margin',1,'EdgeColor','b',
 q75 = quantile(x2,0.75)
 text(1.8,q75,sprintf(fmt,q75),'HorizontalAlignment','right','VerticalAlignment','middle','FontSize',9);
 
@@ -75,7 +75,7 @@ legstr{end+1}='Notch: 95% confidence interval for median = q_2 – 1.57(q_3 – 
 
 
 % median
-set(findobj(gca,'tag','Median'),'LineWidth',5)
+set(findobj(gca,'tag','Median'),'LineWidth',5);
 plot(nan,nan,'r-','LineWidth',5');
 legstr{end+1}='Central red mark: median. ';
 
@@ -94,7 +94,7 @@ text(1.2,q25,sprintf(fmt,q25),'HorizontalAlignment','left' ,'VerticalAlignment',
 q25 = quantile(x2,0.25)
 text(1.8,q25,sprintf(fmt,q25),'HorizontalAlignment','right','VerticalAlignment','middle','FontSize',9);
 
- lower whisker
+% lower whisker
 L=findobj(gca,'tag','Lower Whisker');
 set(L(1),'LineWidth',2,'LineStyle','-','Color','g');
 set(L(2),'LineWidth',2,'LineStyle','-','Color','g');

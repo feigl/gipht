@@ -41,6 +41,7 @@
  *  2019/12/28 Version 2.8  Kurt - Segmentation fault - cannot figure out why
  *  2019/12/29 Version 2.9  Kurt - 
  *  example ./pha2qls <inputfile.pha> xsize ysize [-o <outputfile>]
+*   2025/05/06 v. 2.9 Kurt try to eliminate warning messages
  */
 
 #include <stdlib.h>
@@ -109,9 +110,7 @@ void usage(){
     exit(-1);
 }
 
-int main(argc, argv)
-int argc;
-char **argv; {
+int main(int argc, char* argv[]) {
     long nw = 0; /* number of words written */
     long nr = 0; /* number of words read    */
     long maxpatch;
@@ -127,10 +126,13 @@ char **argv; {
     unsigned int iw, jn, ie, js;
     unsigned int level;
     quadtree_node top;
-    void heapSort();
-    char *strprefix();
-    char *strextension();
-    char *strreplace();
+    
+    /* 2024/05/06 define prototypes for functions to avoid error warnings like the following*/
+    /* a function declaration without a prototype is deprecated in all versions of C and is treated as a zero-parameter prototype in C2x */
+    void heapSort(unsigned char *, long);
+    char *strprefix(char *, char *, char *);
+    char *strextension(char *, char *);
+    char *strreplace(char *, char *, char *);
     
     pi = 4.0 * atan(1.0);
     pname = argv[0];
@@ -624,9 +626,10 @@ static quadtree_node
     signed char *applyramp(signed char *ic1, signed char *i1mod, signed char cmean, slopexy slopevector, long nrows, long ncols);
     signed short i2a, i2b, i2c;
     
-    void heapSort();
+    void heapSort(unsigned char *, long);
     signed short i2buf[6];
-    slopexy slopevector,slopevector1,slopevector2,slope1(),slope2(),slope3();
+    slopexy slopevector,slopevector1,slopevector2;
+    slopexy slope1(signed char *, long, long),slope2(signed char *, long, long),slope3(signed char *, long, long);
     
     double d2; /* temp */
     /* index values for columns, counting from left  */
@@ -1230,7 +1233,7 @@ void vector2_set(vector2 *v, unsigned int x, unsigned int y) {
 void heapSort(unsigned char numbers[], long array_size) {
     long i;
     unsigned char temp;
-    void siftDown();
+    void siftDown(unsigned char *, long , long );
     
     for (i = (array_size / 2)-1; i >= 0; i--)
         siftDown(numbers, i, array_size);

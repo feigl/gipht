@@ -7,6 +7,7 @@ function cmdstr = get_executable_name(srcname)
 exeext  = mexext;
 exename = strrep(srcname,ext,sprintf('.%s',exeext(4:end)))
 
+%exename = '/Users/feigl/gipht/pha2qls2/pha2qlsV29nowarnings.maci64'
 % if numel(getenv('GIPHT_HOME')) > 0
 %     cmdstr = strcat(getenv('GIPHT_HOME'),filesep,'src',filesep,exename);
 % else
