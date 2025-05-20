@@ -92,6 +92,7 @@ addParameter(P,'pos_colorbar','eastoutside');
 addParameter(P,'labelstring','');
 addParameter(P,'overticklabel','');
 addParameter(P,'tickfmt','');
+addParameter(P,'nancolor','');
 parse(P,x,y,data,varargin{:});
 %P.Results
 
@@ -105,6 +106,7 @@ if isfield(P.Results,'labelstring'),   labelstring=P.Results.labelstring;       
 if isfield(P.Results,'pos_colorbar') , pos_colorbar=P.Results.pos_colorbar;     end
 if isfield(P.Results,'overticklabel'), overticklabel=P.Results.overticklabel;   end
 if isfield(P.Results,'tickfmt'),       tickfmt=P.Results.tickfmt;               end
+if isfield(P.Results,'nancolor'),      nancolor=P.Results.nancolor;             end
 
 % method
 % ninterp
@@ -189,19 +191,24 @@ elseif(strcmp(method,'contourf'))
 elseif(strcmp(method,'contour'))
     [hout.c,hout.h] = contour(x,y,z,1:nlev-1);
 elseif(strcmp(method,'pcolor'))
-    hout.h = pcolor(x,y,z);shading flat
+    hout.h = pcolor(x,y,z);
+    shading flat
+%     shading interp;
+% %     % Set axis background color to gray, so it "shows through" at the missing % values
+% %     set(gca,'Color',[0.5 0.5 0.5])
 elseif(strcmp(method,'scatter'))
     hout.h = scatter(x,y,symsize,z,symbol,'filled');
 else
     [hout.c,hout.h] = contourf(x,y,z,1:nlev-1);
 end
+if(exist('nancolor','var')), set(gca,'color',nancolor); end
+    
 
 % set coordinates
 axis xy; 
 axis equal;
 axis tight;
 
-if(exist('nancolor','var')), set(gca,'color',nancolor); end
     
 % set colormap and colorbar
 Ncmap=size(cmap,1);
