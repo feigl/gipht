@@ -1,4 +1,4 @@
-function boxplot2(x1, x2, label1, label2, labely, title_string, fmt)
+function boxplot2(x1, x2, label1, label2, labely, title_string, fmt, drawLegend)
 % make a box plot of two random variables
 % https://www.mathworks.com/matlabcentral/answers/164929-how-to-do-a-boxplot-for-three-samples-of-different-sizes
 % 2023/01/16 Kurt Feigl
@@ -29,7 +29,7 @@ legstr{1}='Outlier';
 
 
 % extrema whiskers 
-% Multiplier for the maximum whisker length, specified as a positive
+% Multiplier for the maximum whisker length, specified as a positive30
 % numeric value. The maximum whisker length is the product of Whisker and
 % the interquartile range.
 % 
@@ -54,11 +54,11 @@ legstr{end+1}='Whisker: 75th percentile + 1.5 * (interquartile range)';
 
 % 75th percentile
 plot(nan,nan,'b-','LineWidth',1');
-legstr{end+1}='Top edge of blue box: 75th percentile.';
-q75 = quantile(x1,0.75)
-text(1.2,q75,sprintf(fmt,q75),'HorizontalAlignment','left' ,'VerticalAlignment','middle','FontSize',9); % 'BackgroundColor','w','Margin',1,'EdgeColor','b',
-q75 = quantile(x2,0.75)
-text(1.8,q75,sprintf(fmt,q75),'HorizontalAlignment','right','VerticalAlignment','middle','FontSize',9);
+legstr{end+1}='Top edge of blue box: 75th percentile (labelled)';
+q75 = quantile(x1,0.75);
+text(1.2,q75,sprintf(fmt,q75),'HorizontalAlignment','left' ,'VerticalAlignment','bottom','FontSize',9,'Rotation',+0); % 'BackgroundColor','w','Margin',1,'EdgeColor','b',
+q75 = quantile(x2,0.75);
+text(1.8,q75,sprintf(fmt,q75),'HorizontalAlignment','right','VerticalAlignment','bottom','FontSize',9,'Rotation',-0);
 
 % top notch
 %Two medians are significantly different at the 5% significance level if
@@ -88,13 +88,13 @@ legstr{end+1}='Notch: 95% confidence interval for median = q_2 + 1.57(q_3 – q_
 % 25th percentile
 set(findobj(gca,'tag','Box'),'LineWidth',1);
 plot(nan,nan,'b-','LineWidth',1');
-legstr{end+1}='Bottom edge of blue box: 25th percentile.';
-q25 = quantile(x1,0.25)
-text(1.2,q25,sprintf(fmt,q25),'HorizontalAlignment','left' ,'VerticalAlignment','middle','FontSize',9); %'BackgroundColor','w','Margin',1,'EdgeColor','b',
-q25 = quantile(x2,0.25)
-text(1.8,q25,sprintf(fmt,q25),'HorizontalAlignment','right','VerticalAlignment','middle','FontSize',9);
+legstr{end+1}='Bottom edge of blue box: 25th percentile (labelled)';
+q25 = quantile(x1,0.25);
+text(1.2,q25,sprintf(fmt,q25),'HorizontalAlignment','left' ,'VerticalAlignment','top','FontSize',9,'Rotation',-0); %'BackgroundColor','w','Margin',1,'EdgeColor','b',
+q25 = quantile(x2,0.25);
+text(1.8,q25,sprintf(fmt,q25),'HorizontalAlignment','right','VerticalAlignment','top','FontSize',9,'Rotation',+0);
 
- lower whisker
+% lower whisker
 L=findobj(gca,'tag','Lower Whisker');
 set(L(1),'LineWidth',2,'LineStyle','-','Color','g');
 set(L(2),'LineWidth',2,'LineStyle','-','Color','g');
@@ -112,11 +112,14 @@ legstr{end+1}='Outlier';
 
 % make the plot symmetric
 axis([0.8,2.2,-Inf,Inf]);
+axis fill
 
 % label
 ylabel(labely);
 title(title_string,'FontSize',12,'FontWeight','bold');
-legend(legstr,'FontName','Times','FontSize',12,'Location','SouthOutside');
+if drawLegend
+    legend(legstr,'FontName','Times','FontSize',12,'Location','SouthOutside');
+end
 
 return
 end

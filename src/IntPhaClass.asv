@@ -1,0 +1,20 @@
+%classdef IntPhaClass
+classdef IntPhaClass
+    % define a class for wrapped phase as a signed 1-byte integer
+    % -128 DN == -pi
+    % +127 DN == +pi
+
+    % https://www.mathworks.com/help/matlab/matlab_oop/create-a-simple-class.html
+
+   properties
+      Value {mustBeNumeric}
+   end
+   methods
+       function r = rad2int8(obj)
+         r = int8(256*round([obj.Value]/pi,2));
+      end
+      function r = arc(obj,a,b)
+         r = [obj.Value]*n;
+      end
+   end
+end

@@ -48,7 +48,10 @@ npatches = NaN;
 %     error(sprintf('Cannot find executable'));
 % end
 
-cmd1 = get_executable_name('pha2qls.c');
+%cmd1 = get_executable_name('pha2qls.c')
+cmd1 = get_executable_name('pha2qlsV29nowarnings.c')
+
+
 %cmd1 = get_executable_name(pha2qlsname)
 %cmd1 = '/Users/feigl/gipht/pha2qls2/pha2qls.maci64' ; % version 2.6
 %cmd1 = '/Users/feigl/gipht/pha2qls/pha2qls.maci64' ; % version 2.7

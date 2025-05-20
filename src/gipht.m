@@ -123,7 +123,7 @@ echo off all
 %splashtext = sprintf('%80s\n',help('gipht.m'));
 
 fprintf(1,'\n\nGeneral Inversion of Phase Technique (GIPhT)\n\n');
-versionnum = 3.0;
+versionnum = 3.1;
 D=dir(which('gipht'));
 versiondat = D.date;
 versionstr = sprintf('GIPhT Development version %.1f of %s'...
@@ -191,6 +191,8 @@ tstart = tic;
 %     handle Quadtree data in 14-column format from JPL
 % 2016 v. 3.0
 %     use GMT grid files projected into UTM for all input
+% 2024 v. 3.1
+%     clean up
 
 % initialize paths
 %giphtpath

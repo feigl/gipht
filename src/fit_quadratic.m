@@ -1,5 +1,5 @@
-function [pest, psig, tfit, ymod, ymodl, ymodu, mse] = fit_straight_line(time,yobs,ysig)
-%function [pest, psig, tfit, ymod, ymodl, ymodu, mse] = fit_straight_line(time,yobs,ysig)
+function [pest, psig, tfit, ymod, ymodl, ymodu, mse] = fit_quadratic(time,yobs,ysig)
+%function [pest, psig, tfit, ymod, ymodl, ymodu, mse] = fit_quadratic(time,yobs,ysig)
 % fit a straight line to data using weighted least squares
 % inputs:
 %     time [arbitrary units]
@@ -12,6 +12,8 @@ function [pest, psig, tfit, ymod, ymodl, ymodu, mse] = fit_straight_line(time,yo
 % 20141125 Kurt Feigl
 % 20220906 Kurt Feigl add help
 % 20240319 Kurt Feigl square sigmas to obtain variances
+% 20240814 Kurt Feigl handle times as date times
+% 20240903 
 
 % sanity check
 n = numel(time);
@@ -36,14 +38,28 @@ yobs = yobs(iok);
 ysig = ysig(iok);
 n = numel(iok);
 
-tmid = mean(tfit);
+if isdatetime(time)
+    tmid=tfit(1)+years((tfit(end)-tfit(1))/2);
+else
+    tmid = mean(tfit);
+end
 
 % build design matrix
-m = 2; % number of parameters
+m = 3; % number of parameters
 G = zeros(n,m);
-for i=1:n
-    j = 1; G(i,j) = 1.0;
-    j = 2; G(i,j) = tfit(i) - tmid;
+if isdatetime(tfit)
+    for i=1:n
+        j = 1; G(i,j) = 1.0;
+        j = 2; G(i,j) = years(tfit(i) - tmid);
+        j = 3; G(i,j) = (years(tfit(i) - tmid))^2;
+    end
+else
+    for i=1:n
+        j = 1; G(i,j) = 1.0;
+        j = 2; G(i,j) = tfit(i) - tmid;
+        j = 3; G(i,j) = (tfit(i) - tmid)^2;
+
+    end
 end
 
 % solve using least squares
