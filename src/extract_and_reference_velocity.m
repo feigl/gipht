@@ -1,7 +1,13 @@
-function [V2,tstring,iref,jref,kref,kok,V0] = extract_and_reference_velocity(AV,VGRD,SGRD,XGRD,YGRD,IGRD,UTMranges,iReferencePoint,Eref,Nref)
+function [V2,tstring,iref,jref,kref,kok,V0] = extract_and_reference_velocity(AV,VGRD,SGRD,XGRD,YGRD,IGRD,UTMranges,iReferencePoint,Eref,Nref,refRadius)
 %function V2 = extract_and_reference_velocity(DV,AV,UTMranges)
 % 2024/09/28 Kurt Feigl
 % 2025/04/10 added UTM E,N for reference pixel
+% 2025/06/12 add radius
+
+narginchk(10,11);
+if nargin == 10
+    refRadius=1000; % "half-width of square containing reference pixels
+end
 
 kilo=1000;
 % use logicals to find pixels within bounds
@@ -13,8 +19,8 @@ kok=and(iok,jok);
 kok=and(kok,isfinite(VGRD));
 
 % subset pixels with SNR > 2
+whos *GRD
 if isfinite(SGRD) == true
-   whos *GRD
    kok=and(kok,isfinite(VGRD));
    kok=and(kok,(abs(VGRD ./ SGRD) > 2.));
 else
@@ -23,13 +29,27 @@ end
 
 %iReferencePoint=3
 switch iReferencePoint
+      case 0
+        % use overall median
+        iref=and(isfinite(VGRD),isfinite(XGRD));
+        jref=and(isfinite(VGRD),isfinite(YGRD));
+        kref=and(jref,iref);
+        V0=median(VGRD(kref),'all','omitnan');
+        tstring = sprintf('w.r.t. overall median');
     case 1
-        if isfinite(VGRD(AV.REF_X,AV.REF_Y))
-            tstring = sprintf('w.r.t. most coherent pixel');
-            V0=VGRD(AV.REF_X,AV.REF_Y);
-            kref=sub2ind(size(VGRD),AV.REF_X,AV.REF_Y);
+        if isfinite(AV.REF_X) && AV.REF_X <= size(VGRD,1) && isfinite(AV.REF_Y) && AV.REF_Y <= size(VGRD,2)
+            if isfinite(VGRD(AV.REF_X,AV.REF_Y))
+                tstring = sprintf('w.r.t. most coherent pixel');
+                V0=VGRD(AV.REF_X,AV.REF_Y);
+                kref=sub2ind(size(VGRD),AV.REF_X,AV.REF_Y);
+            else
+                warning("velocity at most coherent pixel is NaN")
+                V0=zeros(size(VGRD));
+                tstring = sprintf('from MintPy');
+                [~,kref]=find(isfinite(VGRD), 1 );
+            end
         else
-            warning("velocity at most coherent pixel is NaN")
+            warning("most coherent pixel is outside of AOI")
             V0=zeros(size(VGRD));
             tstring = sprintf('from MintPy');
             [~,kref]=find(isfinite(VGRD), 1 );
@@ -42,29 +62,36 @@ switch iReferencePoint
         tstring = sprintf('w.r.t. pixel with minimum std dev');
     case 3
         % use logicals for SW corner
-        iref=and((XGRD - UTMranges(1) <= 2000), (XGRD - UTMranges(1) >0));
-        jref=and((YGRD - UTMranges(3) <= 2000), (YGRD - UTMranges(3) >0));
+        iref=and((XGRD - UTMranges(1) <= 2*refRadius), (XGRD - UTMranges(1) >0));
+        jref=and((YGRD - UTMranges(3) <= 2*refRadius), (YGRD - UTMranges(3) >0));
         kref=and(jref,iref);
         V0=median(VGRD(kref),'all','omitnan');
         tstring = sprintf('w.r.t. median SW corner' );
     case 4
         % use logicals for area around reference
-        iref=and(iok,(abs(XGRD - Eref) <= 1000));
-        jref=and(jok,(abs(YGRD - Nref) <= 1000));
+        iref=and(iok,(abs(XGRD - Eref) <= refRadius));
+        jref=and(jok,(abs(YGRD - Nref) <= refRadius));
         kref=and(jref,iref);
         V0=median(VGRD(kref),'all','omitnan');
         tstring = sprintf('w.r.t. median square at (E,N) =(%.3f %.3f) [km]',Eref/kilo,Nref/kilo);
    case 5
         % use logicals for NW corner
-        iref=and((XGRD - UTMranges(1) <= 2000), (XGRD - UTMranges(1) >     0));
-        jref=and((YGRD - UTMranges(4) <=   0),  (YGRD - UTMranges(4) >= -2000));
+        iref=and((XGRD - UTMranges(1) <= 2*refRadius),  (XGRD - UTMranges(1) >     0));
+        jref=and((YGRD - UTMranges(4) <=        0),  (YGRD - UTMranges(4) >= -2*refRadius));
         kref=and(jref,iref);
         V0=median(VGRD(kref),'all','omitnan');
         tstring = sprintf('w.r.t. SW corner' );
    case 6
         % use logicals for NE corner
-        iref=and((XGRD - UTMranges(2) <=   0),  (XGRD - UTMranges(2) >= -2000));
-        jref=and((YGRD - UTMranges(4) <=   0),  (YGRD - UTMranges(4) >= -2000));
+        iref=and((XGRD - UTMranges(2) <=   0),  (XGRD - UTMranges(2) >= -2*refRadius));
+        jref=and((YGRD - UTMranges(4) <=   0),  (YGRD - UTMranges(4) >= -2*refRadius));
+        kref=and(jref,iref);
+        V0=median(VGRD(kref),'all','omitnan');
+        tstring = sprintf('w.r.t. NE corner' );
+   case 7
+        % use logicals for SE corner
+        iref=and((XGRD - UTMranges(2) <=    0),     (XGRD - UTMranges(2) >= -2*refRadius));
+        jref=and((YGRD - UTMranges(3) <= 2*refRadius), (YGRD - UTMranges(3) >          0));
         kref=and(jref,iref);
         V0=median(VGRD(kref),'all','omitnan');
         tstring = sprintf('w.r.t. NE corner' );
@@ -72,7 +99,7 @@ otherwise
         error('unknown iReferencePoint %d',iReferencePoint)
 end
 
-
+whos *GRD
 V2=double((VGRD - V0) ./ cosd(IGRD));
 
 kok=and(kok,isfinite(kok));

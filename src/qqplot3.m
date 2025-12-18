@@ -191,7 +191,6 @@ else
 end
 
 
-
 %% now make histogram
 % st = struct with fields:
 %     chi2stat: 2.5550
@@ -251,8 +250,6 @@ ylabel(sprintf('observed values'));
 
 title(strcat('QQ plot for ',titlestr));
 h(1) = gcf;
-
-return
 
 %% draw histogram
 figure;hold on;

@@ -7,13 +7,13 @@ function [pest, psig, tfit, ymod, ymodl, ymodu, mse] = fit_quadratic(time,yobs,y
 %     ysig [arbitrary units]
 % output:
 %     pest: estimated values of parameters coeficients (intercept and slope
-%     psig: corresponding uncertainties 
+%     psig: corresponding uncertainties
 %     mse: mean squared error
 % 20141125 Kurt Feigl
 % 20220906 Kurt Feigl add help
 % 20240319 Kurt Feigl square sigmas to obtain variances
 % 20240814 Kurt Feigl handle times as date times
-% 20240903 
+% 20240903
 
 % sanity check
 n = numel(time);
@@ -38,44 +38,60 @@ yobs = yobs(iok);
 ysig = ysig(iok);
 n = numel(iok);
 
-if isdatetime(time)
-    tmid=tfit(1)+years((tfit(end)-tfit(1))/2);
+if n > 4
+    if isdatetime(time)
+        %tmid=tfit(1)+years((tfit(end)-tfit(1))/2);
+        % 20251216 do not assume data are sorted
+        tmid=min(tfit)+years((max(tfit)-min(tfit))/2);
+    else
+        tmid = mean(tfit);
+    end
+
+    % build design matrix
+    m = 3; % number of parameters
+    G = zeros(n,m);
+    if isdatetime(tfit)
+        for i=1:n
+            j = 1; G(i,j) = 1.0;
+            j = 2; G(i,j) = years(tfit(i) - tmid);
+            j = 3; G(i,j) = (years(tfit(i) - tmid))^2;
+        end
+    else
+        for i=1:n
+            j = 1; G(i,j) = 1.0;
+            j = 2; G(i,j) = tfit(i) - tmid;
+            j = 3; G(i,j) = (tfit(i) - tmid)^2;
+
+        end
+    end
+
+    % solve using least squares
+    %[pest, psig, mse] = lscov(G, yobs, diag(ysig));
+    % 20240319 Kurt Feigl square sigmas to obtain variances
+    [pest, psig, mse] = lscov(G, yobs, diag(ysig .^2 ));
+
+    % calculate modeled values
+    ymod = G * pest;
+
+    % lower bounding envelope
+    ymodl = G * (pest - psig);
+
+    % upper bounding envelope
+    ymodu = G * (pest + psig);
+
+
 else
-    tmid = mean(tfit);
+    warning('Not enough good points!')
+    pest  = nan;
+    psig  = nan;
+    ymod  = nan(size(tfit));
+    ymodl = nan(size(tfit));
+    ymodu = nan(size(tfit));
+    mse = nan;
+
 end
 
-% build design matrix
-m = 3; % number of parameters
-G = zeros(n,m);
-if isdatetime(tfit)
-    for i=1:n
-        j = 1; G(i,j) = 1.0;
-        j = 2; G(i,j) = years(tfit(i) - tmid);
-        j = 3; G(i,j) = (years(tfit(i) - tmid))^2;
-    end
-else
-    for i=1:n
-        j = 1; G(i,j) = 1.0;
-        j = 2; G(i,j) = tfit(i) - tmid;
-        j = 3; G(i,j) = (tfit(i) - tmid)^2;
 
-    end
-end
-
-% solve using least squares
-%[pest, psig, mse] = lscov(G, yobs, diag(ysig));
-% 20240319 Kurt Feigl square sigmas to obtain variances
-[pest, psig, mse] = lscov(G, yobs, diag(ysig .^2 ));
-
-% calculate modeled values
-ymod = G * pest;
-
-% lower bounding envelope
-ymodl = G * (pest - psig);
-
-% upper bounding envelope
-ymodu = G * (pest + psig);
-       
 return
 end
 

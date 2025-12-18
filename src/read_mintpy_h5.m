@@ -89,7 +89,7 @@ for i=1:ndatasets
                 fprintf(1,'number of Y coordinates = %d\n',numel(DATA.vecY));
                 % 2025/04/14
                 [DATA.XGRD,DATA.YGRD]=meshgrid(DATA.vecX,DATA.vecY);
-                [nr_grd,nc_grd] = size(DATA.XGRD);
+                [nr_grd,nc_grd] = size(DATA.XGRD)
                 if nr_grd ~= nr_dat
                     nr_dat
                     nr_grd
