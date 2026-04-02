@@ -1,0 +1,105 @@
+ver -support
+-----------------------------------------------------------------------------------------
+MATLAB Version: 24.2.0.3070828 (R2024b) Update 7
+MATLAB License Number: 678095
+Operating System: macOS  Version: 26.3.1 Build: 25D2128 
+Java Version: Java 11.0.30+7-LTS with Amazon.com Inc. OpenJDK 64-Bit Server VM mixed mode
+-----------------------------------------------------------------------------------------
+MATLAB                                                Version 24.2        (R2024b)      License 678095
+Simulink                                              Version 24.2        (R2024b)      License 678095
+5G Toolbox                                            Version 24.2        (R2024b)      License 678095
+AUTOSAR Blockset                                      Version 24.2        (R2024b)      License 678095
+Aerospace Blockset                                    Version 24.2        (R2024b)      License 678095
+Aerospace Toolbox                                     Version 24.2        (R2024b)      License 678095
+Antenna Toolbox                                       Version 24.2        (R2024b)      License 678095
+Audio Toolbox                                         Version 24.2        (R2024b)      License 678095
+Automated Driving Toolbox                             Version 24.2        (R2024b)      License 678095
+Bioinformatics Toolbox                                Version 24.2        (R2024b)      License 678095
+Bluetooth Toolbox                                     Version 24.2        (R2024b)      License 678095
+Communications Toolbox                                Version 24.2        (R2024b)      License 678095
+Computer Vision Toolbox                               Version 24.2        (R2024b)      License 678095
+Control System Toolbox                                Version 24.2        (R2024b)      License 678095
+Curve Fitting Toolbox                                 Version 24.2        (R2024b)      License 678095
+DDS Blockset                                          Version 24.2        (R2024b)      License 678095
+DSP HDL Toolbox                                       Version 24.2        (R2024b)      License 678095
+DSP System Toolbox                                    Version 24.2        (R2024b)      License 678095
+Database Toolbox                                      Version 24.2        (R2024b)      License 678095
+Datafeed Toolbox                                      Version 24.2        (R2024b)      License 678095
+Deep Learning Toolbox                                 Version 24.2        (R2024b)      License 678095
+Econometrics Toolbox                                  Version 24.2        (R2024b)      License 678095
+Embedded Coder                                        Version 24.2        (R2024b)      License 678095
+Financial Instruments Toolbox                         Version 24.2        (R2024b)      License 678095
+Financial Toolbox                                     Version 24.2        (R2024b)      License 678095
+Fixed-Point Designer                                  Version 24.2        (R2024b)      License 678095
+Fuzzy Logic Toolbox                                   Version 24.2        (R2024b)      License 678095
+Global Optimization Toolbox                           Version 24.2        (R2024b)      License 678095
+HDL Coder                                             Version 24.2        (R2024b)      License 678095
+Image Acquisition Toolbox                             Version 24.2        (R2024b)      License 678095
+Image Processing Toolbox                              Version 24.2        (R2024b)      License 678095
+Industrial Communication Toolbox                      Version 24.2        (R2024b)      License 678095
+Instrument Control Toolbox                            Version 24.2        (R2024b)      License 678095
+LTE Toolbox                                           Version 24.2        (R2024b)      License 678095
+Lidar Toolbox                                         Version 24.2        (R2024b)      License 678095
+MATLAB Coder                                          Version 24.2        (R2024b)      License 678095
+MATLAB Compiler                                       Version 24.2        (R2024b)      License 678095
+MATLAB Compiler SDK                                   Version 24.2        (R2024b)      License 678095
+MATLAB Report Generator                               Version 24.2        (R2024b)      License 678095
+MATLAB Test                                           Version 24.2        (R2024b)      License 678095
+Mapping Toolbox                                       Version 24.2        (R2024b)      License 678095
+Medical Imaging Toolbox                               Version 24.2        (R2024b)      License 678095
+Mixed-Signal Blockset                                 Version 24.2        (R2024b)      License 678095
+Model Predictive Control Toolbox                      Version 24.2        (R2024b)      License 678095
+Motor Control Blockset                                Version 24.2        (R2024b)      License 678095
+Navigation Toolbox                                    Version 24.2        (R2024b)      License 678095
+Optimization Toolbox                                  Version 24.2        (R2024b)      License 678095
+Parallel Computing Toolbox                            Version 24.2        (R2024b)      License 678095
+Partial Differential Equation Toolbox                 Version 24.2        (R2024b)      License 678095
+Phased Array System Toolbox                           Version 24.2        (R2024b)      License 678095
+Powertrain Blockset                                   Version 24.2        (R2024b)      License 678095
+Predictive Maintenance Toolbox                        Version 24.2        (R2024b)      License 678095
+RF Blockset                                           Version 24.2        (R2024b)      License 678095
+RF PCB Toolbox                                        Version 24.2        (R2024b)      License 678095
+RF Toolbox                                            Version 24.2        (R2024b)      License 678095
+ROS Toolbox                                           Version 24.2        (R2024b)      License 678095
+Radar Toolbox                                         Version 24.2        (R2024b)      License 678095
+Reinforcement Learning Toolbox                        Version 24.2        (R2024b)      License 678095
+Requirements Toolbox                                  Version 24.2        (R2024b)      License 678095
+Risk Management Toolbox                               Version 24.2        (R2024b)      License 678095
+Robotics System Toolbox                               Version 24.2        (R2024b)      License 678095
+Robust Control Toolbox                                Version 24.2        (R2024b)      License 678095
+Satellite Communications Toolbox                      Version 24.2        (R2024b)      License 678095
+Sensor Fusion and Tracking Toolbox                    Version 24.2        (R2024b)      License 678095
+SerDes Toolbox                                        Version 24.2        (R2024b)      License 678095
+Signal Processing Toolbox                             Version 24.2        (R2024b)      License 678095
+SimBiology                                            Version 24.2        (R2024b)      License 678095
+SimEvents                                             Version 24.2        (R2024b)      License 678095
+Simscape                                              Version 24.2        (R2024b)      License 678095
+Simscape Battery                                      Version 24.2        (R2024b)      License 678095
+Simscape Driveline                                    Version 24.2        (R2024b)      License 678095
+Simscape Electrical                                   Version 24.2        (R2024b)      License 678095
+Simscape Fluids                                       Version 24.2        (R2024b)      License 678095
+Simscape Multibody                                    Version 24.2        (R2024b)      License 678095
+Simulink 3D Animation                                 Version 24.2        (R2024b)      License 678095
+Simulink Check                                        Version 24.2        (R2024b)      License 678095
+Simulink Coder                                        Version 24.2        (R2024b)      License 678095
+Simulink Compiler                                     Version 24.2        (R2024b)      License 678095
+Simulink Control Design                               Version 24.2        (R2024b)      License 678095
+Simulink Coverage                                     Version 24.2        (R2024b)      License 678095
+Simulink Design Optimization                          Version 24.2        (R2024b)      License 678095
+Simulink Design Verifier                              Version 24.2        (R2024b)      License 678095
+Simulink Fault Analyzer                               Version 24.2        (R2024b)      License 678095
+Simulink PLC Coder                                    Version 24.2        (R2024b)      License 678095
+Simulink Report Generator                             Version 24.2        (R2024b)      License 678095
+Simulink Test                                         Version 24.2        (R2024b)      License 678095
+Stateflow                                             Version 24.2        (R2024b)      License 678095
+Statistics and Machine Learning Toolbox               Version 24.2        (R2024b)      License 678095
+Symbolic Math Toolbox                                 Version 24.2        (R2024b)      License 678095
+System Composer                                       Version 24.2        (R2024b)      License 678095
+System Identification Toolbox                         Version 24.2        (R2024b)      License 678095
+Text Analytics Toolbox                                Version 24.2        (R2024b)      License 678095
+UAV Toolbox                                           Version 24.2        (R2024b)      License 678095
+Vehicle Dynamics Blockset                             Version 24.2        (R2024b)      License 678095
+WLAN Toolbox                                          Version 24.2        (R2024b)      License 678095
+Wavelet Toolbox                                       Version 24.2        (R2024b)      License 678095
+Wireless HDL Toolbox                                  Version 24.2        (R2024b)      License 678095
+Wireless Testbench                                    Version 24.2        (R2024b)      License 678095
